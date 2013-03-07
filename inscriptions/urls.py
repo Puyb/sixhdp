@@ -8,5 +8,6 @@ urlpatterns = patterns('inscriptions.views',
     (r'^(?P<id>\d+)/(?P<code>\w+)/$', 'form', {}, 'inscriptions.edit'),
     (r'^$', 'form', {}, 'inscriptions.create'),
     (r'^ipn/$', 'ipn', {}, 'inscriptions.ipn'),
+    (r'^check_name/$', 'check_name', {}, 'inscriptions.check_name'),
 
 )

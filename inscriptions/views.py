@@ -169,3 +169,6 @@ def confirm_ipn_data(data, PP_URL):
 
     return True
 
+@csrf_exempt
+def check_name(request):
+    return HttpResponse(Equipe.objects.filter(nom__iexact=request.POST['nom']).count(), content_type="text/plain")

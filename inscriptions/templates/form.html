@@ -133,6 +133,25 @@
         var tr = document.body.down('input[name=piece_jointe]').up('tr')
         $('justif_EPX').down('table').insert(tr);
 
+        var nom_timeout;
+        $('id_nom')
+            .insert({ after: new Element('div', { id: 'nom_erreur' }) })
+            .observe('keydown', function(event) {
+                if(nom_timeout) clearTimeout(nom_timeout);
+                nom_timeout = setTimeout(function() {
+                    new Ajax.Request('{% url inscriptions.check_name %}', {
+                        parameters: { nom: $F('id_nom') },
+                        onSuccess: function(r) {
+                            if(r.responseText != '0')
+                                $('nom_erreur').update("{% trans "Ce nom d'équipe est déjà utilisé !" %}");
+                            else
+                                $('nom_erreur').update("");
+
+                        }
+                    })
+                }, 500);
+            });
+
 
 
         $('part0').down('input').focus();
@@ -156,7 +175,7 @@
             var test_data = data;
             if(!actual_part) {
                 var tests = {
-                    nom:                /^.+$/i,
+                    nom:                function(k) { return /^.+$/i.test(this.nom) && $('nom_erreur').innerHTML == ''; },
                     gerant_nom:         /^.+$/i,
                     gerant_prenom:      /^.+$/i,
                     gerant_ville:       /^.+$/i,
