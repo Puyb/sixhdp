@@ -1,0 +1,50 @@
+{% load i18n %}
+
+<h1>{% trans 'Merci de vous être inscrit aux' %} {{ TITLE }}</h1
+
+<p>{% blocktrans with nom=instance.gerant_nom prenom=instance.gerant_prenom equipe=instance.nom %}Bonjour,{{ gerant_prenom }} {{ gerant_nom }}<br />
+Votre équipe <strong>{{ equipe }}</strong> est inscrite aux premiers 6h de Paris, le 4 août 2013 sous réserve de la réception et de la validation du paiement et des justificatifs.{% endblocktrans %}</p>
+
+<p>{% if instance.licence_manquantes %}
+    {% trans 'Il manque les licences de :' %} <ul>
+    {% for e in instance.licence_manquantes %}
+    <li>{{ e.prenom }} {{ e.nom }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{% if instance.certificat_manquantes %}
+    {% trans 'Il manque les certificats médicaux de :' %}<ul>
+    {% for e in instance.certificat_manquantes %}
+    <li>{{ e.prenom }} {{ e.nom }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{% if instance.autorisation_manquantes %}
+    {% trans 'Il manque les autorisations parentales :' %}<ul>
+    {% for e in instance.autorisation_manquantes %}
+    <li>{{ e.prenom }} {{ e.nom }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{% if instance.categorie == "EPX" and not instance.piece_jointe_valide and not instance.piece_jointe %}
+{% blocktrans %}Il manque le certificat pour votre inscription en catégorie entreprise (<a href="http://6hdeparis.fr/certificat_employeur.pdf" target="_blank">modèle</a>).{% endblocktrans %}<br />
+{% endif %}
+
+{% if not instance.paiement or instance.licence_manquantes or instance.certificat_manquantes or instance.autorisation_manquantes %}
+{% trans 'Vous pouvez envoyer le paiement et les justificatifs à' %} <br />
+<pre>{% blocktrans %}PUC - 6h Roller de Paris
+17 avenue Pierre de Coubertin
+75013 Paris{% endblocktrans %}</pre>
+<br />
+{% trans "En précisant le nom de votre équipe et le numéro d'inscription ci dessus." %}
+{% endif %}</p>
+
+<p>{% trans 'Nous vous tiendrons au courant dès que votre inscription sera définitive.' %}</p>
+
+<p>{% blocktrans with url=url %}Si vous souhaitez modifier une information ou joindre une licence ou un certificat médicale manquant, vous pouver le faire en cliquant <a href="{{ url }}">ici</a>.{% endblocktrans %}</p>
+
+<p>--<br />
+PUC Roller</p>

@@ -1,0 +1,5 @@
+*.pyc
+.*.swp
+uploads/*
+database.db
+settings.py

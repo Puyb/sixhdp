@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_available_languages as LANGUAGES %}
+{% if create %}<h1>{% trans 'Inscription' %} - {{ TITLE }} {{ YEAR }}</h1>{% endif %}
+{% if update %}<h1>{% trans 'Modification de votre inscription' %} - {{ TITLE }} {{ YEAR }}</h1>{% endif %}
+<script src="{{ STATIC_URL }}prototype.js"></script>
+<script>
+(function() {
+
+    var actual_part = 0;
+    var categories = [
+        {
+            code: 'IDH', label: '{% trans 'Individuel Homme' %}', prix: 50,
+            valid: function(data) { return data.nombre == 1 && data.equipiers[0].sexe == 'H' && data.equipiers.filter(age(18)).length == 1; }
+        }, {
+            code: 'IDF', label: '{% trans 'Individuel Femme' %}', prix: 50,
+            valid: function(data) { return data.nombre == 1 && data.equipiers[0].sexe == 'F' && data.equipiers.filter(age(18)).length == 1; }
+        }, {
+            code: 'DUO', label: '{% trans 'Duo' %}', prix: 80,
+            valid: function(data) { return data.nombre == 2 && data.equipiers.filter(age(18)).length == 2; }
+        }, {
+            code: 'SNH', label: '{% trans 'Sénior Homme' %}', prix: 80,
+            valid: function(data) { return data.nombre > 2 && data.nombre_f == 0; }
+        }, {
+            code: 'SNF', label: '{% trans 'Sénior Femme' %}', prix: 80,
+            valid: function(data) { return data.nombre > 2 && data.nombre_h == 0; }
+        }, {
+            code: 'SNX', label: '{% trans 'Sénior Mixte' %}', prix: 80,
+            valid: function(data) { return data.nombre > 2 && data.nombre_h > 0 && data.nombre_f > 0; }
+        }, {
+            code: 'VEX', label: '{% trans 'Vétéran' %}', prix: 80,
+            valid: function(data) { return data.nombre > 2 && data.equipiers.filter(age(35)).length == data.nombre; }
+        }, {
+            code: 'SVX', label: '{% trans 'Super Vétéran' %}', prix: 80,
+            valid: function(data) { return data.nombre > 2 && data.equipiers.filter(age(50)).length == data.nombre; }
+        }, {
+            code: 'FMX', label: '{% trans 'Famille' %}', prix: 80, show: true,
+            valid: function(data) { return data.nombre >= 2; }
+        }, {
+            code: 'EPX', label: '{% trans 'Entreprise' %}', prix: 80, show: true,
+            valid: function(data) { return data.nombre >= 2; }
+        }
+    ];
+
+    function age(a) {
+        return function(eq) {
+            var b = {{ YEAR }} - parseFloat(eq.date_de_naissance_year);
+            if(b != a) return b > a;
+            if(parseFloat(eq.date_de_naissance_month) != {{ MONTH }})
+                return parseFloat(eq.date_de_naissance_month) < {{ MONTH }};
+            return parseFloat(eq.date_de_naissance_day) <= {{ DAY }}
+        };
+    }
+
+    function serialize() {
+        var data = Form.serialize(document.body, true);
+        data.equipiers = [{}, {}, {}, {}, {}];
+        data.nombre = parseFloat(data.nombre);
+        for(var k in data)
+            if(/^form-\d-/.test(k) && parseFloat(k.substr(5)) < data.nombre)
+                data.equipiers[parseFloat(k.substr(5))][k.substr(7)] = data[k];
+        data.nombre_h = data.equipiers.filter(function(i) { return i.sexe == 'H'; }).length;
+        data.nombre_f = data.equipiers.filter(function(i) { return i.sexe == 'F'; }).length;
+        return data;
+    }
+
+    Event.observe(window, 'load', function() {
+        $('id_categorie').remove();
+        for(var i = 0; i < 5; i++) {
+            $('id_form-' + i + '-date_de_naissance_day').up().id = 'id_form-' + i + '-date_de_naissance';
+            $('id_form-' + i + '-date_certificat_day').up().id   = 'id_form-' + i + '-date_certificat';
+        }
+        //$('id_password').up().insert('<br /><input type="password" id="id_password2" />');
+
+        $$('select[name*=naissance]').invoke('observe', 'change', function(event) {
+            var data = serialize();
+            var n = event.element().name.split('-')[1];
+            if(age(18)(data.equipiers[n])) {
+                $('id_form-' + n + '-autorisation').up('tr').hide();
+            } else {
+                $('id_form-' + n + '-autorisation').up('tr').show()
+                .insert({
+                    after: new Element('tr')
+                            .insert(new Element('td', { colspan: 2 })
+                            .update("{% trans "Si vous le pouvez, scannez l'autorisation et ajouter la en pièce jointe." %}"))
+                });
+            }
+        
+        });
+        $$('input[name*=licence]').each(function(e) {
+            var tr = e.up('tr');
+            var id = e.id.split('-').slice(0, 2).join('-');
+            tr.hide()
+                .next().hide()
+                .next().hide();
+            var handler = function() {
+                if($(id + '-justif-licence').checked) {
+                    tr.show()
+                        .next().hide()
+                        .next().show().down('label').update('{% trans 'Licence' %} (PDF, JPEG):');
+                    tr.next(2).show()
+                }
+                if($(id + '-justif-certif').checked) {
+                    tr.hide()
+                        .next().show()
+                        .next().show().down('label').update('{% trans 'Certificat médical' %} (PDF, JPEG):');
+                    tr.next(2).show()
+                }
+            };
+            tr.insert({
+                before: new Element('tr')
+                    .insert(new Element('th').insert('Justificatif:'))
+                    .insert(new Element('td')
+                        .insert(new Element('input', { type: 'radio', 'id': id + '-justif-licence', name: id + '-justif' }).observe('change', handler))
+                        .insert(new Element('label', { 'for': id + '-justif-licence' }).insert('{% trans 'Licence FFRS' %}'))
+                        .insert(new Element('br'))
+                        .insert(new Element('input', { type: 'radio', 'id': id + '-justif-certif', name: id + '-justif' }).observe('change', handler))
+                        .insert(new Element('label', { 'for': id + '-justif-certif' }).insert('{% trans 'Certificat médical' %}'))
+                    )
+            })
+            if(tr.next().select('select').invoke('getValue').join('') != '000')
+                $(id + '-justif-certif').checked = true;
+            if(e.value)
+                $(id + '-justif-licence').checked = true;
+            handler();
+        })
+        $$('input[name*=parent]').each(function(e) {
+            var tr = e.up('tr').hide();
+            $('justif_FMX').down('table').insert(tr);
+        });
+        var tr = document.body.down('input[name=piece_jointe]').up('tr')
+        $('justif_EPX').down('table').insert(tr);
+
+
+
+        $('part0').down('input').focus();
+
+        $('button_prev').observe('click', function(event) {
+            $$('.parts').invoke('hide');
+            actual_part--;
+            $('part' + actual_part).show();
+            $('part' + actual_part).down('input').focus();
+            $('button_next').show();
+            $('button_submit').hide();
+            if(!actual_part) event.element().hide();
+        });
+
+
+        $('button_next').observe('click', function(event) {
+            var data = serialize();
+            // check values
+            var ok = true;
+            var prefix = 'id_';
+            var test_data = data;
+            if(!actual_part) {
+                var tests = {
+                    nom:                /^.+$/i,
+                    gerant_nom:         /^.+$/i,
+                    gerant_prenom:      /^.+$/i,
+                    gerant_ville:       /^.+$/i,
+                    gerant_code_postal: /^[0-9]{4,6}$/i,
+                    gerant_email:       /^[a-z0-9+\-\._]+@([a-z0-9\-_]+\.)+[a-z]{2,5}$/i,
+                    //password:           {% if create %}/^.{6,}$/i{% else %}/^(|.{6,})$/i{% endif %},
+                    //password2:          function() { return this.password == $F('id_password2'); },
+                    //nombre:             /^[12345]$/i,
+                    gerant_telephone:   /^\+?[0-9]{10,15}$/i
+                };
+            } else {
+                function check_date(k) {
+                    var d = new Date(parseFloat(this[k + '_year']), parseFloat(this[k + '_month']) - 1, parseFloat(this[k + '_day']));
+                    return d.getFullYear()  == parseFloat(this[k + '_year'])  && 
+                           d.getMonth() + 1 == parseFloat(this[k + '_month']) &&
+                           d.getDate()       == parseFloat(this[k + '_day'])   ? d : undefined;
+                }
+
+                var tests = {
+                    nom:                /^.+$/i,
+                    prenom:             /^.+$/i,
+                    //sexe:               /^[HF]$/i,
+                    ville:              /^.+$/i,
+                    code_postal:        /^[0-9]{4,6}$/i,
+                    email:              /^[a-z0-9+\-\._]+@([a-z0-9\-_]+\.)+[a-z]{2,5}$/i,
+                    date_de_naissance:  function(k) { return check_date.call(this, k) && age({{ MIN_AGE }})(this); },
+                    num_licence:        /^(|[0-9]{5,9})$/i,
+                    date_certificat:    function(k) {
+                        var d = check_date.call(this, k);
+                        return (this[k + '_year'] == '0' && this[k + '_month'] == '0' && this[k + '_day'] == '0') ||
+                        (d && new Date({{ YEAR }}, {{ MONTH }} - 1, {{ DAY }}).getTime() - d.getTime() < 92 * 86400000);
+                    }
+                };
+                prefix = 'id_form-' + (actual_part - 1) + '-';
+                test_data = data.equipiers[actual_part - 1];
+            }
+            for(var k in tests) {
+                if(tests[k].test ? tests[k].test(test_data[k]) : tests[k].call(test_data, k)) {
+                    $(prefix + k).setStyle({ background: 'white' });
+                } else {
+                    ok = false;
+                    $(prefix + k).setStyle({ background: '#ff6666' });
+                }
+            }
+            if(actual_part && test_data.num_licence == ''  && 
+                   test_data.date_certificat_year   == '0' &&
+                   test_data.date_certificat_month  == '0' &&
+                   test_data.date_certificat_day    == '0') {
+               ok = false;
+               $(prefix + 'num_licence').setStyle({ background: '#ff6666' });
+               $(prefix + 'date_certificat').setStyle({ background: '#ff6666' });
+            }
+            if(!ok) {
+                return alert('{% trans 'Veuillez corriger les champs en rouge.' %}');
+            }
+
+            // change page
+            $('button_prev').show();
+            $$('.parts').invoke('hide');
+            actual_part++;
+            if(actual_part > parseInt($F('id_nombre'))) {
+                // last page
+                $('partlast').show();
+                $('partlast').down('input').focus();
+
+                actual_categories = categories.filter(function(c) {
+                    return c.valid(data);
+                })
+                
+                if(actual_categories.length == 0) {
+                    $('button_prev').click();
+                    return alert("{% trans "Votre éuipe n'est éligible dans aucune des catégories proposées pour cette compétition. Veuillez vous référer au réglement de la course disponible sur le site pour voir les critères de chaque catégorie." %}");
+                }
+
+                $('catwrapper').innerHTML = actual_categories.map(function(c) {
+                    return '<input type="radio" value="#{code}" name="categorie" id="id_categorie-#{code}"><label for="id_categorie-#{code}">#{label} - #{prix} €</label><br />'.interpolate(c);
+                }).join('');
+                $$('input[name=categorie]').invoke('observe', 'change', function(event) {
+                    var categorie = $$('input[name=categorie]').filter(function(e) { return e.checked; })[0].value;
+                    var d = categories.filter(function(c) { return c.code == categorie; })[0];
+                    $('id_prix').value = d.prix;
+                    $$('.justif_supp').invoke('hide');
+                    if(d.show)
+                        $('justif_' + d.code).show();
+                });
+
+                for(var i = 1; i < actual_part; i++) {
+                    var tr = $('justif_FMX').down('tr', i - 1);
+                    tr.show();
+                    tr.down().update($F('id_form-' + (i - 1) + '-prenom') + ' ' + $F('id_form-' + (i - 1) + '-nom'));
+                }
+
+                {% if update %}
+                $('id_categorie-{{ instance.categorie }}').checked = true;
+                {% else %}
+                $$('input[name=categorie]')[0].checked = true;
+                $('id_prix').value = actual_categories[0].prix;
+                {% endif %}
+
+                $('button_next').hide();
+                $R(actual_part, 5).each(function(i) { $('part' + i).remove(); });
+                $('id_form-TOTAL_FORMS').value = actual_part - 1;
+                $('button_submit').show();
+            } else {
+                $('part' + actual_part).show();
+                $('part' + actual_part).down('input').focus();
+                if(age(18)(data.equipiers[actual_part - 1]))
+                    $('id_form-' + (actual_part - 1) + '-autorisation').up('tr').hide();
+            }
+        });
+
+
+
+        $('button_submit').observe('mousedown', function(event) {
+            var categorie = $$('input[name=categorie]').filter(function(e) { return e.checked; })[0].value;
+            $('id_prix').value = categories.filter(function(c) { return c.code == categorie; })[0].prix;
+            if(!categorie) {
+                event.stop();
+                alert("{% trans 'Vous devez choisir une catégorie' %}");
+            }
+            if(!$('id_conditions').checked) {
+                event.stop();
+                alert("{% trans 'Vous devez accépter le règlement de la compétition' %}");
+            }
+        });
+    });
+
+
+
+})()
+</script>
+<form method="post" enctype="multipart/form-data" onsubmit="$('button_submit').style.display=='none'">
+    <div id="errors">
+        {% if equipe_form.errors %}
+        <h3>{% trans 'Information générales' %}</h3>
+            {% for k,v in equipe_form.errors.items %}
+                {{ k }} : {{ v }}
+            {% endfor %}
+        {% endif %}
+        {% for equipier_form in equipier_formset %}
+            {% if equipier_form.errors %}
+            <h3>{% blocktrans with n=forloop.counter %}Équipier {{ n }}{% endblocktrans %}</h3>
+                {% for k,v in equipier_form.errors.items %}
+                    {{ k }} : {{ v }}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div id="part0" class="parts">
+        <h2>{%trans 'Information générales' %}</h2>
+        <table>{{ equipe_form.as_table }}</table>
+    </div>
+
+    {% for equipier_form in equipier_formset %}
+    <div id="part{{ forloop.counter }}" style="display: none;" class="parts">
+        <h2>Equipier {{ forloop.counter }}</h2>
+        <table>
+            {{ equipier_form.as_table }}
+            <tr style="display: none"><td colspan="2">{% trans 'Si vous le pouvez, scannez le certificat ou la licence et ajouter le en pièce jointe.' %}</td></tr>
+        </table><br />
+        {% blocktrans with MIN_AGE=MIN_AGE DAY=DAY MONTH=MONTH YEAR=YEAR %}Chaque équipier doit avoir plus de {{ MIN_AGE }} ans au {{ DAY }}/{{ MONTH }}/{{ YEAR }}.{% endblocktrans %}<br />
+        {% trans 'Chaque équipier doit avoir un certificat médical de moins de 3 mois ou une licence FFRS en cours de validité pour particper.' %}<br />
+    </div>
+    {% endfor %}
+
+    <div id="partlast" style="display: none;" class="parts">
+        <h2>Choix de la catégorie</h2>
+        <div id="catwrapper"></div>
+        <br />
+        <div id="justif_FMX" class="justif_supp" style="display: none">
+            {% trans "La catégorie que vous avez choisi nécéssite des justificatifs suplémentaires." %}<br />
+            {% trans "Catégorie Famille : Veuillez le renseigner les liens de parenté pour chaque équipiers." %}<br />
+            <table></table>
+        </div>
+        <div id="justif_EPX" class="justif_supp" style="display: none">
+            {% trans "La catégorie que vous avez choisi nécéssite des justificatifs suplémentaires." %}<br />
+            {% blocktrans %}Catégorie Entreprise : Veuillez ajouter un certificat signé par l'employeur (<a href="http://6hdeparis.fr/certificat_employeur.pdf" target="_blank">modèle</a>).{% endblocktrans %}<br />
+            <table></table>
+        </div>
+        <br />
+        <input type="checkbox" name="conditions" id="id_conditions" /><label for="id_conditions">{% blocktrans %}J'accepte le <a href="http://6hdeparis.fr/reglement/" target="_blank">règlement de la course</a>{% endblocktrans %}</label>
+        <br />
+    </div>
+
+    {{ equipier_formset.management_form }}
+    <div id="buttons">
+        <input id="button_prev"   type="button" value="{% trans 'Précédent' %}" />
+        <input id="button_next"   type="button" value="{% trans 'Suivant' %}" />
+        <input id="button_submit" type="submit" value="{% trans 'Valider' %}" style="display: none;" />
+    </div>
+    {% csrf_token %}
+</form>
+{% endblock %}

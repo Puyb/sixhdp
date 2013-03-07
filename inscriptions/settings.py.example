@@ -1,0 +1,10 @@
+YEAR = 2013
+MONTH = 8
+DAY = 4
+TITLE = '6h de Paris'
+MIN_AGE = 12
+
+PAYPAL_URL = 'https://www.paypal.com/cgi-bin/webscr'
+# PAYPAL_URL = 'https://www.sandbox.paypal.com/cgi-bin/webscr'
+PAYPAL_BUSINESS = ''
+
