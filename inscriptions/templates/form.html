@@ -70,7 +70,6 @@
         $('id_categorie').remove();
         for(var i = 0; i < 5; i++) {
             $('id_form-' + i + '-date_de_naissance_day').up().id = 'id_form-' + i + '-date_de_naissance';
-            $('id_form-' + i + '-date_certificat_day').up().id   = 'id_form-' + i + '-date_certificat';
         }
         //$('id_password').up().insert('<br /><input type="password" id="id_password2" />');
 
@@ -84,7 +83,7 @@
                 .insert({
                     after: new Element('tr')
                             .insert(new Element('td', { colspan: 2 })
-                            .update("{% trans "Si vous le pouvez, scannez l'autorisation et ajouter la en pièce jointe." %}"))
+                            .update("{% trans "Si vous le pouvez, scannez l'autorisation et ajoutez la en pièce jointe (formats PDF ou JPEG)." %}<br />{% trans "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier." %}"))
                 });
             }
         
@@ -93,37 +92,22 @@
             var tr = e.up('tr');
             var id = e.id.split('-').slice(0, 2).join('-');
             tr.hide()
-                .next().hide()
                 .next().hide();
             var handler = function() {
-                if($(id + '-justif-licence').checked) {
+                if($(id + '-justificatif_1').checked) {
                     tr.show()
-                        .next().hide()
-                        .next().show().down('label').update('{% trans 'Licence' %} (PDF, JPEG):');
-                    tr.next(2).show()
+                        .next().show().down('label').update('{% trans 'Licence' %}:');
+                    tr.next(1).show()
                 }
-                if($(id + '-justif-certif').checked) {
+                if($(id + '-justificatif_2').checked) {
                     tr.hide()
-                        .next().show()
-                        .next().show().down('label').update('{% trans 'Certificat médical' %} (PDF, JPEG):');
-                    tr.next(2).show()
+                        .next().show().down('label').update('{% trans 'Certificat médical' %}:');
+                    tr.next(1).show()
                 }
             };
-            tr.insert({
-                before: new Element('tr')
-                    .insert(new Element('th').insert('Justificatif:'))
-                    .insert(new Element('td')
-                        .insert(new Element('input', { type: 'radio', 'id': id + '-justif-licence', name: id + '-justif' }).observe('change', handler))
-                        .insert(new Element('label', { 'for': id + '-justif-licence' }).insert('{% trans 'Licence FFRS' %}'))
-                        .insert(new Element('br'))
-                        .insert(new Element('input', { type: 'radio', 'id': id + '-justif-certif', name: id + '-justif' }).observe('change', handler))
-                        .insert(new Element('label', { 'for': id + '-justif-certif' }).insert('{% trans 'Certificat médical' %}'))
-                    )
-            })
-            if(tr.next().select('select').invoke('getValue').join('') != '000')
-                $(id + '-justif-certif').checked = true;
-            if(e.value)
-                $(id + '-justif-licence').checked = true;
+            $(id + '-justificatif_0').up('li').remove();
+            $(id + '-justificatif_1').observe('change', handler);
+            $(id + '-justificatif_2').observe('change', handler);
             handler();
         })
         $$('input[name*=parent]').each(function(e) {
@@ -202,12 +186,7 @@
                     code_postal:        /^[0-9]{4,6}$/i,
                     email:              /^[a-z0-9+\-\._]+@([a-z0-9\-_]+\.)+[a-z]{2,5}$/i,
                     date_de_naissance:  function(k) { return check_date.call(this, k) && age({{ MIN_AGE }})(this); },
-                    num_licence:        /^(|[0-9]{5,9})$/i,
-                    date_certificat:    function(k) {
-                        var d = check_date.call(this, k);
-                        return (this[k + '_year'] == '0' && this[k + '_month'] == '0' && this[k + '_day'] == '0') ||
-                        (d && new Date({{ YEAR }}, {{ MONTH }} - 1, {{ DAY }}).getTime() - d.getTime() < 92 * 86400000);
-                    }
+                    num_licence:        function(k) { return this.justificatif != 'licence' || /^[0-9]{3,9}$/i.test(this[k]); }
                 };
                 prefix = 'id_form-' + (actual_part - 1) + '-';
                 test_data = data.equipiers[actual_part - 1];
@@ -219,14 +198,6 @@
                     ok = false;
                     $(prefix + k).setStyle({ background: '#ff6666' });
                 }
-            }
-            if(actual_part && test_data.num_licence == ''  && 
-                   test_data.date_certificat_year   == '0' &&
-                   test_data.date_certificat_month  == '0' &&
-                   test_data.date_certificat_day    == '0') {
-               ok = false;
-               $(prefix + 'num_licence').setStyle({ background: '#ff6666' });
-               $(prefix + 'date_certificat').setStyle({ background: '#ff6666' });
             }
             if(!ok) {
                 return alert('{% trans 'Veuillez corriger les champs en rouge.' %}');
@@ -334,10 +305,10 @@
         <h2>Equipier {{ forloop.counter }}</h2>
         <table>
             {{ equipier_form.as_table }}
-            <tr style="display: none"><td colspan="2">{% trans 'Si vous le pouvez, scannez le certificat ou la licence et ajouter le en pièce jointe.' %}</td></tr>
+            <tr style="display: none"><td colspan="2">{% trans 'Si vous le pouvez, scannez le certificat ou la licence et ajoutez le en pièce jointe (formats PDF ou JPEG).' %}<br />{% trans "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier." %}</td></tr>
         </table><br />
         {% blocktrans with MIN_AGE=MIN_AGE DAY=DAY MONTH=MONTH YEAR=YEAR %}Chaque équipier doit avoir plus de {{ MIN_AGE }} ans au {{ DAY }}/{{ MONTH }}/{{ YEAR }}.{% endblocktrans %}<br />
-        {% trans 'Chaque équipier doit avoir un certificat médical de moins de 3 mois ou une licence FFRS en cours de validité pour particper.' %}<br />
+        {% trans "Chaque équipier doit avoir un certificat médical d'un an ou une licence FFRS en cours de validité pour participer." %}<br />
     </div>
     {% endfor %}
 

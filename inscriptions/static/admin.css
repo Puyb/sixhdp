@@ -6,9 +6,3 @@ form .aligned p { font-size: 12px; margin-top: -1px; }
 .field-box.field-piece_jointe_valide label { color: red; font-weight: bold; }
 .field-box.field-autorisation_valide label { color: red; font-weight: bold; }
 
-.field-piece_jointe p,
-.field-autorisation p {
-    color: blue;
-    cursor: pointer;
-    text-decoration: underline;
-}

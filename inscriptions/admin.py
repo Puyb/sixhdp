@@ -19,11 +19,11 @@ class EquipierInlineMini(admin.StackedInline):
     model = Equipier
     extra = 0
     max_num = 5
-    readonly_fields = [ 'nom', 'prenom', 'sexe', 'adresse1', 'adresse2', 'ville', 'code_postal', 'pays', 'email', 'date_de_naissance', 'autorisation', 'num_licence', 'date_certificat', 'piece_jointe',]
+    readonly_fields = [ 'nom', 'prenom', 'sexe', 'adresse1', 'adresse2', 'ville', 'code_postal', 'pays', 'email', 'date_de_naissance', 'autorisation', 'justificatif', 'num_licence', 'piece_jointe',]
     fieldsets = (
         (None, { 'fields': (('nom', 'prenom', 'sexe'), ) }),
         (u'Coordonnées', { 'classes': ('collapse', 'collapsed'), 'fields': ('adresse1', 'adresse2', ('ville', 'code_postal'), 'pays', 'email') }),
-        (None, { 'classes': ('wide', ), 'fields': (('date_de_naissance',), ('autorisation_valide', 'autorisation'), ('num_licence', 'date_certificat'), ('piece_jointe_valide', 'piece_jointe')) }),
+        (None, { 'classes': ('wide', ), 'fields': (('date_de_naissance',), ('autorisation_valide', 'autorisation'), ('justificatif', 'num_licence', ), ('piece_jointe_valide', 'piece_jointe')) }),
     )
 
 class EquipeAdminMini(admin.ModelAdmin):

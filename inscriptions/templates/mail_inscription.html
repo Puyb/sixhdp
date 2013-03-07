@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<h1>{% trans 'Merci de vous être inscrit aux' %} {{ TITLE }}</h1
+<h1>{% trans 'Merci de vous être inscrit aux' %} {{ TITLE }}</h1>
 
 <p>{% blocktrans with nom=instance.gerant_nom prenom=instance.gerant_prenom equipe=instance.nom %}Bonjour,{{ gerant_prenom }} {{ gerant_nom }}<br />
 Votre équipe <strong>{{ equipe }}</strong> est inscrite aux premiers 6h de Paris, le 4 août 2013 sous réserve de la réception et de la validation du paiement et des justificatifs.{% endblocktrans %}</p>

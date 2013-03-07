@@ -1,6 +1,9 @@
 Event.observe(window, 'load', function() {
-    $$('.field-piece_jointe p', '.field-autorisation p').invoke('observe', 'click', function(event) {
-        open('/uploads/' + event.element().textContent);
+    $$('.field-piece_jointe p', '.field-autorisation p').each(function(p) {
+        if(p.textContent == '')
+            p.innerHTML = 'Aucun fichier joint';
+        else
+            p.innerHTML = '<a href="/uploads/' + p.textContent + '" target="_blank">' + p.textContent + '</a>';
     });
 
     $$('.add-row, .delete').invoke('remove');

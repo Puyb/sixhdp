@@ -1,0 +1,16 @@
+<h1>Nouvelle équipe {{ instance.id }}</h1>
+<a href="{{ url_admin }}">Voir la fiche dans l'administration</a><br />
+<table>
+{% for field in equipe_form %}
+    <tr><td>{{ field.label }}:</td><td>{{ field.data }}</td></tr>
+{% endfor %}
+</table>
+{% for equipier_form in equipier_formset %}
+<h2>Equipier {{ forloop.counter }}</h2>
+<table>
+{% for field in equipier_form %}
+    <tr><td>{{ field.label }}:</td><td>{{ field.data }}</td></tr>
+{% endfor %}
+</table>
+{% endfor %}
+

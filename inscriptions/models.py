@@ -2,6 +2,8 @@
 from django.utils.translation import ugettext_lazy as _
 from django_countries import CountryField
 from django.conf import settings
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
 import os
 from django.db import models
 from settings import *
@@ -18,6 +20,16 @@ from decimal import Decimal
 #     'VEH': { 'prix' : 80 },
 #     'VEF': { 'prix' : 80 },
 # }
+
+SEXE_CHOICES = (
+    ('H', _(u'Homme')),
+    ('F', _(u'Femme'))
+)
+
+JUSTIFICATIF_CHOICES = (
+    ('licence',    _(u'Licence FFRS 2013')),
+    ('certificat', _(u'Certificat médicale établi après le 4/08/2012'))
+)
 
 class Equipe(models.Model):
     nom                = models.CharField(_(u"Nom d'équipe"), max_length=30)
@@ -47,10 +59,10 @@ class Equipe(models.Model):
         return u'%s - %s - %s' % (self.id, self.categorie, self.nom)
 
     def licence_manquantes(self):
-        return [equipier for equipier in self.equipier_set.all() if equipier.num_licence and not equipier.piece_jointe_valide and not equipier.piece_jointe ]
+        return [equipier for equipier in self.equipier_set.all() if equipier.justificatif == 'licence' and not equipier.piece_jointe_valide and not equipier.piece_jointe ]
 
     def certificat_manquantes(self):
-        return [equipier for equipier in self.equipier_set.all() if equipier.date_certificat and not equipier.piece_jointe_valide and not equipier.piece_jointe ]
+        return [equipier for equipier in self.equipier_set.all() if equipier.justificatif == 'certificat' and not equipier.piece_jointe_valide and not equipier.piece_jointe ]
 
     def autorisation_manquantes(self):
         return [equipier for equipier in self.equipier_set.all() if equipier.age() < 18 and not equipier.autorisation_valide and not equipier.autorisation ]
@@ -64,6 +76,24 @@ class Equipe(models.Model):
     def prix_paypal(self):
         return self.prix + self.frais_paypal()
         
+    def save(self, *args, **kwargs):
+        if self.id:
+            paiement = Equipe.objects.get(id=self.id).paiement
+            if paiement != self.paiement:
+                ctx = { "instance": self, }
+                subject = '[6h de Paris 2013] Paiement reçu'
+                message = render_to_string( 'mail_paiement.html', ctx)
+                msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ self.gerant_email ])
+                msg.content_subtype = "html"
+                msg.send()
+
+                subject = '[6h de Paris 2013] Paiement reçu %s' % (self.id, )
+                message = render_to_string( 'mail_paiement_admin.html', ctx)
+                msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ 'inscriptions@6hdeparis.fr' ])
+                msg.content_subtype = "html"
+                msg.send()
+
+        super(Equipe, self).save(*args, **kwargs)
     
 
 class Equipier(models.Model):
@@ -71,7 +101,7 @@ class Equipier(models.Model):
     equipe            = models.ForeignKey(Equipe)
     nom               = models.CharField(_(u'Nom'), max_length=200)
     prenom            = models.CharField(_(u'Prénom'), max_length=200, blank=True)
-    sexe              = models.CharField(_(u'Sexe'), max_length=1, choices=(('H', _(u'Homme')), ('F', _('Femme'))))
+    sexe              = models.CharField(_(u'Sexe'), max_length=1, choices=SEXE_CHOICES)
     adresse1          = models.CharField(_(u'Adresse'), max_length=200, blank=True)
     adresse2          = models.CharField(_(u'Adresse'), max_length=200, blank=True)
     ville             = models.CharField(max_length=200)
@@ -81,8 +111,8 @@ class Equipier(models.Model):
     date_de_naissance = models.DateField(_(u'Date de naissance'))
     autorisation      = models.FileField(_(u'Autorisation parentale'), upload_to='certificats', blank=True)
     autorisation_valide  = models.NullBooleanField(_(u'Autorisation parentale valide'))
+    justificatif      = models.CharField(_(u'Justificatif'), max_length=15, choices=JUSTIFICATIF_CHOICES)
     num_licence       = models.CharField(_(u'Numéro de licence'), max_length=15, blank=True)
-    date_certificat   = models.DateField(_(u'Date du certificat médical'), blank=True, null=True)
     piece_jointe      = models.FileField(_(u'Certificat ou licence'), upload_to='certificats', blank=True)
     piece_jointe_valide  = models.NullBooleanField(_(u'Certificat ou licence valide'))
     parent            = models.CharField(_(u'Lien de parenté'), max_length=200, blank=True)

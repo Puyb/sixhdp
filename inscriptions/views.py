@@ -1,11 +1,11 @@
 import sys
-from models import Equipe, Equipier #, CATEGORIES
+from models import Equipe, Equipier, SEXE_CHOICES, JUSTIFICATIF_CHOICES
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, Http404
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
-from django.forms import ModelForm, Form, CharField, PasswordInput, HiddenInput, Select
+from django.forms import ModelForm, Form, CharField, PasswordInput, HiddenInput, Select, RadioSelect
 from django.forms.extras.widgets import SelectDateWidget
 from django.forms.formsets import formset_factory
 from django.forms.models import BaseModelFormSet
@@ -34,9 +34,9 @@ class EquipierForm(ModelForm):
         model = Equipier
         exclude = ('equipe', 'numero', 'piece_jointe_valide', 'autorisation_valide')
         widgets = {
-            'sexe':              Select(choices=(('H', _(u'Homme')), ('F', _('Femme')))),
+            'sexe':              Select(choices=SEXE_CHOICES),
             'date_de_naissance': SelectDateWidget(years=range(YEAR-MIN_AGE, YEAR-100, -1)),
-            'date_certificat':   SelectDateWidget(years=[YEAR])
+            'justificatif':      RadioSelect(choices=JUSTIFICATIF_CHOICES),
         }
 
 EquipierFormset = formset_factory(EquipierForm, formset=BaseModelFormSet, extra=5)
@@ -83,12 +83,24 @@ def form(request, id=None, code=None):
                         'id': new_instance.id,
                         'code': new_instance.password
                     }
-                ))
+                )),
+                'url_admin': request.build_absolute_uri(reverse( 
+                    'admin:inscriptions_equipe_change', 
+                    args=[new_instance.id]
+                )),
+                "equipe_form": equipe_form,
+                "equipier_formset": equipier_formset,
             })
             if not instance:
                 subject = '[6h de Paris 2013] Inscription'
                 message = render_to_string( 'mail_inscription.html', ctx)
                 msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ new_instance.gerant_email ])
+                msg.content_subtype = "html"
+                msg.send()
+
+                subject = '[6h de Paris 2013] Inscription %s' % (new_instance.id, )
+                message = render_to_string( 'mail_inscription_admin.html', ctx)
+                msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ 'inscriptions@6hdeparis.fr' ])
                 msg.content_subtype = "html"
                 msg.send()
             return redirect('inscriptions.done', id=new_instance.id)
