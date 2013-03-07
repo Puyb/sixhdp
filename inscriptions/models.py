@@ -28,7 +28,7 @@ SEXE_CHOICES = (
 
 JUSTIFICATIF_CHOICES = (
     ('licence',    _(u'Licence FFRS 2013')),
-    ('certificat', _(u'Certificat médicale établi après le 4/08/2012'))
+    ('certificat', _(u'Certificat médical établi après le 4/08/2012'))
 )
 
 class Equipe(models.Model):

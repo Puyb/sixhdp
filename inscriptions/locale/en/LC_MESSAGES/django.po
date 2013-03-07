@@ -5,152 +5,157 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: sixhdp\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-05 13:45+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2013-03-07 19:03+0100\n"
+"PO-Revision-Date: 2013-03-07 19:03+0100\n"
+"Last-Translator: Puyb <puyb@puyb.net>\n"
+"Language-Team: English <LL@li.org>\n"
+"Language: English\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.4\n"
 
-#: models.py:23
-msgid "Nom d'équipe"
-msgstr "Team name"
-
-#: models.py:24
-msgid "Club"
-msgstr "Club"
-
-#: models.py:25 models.py:72
-msgid "Nom"
-msgstr "Last name"
-
-#: models.py:26 models.py:73
-msgid "Prénom"
-msgstr "First name"
-
-#: models.py:27 models.py:75 models.py:76
-msgid "Adresse"
-msgstr "Address"
-
-#: models.py:28
-msgid "Adresse 2"
-msgstr ""
-
-#: models.py:29
-msgid "Ville"
-msgstr "City"
-
-#: models.py:30
-msgid "Code postal"
-msgstr "Postal code"
-
-#: models.py:31 models.py:79
-msgid "Pays"
-msgstr "Country"
-
-#: models.py:32 models.py:80
-msgid "e-mail"
-msgstr "e-mail"
-
-#: models.py:33
-msgid "Mot de passe"
-msgstr "Password"
-
-#: models.py:34
-msgid "Téléphone"
-msgstr "Phone"
-
-#: models.py:35
-msgid "Catégorie"
-msgstr "Category"
-
-#: models.py:36
-msgid "Nombre d'équipiers"
-msgstr "Number of teammate"
-
-#: models.py:37
-msgid "Détails"
-msgstr "Details"
-
-#: models.py:38
-msgid "Prix"
-msgstr "Price"
-
-#: models.py:39
-msgid "Paiement"
-msgstr "Payment"
-
-#: models.py:40
-msgid "Dossier complet"
-msgstr ""
-
-#: models.py:41
-msgid "Date d'insciption"
-msgstr ""
-
-#: models.py:42
-msgid "Commentaires"
-msgstr ""
-
-#: models.py:43
-msgid "Justificatif"
-msgstr ""
-
-#: models.py:44
-msgid "Justificatif valide"
-msgstr ""
-
-#: models.py:70
-msgid "Numéro"
-msgstr ""
-
-#: models.py:74
-msgid "Sexe"
-msgstr "Sex"
-
-#: models.py:74 views.py:37
+#: models.py:25
 msgid "Homme"
 msgstr "Man"
 
-#: models.py:74 views.py:37
+#: models.py:26
 msgid "Femme"
 msgstr "Woman"
 
-#: models.py:81
+#: models.py:30
+msgid "Licence FFRS 2013"
+msgstr "License FFRS 2012"
+
+#: models.py:31
+msgid "Certificat médical établi après le 4/08/2012"
+msgstr "Medical certificate issued after the 08.04.2012"
+
+#: models.py:35
+msgid "Nom d'équipe"
+msgstr "Team name"
+
+#: models.py:36
+msgid "Club"
+msgstr "Club"
+
+#: models.py:37 models.py:102
+msgid "Nom"
+msgstr "Last name"
+
+#: models.py:38 models.py:103
+msgid "Prénom"
+msgstr "First name"
+
+#: models.py:39 models.py:105 models.py:106
+msgid "Adresse"
+msgstr "Address"
+
+#: models.py:40
+msgid "Adresse 2"
+msgstr "Address 2"
+
+#: models.py:41
+msgid "Ville"
+msgstr "City"
+
+#: models.py:42
+msgid "Code postal"
+msgstr "Postal code"
+
+#: models.py:43 models.py:109
+msgid "Pays"
+msgstr "Country"
+
+#: models.py:44 models.py:110
+msgid "e-mail"
+msgstr "e-mail"
+
+#: models.py:45
+msgid "Mot de passe"
+msgstr "Password"
+
+#: models.py:46
+msgid "Téléphone"
+msgstr "Phone"
+
+#: models.py:47
+msgid "Catégorie"
+msgstr "Category"
+
+#: models.py:48
+msgid "Nombre d'équipiers"
+msgstr "Number of teammate"
+
+#: models.py:49
+msgid "Détails"
+msgstr "Details"
+
+#: models.py:50
+msgid "Prix"
+msgstr "Price"
+
+#: models.py:51
+msgid "Paiement"
+msgstr "Payment"
+
+#: models.py:52
+msgid "Dossier complet"
+msgstr "File completed"
+
+#: models.py:53
+msgid "Date d'insciption"
+msgstr "Registration date"
+
+#: models.py:54
+msgid "Commentaires"
+msgstr "Comments"
+
+#: models.py:55 models.py:114
+msgid "Justificatif"
+msgstr "Justificative"
+
+#: models.py:56
+msgid "Justificatif valide"
+msgstr "Valid justificative"
+
+#: models.py:100
+msgid "Numéro"
+msgstr "Number"
+
+#: models.py:104
+msgid "Sexe"
+msgstr "Sex"
+
+#: models.py:111
 msgid "Date de naissance"
 msgstr "Birthday"
 
-#: models.py:82
+#: models.py:112
 msgid "Autorisation parentale"
 msgstr "Parental authorization"
 
-#: models.py:83
+#: models.py:113
 msgid "Autorisation parentale valide"
-msgstr ""
+msgstr "Valid parental authorization"
 
-#: models.py:84
+#: models.py:115
 msgid "Numéro de licence"
 msgstr "Licence Number"
 
-#: models.py:85
-msgid "Date du certificat médical"
-msgstr "Medical certificate date"
-
-#: models.py:86
+#: models.py:116
 msgid "Certificat ou licence"
 msgstr "Certificat or licence"
 
-#: models.py:87
+#: models.py:117
 msgid "Certificat ou licence valide"
-msgstr ""
+msgstr "Valid certificate or license"
 
-#: models.py:88
+#: models.py:118
 msgid "Lien de parenté"
-msgstr ""
+msgstr "Family relationship"
 
 #: templates/done.html:4
 msgid "Votre inscription est enregistrée"
@@ -162,47 +167,47 @@ msgstr "Team: "
 
 #: templates/done.html:7
 msgid "Numéro d'inscription :"
-msgstr ""
+msgstr "Registration number:"
 
 #: templates/done.html:10
 msgid "Un email de confirmation vient de vous être envoyé."
-msgstr ""
+msgstr "A confirmation mail has just been sent."
 
 #: templates/done.html:13
 msgid "Pour régler votre inscription vous pouvez payer par internet :"
-msgstr ""
+msgstr "You can pay your registration online:"
 
 #: templates/done.html:33
 msgid "Paypal ou Carte bancaire"
-msgstr ""
+msgstr "Paypal or credit card"
 
 #: templates/done.html:43
 #, python-format
 msgid "Pour tout paiement par internet, %(frais)s € de frais seront ajoutés."
-msgstr ""
+msgstr "For online payment, € %(frais)s fee will be added."
 
 #: templates/done.html:45
 #, python-format
 msgid ""
 "Ou envoyer un chèque de %(prix)s € à l'ordre du \"Paris Université Club\"."
-msgstr ""
+msgstr "Or send a € %(prix)s check payable to the \"Paris University Club \"."
 
 #: templates/done.html:47
 #, python-format
 msgid "Votre paiement de %(prix)s € à bien été reçu."
-msgstr ""
+msgstr "Your payment of € %(prix)s was received."
 
 #: templates/done.html:52 templates/mail_inscription.html:9
 msgid "Il manque les licences de :"
-msgstr ""
+msgstr "Missing licenses:"
 
 #: templates/done.html:60 templates/mail_inscription.html:17
 msgid "Il manque les certificats médicaux de :"
-msgstr ""
+msgstr "Missing medical certificate:"
 
 #: templates/done.html:68 templates/mail_inscription.html:25
 msgid "Il manque les autorisations parentales :"
-msgstr ""
+msgstr "Missing parental authorization:"
 
 #: templates/done.html:76 templates/mail_inscription.html:33
 msgid ""
@@ -210,10 +215,12 @@ msgid ""
 "href=\"http://6hdeparis.fr/certificat_employeur.pdf\" target=\"_blank"
 "\">modèle</a>)."
 msgstr ""
+"Missing enterprise certificate (<a href=\"http://6hdeparis.fr/"
+"enterprise_certificate.pdf\" target=\"_blank\">model</a>)."
 
 #: templates/done.html:82 templates/mail_inscription.html:37
 msgid "Vous pouvez envoyer le paiement et les justificatifs à"
-msgstr ""
+msgstr "You can send paiment and justificatives to"
 
 #: templates/done.html:83 templates/mail_inscription.html:38
 msgid ""
@@ -221,164 +228,187 @@ msgid ""
 "17 avenue Pierre de Coubertin\n"
 "75013 Paris"
 msgstr ""
+"PUC - 6h Roller de Paris\n"
+"17 avenue Pierre de Coubertin\n"
+"75013 Paris"
 
 #: templates/done.html:87 templates/mail_inscription.html:42
 msgid ""
 "En précisant le nom de votre équipe et le numéro d'inscription ci dessus."
-msgstr ""
+msgstr "Specifying the name of your team and the registration number above."
 
 #: templates/form.html:6
 msgid "Inscription"
-msgstr ""
+msgstr "Registration"
 
 #: templates/form.html:7
 msgid "Modification de votre inscription"
-msgstr ""
+msgstr "Modify your registration"
 
 #: templates/form.html:15
 msgid "Individuel Homme"
-msgstr ""
+msgstr "Individual Man"
 
 #: templates/form.html:18
 msgid "Individuel Femme"
-msgstr ""
+msgstr "Individual Woman"
 
 #: templates/form.html:21
 msgid "Duo"
-msgstr ""
+msgstr "Duo"
 
 #: templates/form.html:24
 msgid "Sénior Homme"
-msgstr ""
+msgstr "Senior Man"
 
 #: templates/form.html:27
 msgid "Sénior Femme"
-msgstr ""
+msgstr "Senior Woman"
 
 #: templates/form.html:30
 msgid "Sénior Mixte"
-msgstr ""
+msgstr "Senior Mixed"
 
 #: templates/form.html:33
 msgid "Vétéran"
-msgstr ""
+msgstr "Veteran"
 
 #: templates/form.html:36
 msgid "Super Vétéran"
-msgstr ""
+msgstr "Super Veteran"
 
 #: templates/form.html:39
-#, fuzzy
 msgid "Famille"
-msgstr "City"
+msgstr "Family"
 
 #: templates/form.html:42
 msgid "Entreprise"
-msgstr ""
+msgstr "Enterprise"
 
-#: templates/form.html:87
+#: templates/form.html:86
 msgid ""
-"Si vous le pouvez, scannez l'autorisation et ajouter la en pièce jointe."
-msgstr ""
+"Si vous le pouvez, scannez l'autorisation et ajoutez la en pièce jointe "
+"(formats PDF ou JPEG)."
+msgstr "If you can, scan the authorization and add it (formats PDF or JPEG)."
 
-#: templates/form.html:102
+#: templates/form.html:86 templates/form.html.py:308
+msgid "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier."
+msgstr "You alsa can upload it later or send it by mail."
+
+#: templates/form.html:99
 msgid "Licence"
-msgstr ""
+msgstr "License"
 
-#: templates/form.html:108 templates/form.html.py:120
+#: templates/form.html:104
 msgid "Certificat médical"
-msgstr ""
+msgstr "Medical certificate"
 
-#: templates/form.html:117
-msgid "Licence FFRS"
-msgstr ""
+#: templates/form.html:130
+msgid "Ce nom d'équipe est déjà utilisé !"
+msgstr "This teamname is allready used!"
 
-#: templates/form.html:213
+#: templates/form.html:203
 msgid "Veuillez corriger les champs en rouge."
-msgstr ""
+msgstr "Please correct fields in red."
 
-#: templates/form.html:231
+#: templates/form.html:221
 msgid ""
-"Votre éuipe n'est éligible dans aucune des catégories proposées pour cette "
+"Votre équipe n'est éligible dans aucune des catégories proposées pour cette "
 "compétition. Veuillez vous référer au réglement de la course disponible sur "
 "le site pour voir les critères de chaque catégorie."
 msgstr ""
+"Your team is not eligible in any of the categories for this competition. "
+"Please refer to the rules of the race available on the site to see the "
+"criteria for each category."
 
-#: templates/form.html:278
+#: templates/form.html:268
 msgid "Vous devez choisir une catégorie"
-msgstr ""
+msgstr "Youi must choose a category."
 
-#: templates/form.html:282
+#: templates/form.html:272
 msgid "Vous devez accépter le règlement de la compétition"
-msgstr ""
+msgstr "You must accept the rules of the race"
 
-#: templates/form.html:294 templates/form.html.py:309
-msgid "Information générales"
-msgstr ""
+#: templates/form.html:284
+msgid "Informations générales"
+msgstr "General informations"
 
-#: templates/form.html:301
+#: templates/form.html:291
 #, python-format
 msgid "Équipier %(n)s"
-msgstr ""
+msgstr "Teammate %(n)s"
 
-#: templates/form.html:318
+#: templates/form.html:299
+msgid "Information générales"
+msgstr "General informations"
+
+#: templates/form.html:308
 msgid ""
-"Si vous le pouvez, scannez le certificat ou la licence et ajouter le en "
-"pièce jointe."
+"Si vous le pouvez, scannez le certificat ou la licence et ajoutez le en "
+"pièce jointe (formats PDF ou JPEG)."
 msgstr ""
+"If you can, scan the certificate or the license and add it (formats PDF or "
+"JPEG)."
 
-#: templates/form.html:320
+#: templates/form.html:310
 #, python-format
 msgid ""
 "Chaque équipier doit avoir plus de %(MIN_AGE)s ans au %(DAY)s/%(MONTH)s/"
 "%(YEAR)s."
+msgstr "Each teammate must be %(MIN_AGE)s at %(MONTH)s.%(DAY)s.%(YEAR)s."
+
+#: templates/form.html:311
+msgid ""
+"Chaque équipier doit avoir un certificat médical d'un an ou une licence FFRS "
+"en cours de validité pour participer."
 msgstr ""
+"Each teammate must have a medical certificate or a valid FFRS license to "
+"participate."
+
+#: templates/form.html:320 templates/form.html.py:325
+msgid ""
+"La catégorie que vous avez choisi nécéssite des justificatifs suplémentaires."
+msgstr "The category you choose need additional justificatives."
 
 #: templates/form.html:321
 msgid ""
-"Chaque équipier doit avoir un certificat médical de moins de 3 mois ou une "
-"licence FFRS en cours de validité pour particper."
-msgstr ""
-
-#: templates/form.html:330 templates/form.html.py:335
-msgid ""
-"La catégorie que vous avez choisi nécéssite des justificatifs suplémentaires."
-msgstr ""
-
-#: templates/form.html:331
-msgid ""
 "Catégorie Famille : Veuillez le renseigner les liens de parenté pour chaque "
 "équipiers."
-msgstr ""
+msgstr "Family category: Please inform kinship for each crew."
 
-#: templates/form.html:336
+#: templates/form.html:326
 msgid ""
 "Catégorie Entreprise : Veuillez ajouter un certificat signé par l'employeur "
 "(<a href=\"http://6hdeparis.fr/certificat_employeur.pdf\" target=\"_blank"
 "\">modèle</a>)."
 msgstr ""
+"Enterprise category: Please add a certificate signed by the employer  (<a "
+"href=\"http://6hdeparis.fr/employer_certificate.pdf\" target=\"_blank"
+"\">model</a>)."
 
-#: templates/form.html:340
+#: templates/form.html:330
 msgid ""
 "J'accepte le <a href=\"http://6hdeparis.fr/reglement/\" target=\"_blank"
 "\">règlement de la course</a>"
 msgstr ""
+"I accept the <a href=\"http://6hdeparis.fr/reglement/\" target=\"_blank"
+"\">race rules</a>"
 
-#: templates/form.html:346
+#: templates/form.html:336
 msgid "Précédent"
-msgstr ""
+msgstr "Previous"
 
-#: templates/form.html:347
+#: templates/form.html:337
 msgid "Suivant"
-msgstr ""
+msgstr "Next"
 
-#: templates/form.html:348
+#: templates/form.html:338
 msgid "Valider"
-msgstr ""
+msgstr "Submit"
 
 #: templates/mail_inscription.html:3
 msgid "Merci de vous être inscrit aux"
-msgstr ""
+msgstr "Thank for registering at"
 
 #: templates/mail_inscription.html:5
 #, python-format
@@ -388,11 +418,15 @@ msgid ""
 "Paris, le 4 août 2013 sous réserve de la réception et de la validation du "
 "paiement et des justificatifs."
 msgstr ""
+"Hi,%(gerant_prenom)s %(gerant_nom)s<br />\n"
+"Your team <strong>%(equipe)s</strong> is booked tothe first 6h de Paris, on "
+"august 4th, 2013 under condition of good reception and validation of your "
+"paiment and justificatives."
 
 #: templates/mail_inscription.html:45
 msgid ""
 "Nous vous tiendrons au courant dès que votre inscription sera définitive."
-msgstr ""
+msgstr "You'll be informed as soon your registration is complete."
 
 #: templates/mail_inscription.html:47
 #, python-format
@@ -401,3 +435,19 @@ msgid ""
 "certificat médicale manquant, vous pouver le faire en cliquant <a href="
 "\"%(url)s\">ici</a>."
 msgstr ""
+"If you wan't to modify an information or add a missing justificative, you "
+"can do it by clicking <a href=\"%(url)s\">here</a>."
+
+#: templates/mail_paiement.html:3
+#, python-format
+msgid ""
+"Bonjour,%(gerant_prenom)s %(gerant_nom)s<br />\n"
+"Nous avons bien reçu votre paiement de %(paiement)s € pour l'équipe <strong>"
+"%(equipe)s</strong>."
+msgstr ""
+"Hi,%(gerant_prenom)s %(gerant_nom)s<br />\n"
+"We hace received your paiment of € %(paiement)s € for the team <strong>"
+"%(equipe)s</strong>."
+
+#~ msgid "Date du certificat médical"
+#~ msgstr "Medical certificate date"

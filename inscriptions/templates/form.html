@@ -218,7 +218,7 @@
                 
                 if(actual_categories.length == 0) {
                     $('button_prev').click();
-                    return alert("{% trans "Votre éuipe n'est éligible dans aucune des catégories proposées pour cette compétition. Veuillez vous référer au réglement de la course disponible sur le site pour voir les critères de chaque catégorie." %}");
+                    return alert("{% trans "Votre équipe n'est éligible dans aucune des catégories proposées pour cette compétition. Veuillez vous référer au réglement de la course disponible sur le site pour voir les critères de chaque catégorie." %}");
                 }
 
                 $('catwrapper').innerHTML = actual_categories.map(function(c) {
@@ -281,7 +281,7 @@
 <form method="post" enctype="multipart/form-data" onsubmit="$('button_submit').style.display=='none'">
     <div id="errors">
         {% if equipe_form.errors %}
-        <h3>{% trans 'Information générales' %}</h3>
+        <h3>{% trans 'Informations générales' %}</h3>
             {% for k,v in equipe_form.errors.items %}
                 {{ k }} : {{ v }}
             {% endfor %}
