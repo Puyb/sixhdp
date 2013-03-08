@@ -116,6 +116,7 @@ def form(request, id=None, code=None):
         "instance": instance,
         "create": not instance,
         "update": not not instance,
+        "solo": Equipe.objects.filter(categorie__startswith='ID').count(),
     }))
 
 def done(request, id):

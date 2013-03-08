@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sixhdp\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-07 19:03+0100\n"
-"PO-Revision-Date: 2013-03-07 19:03+0100\n"
+"POT-Creation-Date: 2013-03-08 18:12+0100\n"
+"PO-Revision-Date: 2013-03-08 18:13+0100\n"
 "Last-Translator: Puyb <puyb@puyb.net>\n"
 "Language-Team: English <LL@li.org>\n"
 "Language: English\n"
@@ -157,6 +157,10 @@ msgstr "Valid certificate or license"
 msgid "Lien de parenté"
 msgstr "Family relationship"
 
+#: templates/base.html:69
+msgid "Accueil"
+msgstr "Home"
+
 #: templates/done.html:4
 msgid "Votre inscription est enregistrée"
 msgstr "Your registration is booked"
@@ -173,43 +177,43 @@ msgstr "Registration number:"
 msgid "Un email de confirmation vient de vous être envoyé."
 msgstr "A confirmation mail has just been sent."
 
-#: templates/done.html:13
+#: templates/done.html:16
 msgid "Pour régler votre inscription vous pouvez payer par internet :"
 msgstr "You can pay your registration online:"
 
-#: templates/done.html:33
+#: templates/done.html:36
 msgid "Paypal ou Carte bancaire"
 msgstr "Paypal or credit card"
 
-#: templates/done.html:43
+#: templates/done.html:41
 #, python-format
 msgid "Pour tout paiement par internet, %(frais)s € de frais seront ajoutés."
 msgstr "For online payment, € %(frais)s fee will be added."
 
-#: templates/done.html:45
+#: templates/done.html:43
 #, python-format
 msgid ""
 "Ou envoyer un chèque de %(prix)s € à l'ordre du \"Paris Université Club\"."
 msgstr "Or send a € %(prix)s check payable to the \"Paris University Club \"."
 
-#: templates/done.html:47
+#: templates/done.html:45
 #, python-format
 msgid "Votre paiement de %(prix)s € à bien été reçu."
 msgstr "Your payment of € %(prix)s was received."
 
-#: templates/done.html:52 templates/mail_inscription.html:9
+#: templates/done.html:54 templates/mail_inscription.html:9
 msgid "Il manque les licences de :"
 msgstr "Missing licenses:"
 
-#: templates/done.html:60 templates/mail_inscription.html:17
+#: templates/done.html:64 templates/mail_inscription.html:17
 msgid "Il manque les certificats médicaux de :"
 msgstr "Missing medical certificate:"
 
-#: templates/done.html:68 templates/mail_inscription.html:25
+#: templates/done.html:74 templates/mail_inscription.html:25
 msgid "Il manque les autorisations parentales :"
 msgstr "Missing parental authorization:"
 
-#: templates/done.html:76 templates/mail_inscription.html:33
+#: templates/done.html:84 templates/mail_inscription.html:33
 msgid ""
 "Il manque le certificat pour votre inscription en catégorie entreprise (<a "
 "href=\"http://6hdeparis.fr/certificat_employeur.pdf\" target=\"_blank"
@@ -218,11 +222,11 @@ msgstr ""
 "Missing enterprise certificate (<a href=\"http://6hdeparis.fr/"
 "enterprise_certificate.pdf\" target=\"_blank\">model</a>)."
 
-#: templates/done.html:82 templates/mail_inscription.html:37
+#: templates/done.html:93 templates/mail_inscription.html:37
 msgid "Vous pouvez envoyer le paiement et les justificatifs à"
 msgstr "You can send paiment and justificatives to"
 
-#: templates/done.html:83 templates/mail_inscription.html:38
+#: templates/done.html:94 templates/mail_inscription.html:38
 msgid ""
 "PUC - 6h Roller de Paris\n"
 "17 avenue Pierre de Coubertin\n"
@@ -232,7 +236,7 @@ msgstr ""
 "17 avenue Pierre de Coubertin\n"
 "75013 Paris"
 
-#: templates/done.html:87 templates/mail_inscription.html:42
+#: templates/done.html:98 templates/mail_inscription.html:42
 msgid ""
 "En précisant le nom de votre équipe et le numéro d'inscription ci dessus."
 msgstr "Specifying the name of your team and the registration number above."
@@ -258,60 +262,64 @@ msgid "Duo"
 msgstr "Duo"
 
 #: templates/form.html:24
+msgid "Junior"
+msgstr "Junior"
+
+#: templates/form.html:27
 msgid "Sénior Homme"
 msgstr "Senior Man"
 
-#: templates/form.html:27
+#: templates/form.html:30
 msgid "Sénior Femme"
 msgstr "Senior Woman"
 
-#: templates/form.html:30
+#: templates/form.html:33
 msgid "Sénior Mixte"
 msgstr "Senior Mixed"
 
-#: templates/form.html:33
+#: templates/form.html:36
 msgid "Vétéran"
 msgstr "Veteran"
 
-#: templates/form.html:36
+#: templates/form.html:39
 msgid "Super Vétéran"
 msgstr "Super Veteran"
 
-#: templates/form.html:39
+#: templates/form.html:42
 msgid "Famille"
 msgstr "Family"
 
-#: templates/form.html:42
+#: templates/form.html:45
 msgid "Entreprise"
 msgstr "Enterprise"
 
-#: templates/form.html:86
+#: templates/form.html:91
 msgid ""
 "Si vous le pouvez, scannez l'autorisation et ajoutez la en pièce jointe "
 "(formats PDF ou JPEG)."
 msgstr "If you can, scan the authorization and add it (formats PDF or JPEG)."
 
-#: templates/form.html:86 templates/form.html.py:308
+#: templates/form.html:91 templates/form.html.py:313
 msgid "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier."
 msgstr "You alsa can upload it later or send it by mail."
 
-#: templates/form.html:99
+#: templates/form.html:104
 msgid "Licence"
 msgstr "License"
 
-#: templates/form.html:104
+#: templates/form.html:109
 msgid "Certificat médical"
 msgstr "Medical certificate"
 
-#: templates/form.html:130
+#: templates/form.html:135
 msgid "Ce nom d'équipe est déjà utilisé !"
 msgstr "This teamname is allready used!"
 
-#: templates/form.html:203
+#: templates/form.html:208
 msgid "Veuillez corriger les champs en rouge."
 msgstr "Please correct fields in red."
 
-#: templates/form.html:221
+#: templates/form.html:226
 msgid ""
 "Votre équipe n'est éligible dans aucune des catégories proposées pour cette "
 "compétition. Veuillez vous référer au réglement de la course disponible sur "
@@ -321,28 +329,28 @@ msgstr ""
 "Please refer to the rules of the race available on the site to see the "
 "criteria for each category."
 
-#: templates/form.html:268
+#: templates/form.html:273
 msgid "Vous devez choisir une catégorie"
 msgstr "Youi must choose a category."
 
-#: templates/form.html:272
+#: templates/form.html:277
 msgid "Vous devez accépter le règlement de la compétition"
 msgstr "You must accept the rules of the race"
 
-#: templates/form.html:284
+#: templates/form.html:289
 msgid "Informations générales"
 msgstr "General informations"
 
-#: templates/form.html:291
+#: templates/form.html:296
 #, python-format
 msgid "Équipier %(n)s"
 msgstr "Teammate %(n)s"
 
-#: templates/form.html:299
+#: templates/form.html:304
 msgid "Information générales"
 msgstr "General informations"
 
-#: templates/form.html:308
+#: templates/form.html:313
 msgid ""
 "Si vous le pouvez, scannez le certificat ou la licence et ajoutez le en "
 "pièce jointe (formats PDF ou JPEG)."
@@ -350,14 +358,14 @@ msgstr ""
 "If you can, scan the certificate or the license and add it (formats PDF or "
 "JPEG)."
 
-#: templates/form.html:310
+#: templates/form.html:315
 #, python-format
 msgid ""
 "Chaque équipier doit avoir plus de %(MIN_AGE)s ans au %(DAY)s/%(MONTH)s/"
 "%(YEAR)s."
 msgstr "Each teammate must be %(MIN_AGE)s at %(MONTH)s.%(DAY)s.%(YEAR)s."
 
-#: templates/form.html:311
+#: templates/form.html:316
 msgid ""
 "Chaque équipier doit avoir un certificat médical d'un an ou une licence FFRS "
 "en cours de validité pour participer."
@@ -365,18 +373,18 @@ msgstr ""
 "Each teammate must have a medical certificate or a valid FFRS license to "
 "participate."
 
-#: templates/form.html:320 templates/form.html.py:325
+#: templates/form.html:325 templates/form.html.py:330
 msgid ""
 "La catégorie que vous avez choisi nécéssite des justificatifs suplémentaires."
 msgstr "The category you choose need additional justificatives."
 
-#: templates/form.html:321
+#: templates/form.html:326
 msgid ""
 "Catégorie Famille : Veuillez le renseigner les liens de parenté pour chaque "
 "équipiers."
 msgstr "Family category: Please inform kinship for each crew."
 
-#: templates/form.html:326
+#: templates/form.html:331
 msgid ""
 "Catégorie Entreprise : Veuillez ajouter un certificat signé par l'employeur "
 "(<a href=\"http://6hdeparis.fr/certificat_employeur.pdf\" target=\"_blank"
@@ -386,7 +394,7 @@ msgstr ""
 "href=\"http://6hdeparis.fr/employer_certificate.pdf\" target=\"_blank"
 "\">model</a>)."
 
-#: templates/form.html:330
+#: templates/form.html:335
 msgid ""
 "J'accepte le <a href=\"http://6hdeparis.fr/reglement/\" target=\"_blank"
 "\">règlement de la course</a>"
@@ -394,15 +402,15 @@ msgstr ""
 "I accept the <a href=\"http://6hdeparis.fr/reglement/\" target=\"_blank"
 "\">race rules</a>"
 
-#: templates/form.html:336
+#: templates/form.html:341
 msgid "Précédent"
 msgstr "Previous"
 
-#: templates/form.html:337
+#: templates/form.html:342
 msgid "Suivant"
 msgstr "Next"
 
-#: templates/form.html:338
+#: templates/form.html:343
 msgid "Valider"
 msgstr "Submit"
 

@@ -7,6 +7,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^', include('inscriptions.urls')),
 )
 urlpatterns += staticfiles_urlpatterns()

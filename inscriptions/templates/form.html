@@ -12,37 +12,42 @@
     var actual_part = 0;
     var categories = [
         {
-            code: 'IDH', label: '{% trans 'Individuel Homme' %}', prix: 50,
+            code: 'IDH', label: '{% trans 'Individuel Homme' %}', prix: 40,
             valid: function(data) { return data.nombre == 1 && data.equipiers[0].sexe == 'H' && data.equipiers.filter(age(18)).length == 1; }
         }, {
-            code: 'IDF', label: '{% trans 'Individuel Femme' %}', prix: 50,
+            code: 'IDF', label: '{% trans 'Individuel Femme' %}', prix: 40,
             valid: function(data) { return data.nombre == 1 && data.equipiers[0].sexe == 'F' && data.equipiers.filter(age(18)).length == 1; }
         }, {
-            code: 'DUO', label: '{% trans 'Duo' %}', prix: 80,
+            code: 'DUO', label: '{% trans 'Duo' %}', prix: 50,
             valid: function(data) { return data.nombre == 2 && data.equipiers.filter(age(18)).length == 2; }
         }, {
-            code: 'SNH', label: '{% trans 'Sénior Homme' %}', prix: 80,
+            code: 'JNX', label: '{% trans 'Junior' %}', prix: 75,
+            valid: function(data) { return data.nombre == 5 && data.equipiers.filter(age(18)).length == 0 }
+        }, {
+            code: 'SNH', label: '{% trans 'Sénior Homme' %}', prix: 75,
             valid: function(data) { return data.nombre > 2 && data.nombre_f == 0; }
         }, {
-            code: 'SNF', label: '{% trans 'Sénior Femme' %}', prix: 80,
+            code: 'SNF', label: '{% trans 'Sénior Femme' %}', prix: 75,
             valid: function(data) { return data.nombre > 2 && data.nombre_h == 0; }
         }, {
-            code: 'SNX', label: '{% trans 'Sénior Mixte' %}', prix: 80,
+            code: 'SNX', label: '{% trans 'Sénior Mixte' %}', prix: 75,
             valid: function(data) { return data.nombre > 2 && data.nombre_h > 0 && data.nombre_f > 0; }
         }, {
-            code: 'VEX', label: '{% trans 'Vétéran' %}', prix: 80,
+            code: 'VEX', label: '{% trans 'Vétéran' %}', prix: 75,
             valid: function(data) { return data.nombre > 2 && data.equipiers.filter(age(35)).length == data.nombre; }
         }, {
-            code: 'SVX', label: '{% trans 'Super Vétéran' %}', prix: 80,
+            code: 'SVX', label: '{% trans 'Super Vétéran' %}', prix: 75,
             valid: function(data) { return data.nombre > 2 && data.equipiers.filter(age(50)).length == data.nombre; }
         }, {
-            code: 'FMX', label: '{% trans 'Famille' %}', prix: 80, show: true,
+            code: 'FMX', label: '{% trans 'Famille' %}', prix: 75, show: true,
             valid: function(data) { return data.nombre >= 2; }
         }, {
-            code: 'EPX', label: '{% trans 'Entreprise' %}', prix: 80, show: true,
+            code: 'EPX', label: '{% trans 'Entreprise' %}', prix: 75, show: true,
             valid: function(data) { return data.nombre >= 2; }
         }
     ];
+    if({{ solo }} > 40) // Limitation des solos à 30
+        categories = categories.slice(2);
 
     function age(a) {
         return function(eq) {
@@ -333,7 +338,7 @@
 
     {{ equipier_formset.management_form }}
     <div id="buttons">
-        <input id="button_prev"   type="button" value="{% trans 'Précédent' %}" />
+        <input id="button_prev"   type="button" value="{% trans 'Précédent' %}" style="display: none;" />
         <input id="button_next"   type="button" value="{% trans 'Suivant' %}" />
         <input id="button_submit" type="submit" value="{% trans 'Valider' %}" style="display: none;" />
     </div>

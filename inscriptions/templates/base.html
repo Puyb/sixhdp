@@ -1,18 +1,147 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-    <head>
-        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-        <meta http-equiv="Content-Language" content="en-us" />
-        <title>{% block title %}{{ TITLE }} {{ YEAR }}{% endblock %}</title>
-        <style>
-            html, body { font-family: sans-serif; }
-            th { font-weight: normal; text-align: left; vertical-align: top; }
-            input { border: 1px solid #666; }
-            #nom_erreur { color: red; }
-        </style>
-    </head>
-    <body>
-        {% block content %}{% endblock %}
+{% load i18n %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr-FR">
+<head profile="http://gmpg.org/xfn/11">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <title>{% block title %}{{ TITLE }} {{ YEAR }}{% endblock %}</title>
+    <script type="text/javascript">
+    WebFontConfig = {
+        google: { families: ['Pontano+Sans::latin,latin-ext'] }
+    };
+    (function() {
+        var wf = document.createElement('script');
+        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+        wf.type = 'text/javascript';
+        wf.async = 'true';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(wf, s);
+    })(); 
+    </script>
+    <link rel='stylesheet' id='admin-bar-css'  href='http://www.6hdeparis.fr/wp-includes/css/admin-bar.min.css?ver=3.5.1' type='text/css' media='all' />
+    <link rel='stylesheet' id='contact-form-7-css'  href='http://www.6hdeparis.fr/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=3.3.3' type='text/css' media='all' />
+    <link rel='stylesheet' id='graphene-stylesheet-css'  href='http://www.6hdeparis.fr/wp-content/themes/graphene/style.css?ver=3.5.1' type='text/css' media='screen' />
+    <style type="text/css">
+        #content, .menu-bottom-shadow, #sidebar_bottom{background-color: #ffffff}.post-title, .post-title a, .post-title a:visited, .entry-footer{border-color: #ffffff}.post{border-top-color: #ffffff}.post{border-bottom-color: #ffffff}.sidebar h3{border-color: #5f138f}.sidebar h3{ background: #8f1378; background: -moz-linear-gradient(#eb6ce1, #8f1378); background: -webkit-linear-gradient(#eb6ce1, #8f1378); background: -o-linear-gradient(#eb6ce1, #8f1378); -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#eb6ce1', EndColorStr='#8f1378')"; background: linear-gradient(#eb6ce1, #8f1378); }.block-button, .block-button:visited, .Button, .button, #commentform #submit, .wpsc_buy_button{ background: #75005E; background: -moz-linear-gradient(#8f1378,#75005E); background: -webkit-linear-gradient(#8f1378,#75005E); background: -o-linear-gradient(#8f1378, #75005E); -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#8f1378', EndColorStr='#75005E')"; background: linear-gradient(#8f1378,#75005E); border-color: #75005E; text-shadow: 0 -1px 1px #5f138f; color: #fff; -moz-box-shadow: 0 0 5px #555555; -webkit-box-shadow: 0 0 5px #555555; box-shadow: 0 0 5px #555555} .block-button:hover, .button:hover, #commentform #submit:hover,.wpsc_buy_button:hover{ background: #75005E; background: -moz-linear-gradient(#8f1378,#5B0044); background: -webkit-linear-gradient(#8f1378,#5B0044); background: -o-linear-gradient(#8f1378, #5B0044); -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#8f1378', EndColorStr='#5B0044')"; background: linear-gradient(#8f1378,#5B0044); color: #fff; }.page-title{ -pie-background: linear-gradient(left top,#5f138f,#8f1378); background: #8f1378; background: -moz-linear-gradient(left top,#5f138f, #8f1378); background: -webkit-linear-gradient(left top,#5f138f, #8f1378); background: -o-linear-gradient(left top,#5f138f, #8f1378); -ms-filter: "progid:DXImageTransform.Microsoft.gradient(gradientType=1,startColorStr='#5f138f', EndColorStr='#8f1378')"; background: linear-gradient(left top,#5f138f, #8f1378); }.header_title, .header_title a, .header_title a:visited, .header_title a:hover, .header_desc {color:#blank}a,.post-title,.post-title a,#comments > h4.current a{color: #8f1378}a:visited,.post-title a:visited{color: #8f1378}a:hover,.post-title a:hover{color: #5f138f}.post-title, .post-title a, .post-title a:hover, .post-title a:visited{ color: #8f1378 }html{ background: #aaa; } body{ background: white url("http://www.6hdeparis.fr/wp-content/uploads/2012/06/bg.png") no-repeat right bottom; } H1.page-title.archive-title{ font-size: 0; color: transparent; background: transparent; margin-top: -26px} H1.page-title.archive-title span{ font: 24px "Pontano Sans", sans-serif; color: #8F1378; display: block; } #nav LI.lang-item{ float: right; } #graphene-dynamic-widget-graphene_header .sidebar-wrap{ position: static; }
+    </style>
+    <!--[if lte IE 7]>
+      <style type="text/css" media="screen">
+        #footer, div.sidebar-wrap, .block-button, .featured_slider, #slider_root, #nav li ul, .pie{behavior: url(http://www.6hdeparis.fr/wp-content/themes/graphene/js/PIE.php);}
+        .featured_slider{margin-top:0 !important;}
+        #header-menu-wrap {z-index:5}
+      </style>
+    <![endif]-->
+    <style>
+        th { font-weight: normal; text-align: left; vertical-align: top; }
+        #nom_erreur { color: red; }
+        .entry-content h1 {
+            color: #8F1378;
+            border-color: #FFFFFF;
+            font: 24px "Pontano Sans",sans-serif;
+            margin-top: -3px;
+        }
+        table th, table td, table tr {
+            border: none transparent;
+            background: transparent;
+        }
+        #buttons { text-align: right; }
+        #buttons input { margin: 10px 30px; }
+    </style>
+</head>
+    <body class="page page-template-default logged-in admin-bar no-customize-support one_column">
+
+        <div class="bg-gradient">
+
+
+            <div id="container" class="container_16">
+
+
+                <div id="header">
+                    <div class="graphene-dynamic-widget" id="graphene-dynamic-widget-graphene_header">
+                        <div id="text-4" class="sidebar-wrap clearfix widget_text">
+                             <div class="textwidget"><img src="http://www.6hdeparis.fr/wp-content/uploads/2012/09/bandeau_{{ LANGUAGE_CODE }}.png" alt="" class="header-img"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="nav">
+                    <div id="header-menu-wrap" class="clearfix">
+                        <ul id="header-menu" class="menu clearfix">
+                            <li id="menu-item-238" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="http://www.6hdeparis.fr/"><strong>{% trans "Accueil" %}</strong></a></li>
+                            <li class='no-translation lang-item lang-item-9 lang-item-en menu-item'><a hreflang='en' href="javascript:set_lang('en')"><img src="http://www.6hdeparis.fr/wp-content/plugins/polylang/flags/en_US.png" title="English" alt="English" /></a></li>
+                            <li class='lang-item lang-item-8 lang-item-fr current-lang menu-item'><a hreflang='fr' href="javascript:set_lang('fr')"><img src="http://www.6hdeparis.fr/wp-content/plugins/polylang/flags/fr_FR.png" title="Français" alt="Français" /></a></li>
+                        </ul>            
+                        <script> function set_lang(l) {
+                            var i = document.getElementById('id_language');
+                            i.value = l;
+                            i.parentNode.submit();
+                        } </script>
+                        <form action="/i18n/setlang/" method="post">{% csrf_token %}
+                            <input id="id_language" name="language" type="hidden" value="" />
+                        </form>
+                    <div class="clear"></div>
+        
+                    
+                
+                </div>
+    
+            
+                <div class="menu-bottom-shadow">&nbsp;</div>
+
+
+        
+
+                
+                <div id="content" class="clearfix hfeed">
+                    <div id="content-main" class="clearfix grid_11">
+                        <div class="entry clearfix">                
+                            <div class="entry-content clearfix">
+                                {% block content %}{% endblock %}
+                            </div>
+                            <div class="entry-footer clearfix"></div>
+                        </div>
+                    </div><!-- #content-main -->
+                </div><!-- #content -->
+
+
+
+                <div id="footer" class="clearfix">
+                    <div id="copyright">
+                        <h3>Copyright</h3>
+                        <p> &copy; 2013 6h de Paris.</p> 
+                    </div>
+
+                    <div class="footer-menu-wrap">
+                        <ul id="footer-menu" class="clearfix">
+                            <li class="menu-item return-top"><a href="#">Retour en Haut</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div id="developer" class="grid_7">
+                        <p> Inscription roller par <a href="http://puyb.net/">Puyb</a></p>
+                    </div>
+                </div><!-- #footer -->
+
+
+            </div><!-- #container -->
+
+        </div><!-- .bg-gradient -->
+
+    <!--[if IE 8]>
+    <script type="text/javascript">
+        (function( $) {
+            var imgs, i, w;
+            var imgs = document.getElementsByTagName( 'img' );
+            maxwidth = 0.98 * $( '.entry-content' ).width();
+            for( i = 0; i < imgs.length; i++ ) {
+                w = imgs[i].getAttribute( 'width' );
+                if ( w > maxwidth ) {
+                    imgs[i].removeAttribute( 'width' );
+                    imgs[i].removeAttribute( 'height' );
+                }
+            }
+        })(jQuery);
+    </script>
+    <![endif]-->
+
     </body>
 </html>
