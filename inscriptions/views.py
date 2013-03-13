@@ -17,6 +17,7 @@ import urllib2
 import random
 from settings import *
 from datetime import datetime
+from threading import Thread
 
 class EquipeForm(ModelForm):
     class Meta:
@@ -41,6 +42,14 @@ class EquipierForm(ModelForm):
 
 EquipierFormset = formset_factory(EquipierForm, formset=BaseModelFormSet, extra=5)
 EquipierFormset.model = Equipier
+
+class mailThread(Thread):
+    def __init__ (self,msg):
+        Thread.__init__(self)
+        self.msg = msg
+
+    def run(self):  
+        self.msg.send()
 
 def form(request, id=None, code=None):
     instance = None
@@ -96,13 +105,13 @@ def form(request, id=None, code=None):
                 message = render_to_string( 'mail_inscription.html', ctx)
                 msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ new_instance.gerant_email ])
                 msg.content_subtype = "html"
-                msg.send()
+                mailThread(msg).start()
 
                 subject = '[6h de Paris 2013] Inscription %s' % (new_instance.id, )
                 message = render_to_string( 'mail_inscription_admin.html', ctx)
                 msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ 'inscriptions@6hdeparis.fr' ])
                 msg.content_subtype = "html"
-                msg.send()
+                mailThread(msg).start()
             return redirect('inscriptions.done', id=new_instance.id)
     else:
         equipe_form = EquipeForm(instance=instance)
