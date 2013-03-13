@@ -122,22 +122,24 @@
         });
 
         var nom_timeout;
+        function check_nom(wait) {
+            new Ajax.Request('{% url inscriptions.check_name %}', {
+                parameters: { nom: $F('id_nom') },
+                asynchronous: !wait,
+                onSuccess: function(r) {
+                    if(r.responseText != '0')
+                        $('nom_erreur').update("{% trans "Ce nom d'équipe est déjà utilisé !" %}");
+                    else
+                        $('nom_erreur').update("");
+
+                }
+            });
+        }
         $('id_nom')
             .insert({ after: new Element('div', { id: 'nom_erreur' }) })
             .observe('keydown', function(event) {
                 if(nom_timeout) clearTimeout(nom_timeout);
-                nom_timeout = setTimeout(function() {
-                    new Ajax.Request('{% url inscriptions.check_name %}', {
-                        parameters: { nom: $F('id_nom') },
-                        onSuccess: function(r) {
-                            if(r.responseText != '0')
-                                $('nom_erreur').update("{% trans "Ce nom d'équipe est déjà utilisé !" %}");
-                            else
-                                $('nom_erreur').update("");
-
-                        }
-                    })
-                }, 500);
+                nom_timeout = setTimeout(check_nom, 500);
             });
 
 
@@ -163,7 +165,7 @@
             var test_data = data;
             if(!actual_part) {
                 var tests = {
-                    nom:                function(k) { return /^.+$/i.test(this.nom) && $('nom_erreur').innerHTML == ''; },
+                    nom:                function(k) { check_nom(true); return /^.+$/i.test(this.nom) && $('nom_erreur').innerHTML == ''; },
                     gerant_nom:         /^.+$/i,
                     gerant_prenom:      /^.+$/i,
                     gerant_ville:       /^.+$/i,
