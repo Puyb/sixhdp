@@ -175,8 +175,5 @@ EMAIL_HOST_PASSWORD = ''
 
 LANGUAGES = (
     ('fr', u'Français'),
-    ('de', u'Deutsch'),
     ('en', u'English'),
-    ('es', u'Español'),
-    ('it', u'Italiano'),
 )

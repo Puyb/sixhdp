@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sixhdp\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-08 18:12+0100\n"
-"PO-Revision-Date: 2013-03-08 18:13+0100\n"
+"POT-Creation-Date: 2013-03-13 17:09+0100\n"
+"PO-Revision-Date: 2013-03-13 17:11+0100\n"
 "Last-Translator: Puyb <puyb@puyb.net>\n"
 "Language-Team: English <LL@li.org>\n"
 "Language: English\n"
@@ -41,15 +41,15 @@ msgstr "Team name"
 msgid "Club"
 msgstr "Club"
 
-#: models.py:37 models.py:102
+#: models.py:37 models.py:100
 msgid "Nom"
 msgstr "Last name"
 
-#: models.py:38 models.py:103
+#: models.py:38 models.py:101
 msgid "Prénom"
 msgstr "First name"
 
-#: models.py:39 models.py:105 models.py:106
+#: models.py:39 models.py:103 models.py:104
 msgid "Adresse"
 msgstr "Address"
 
@@ -65,11 +65,11 @@ msgstr "City"
 msgid "Code postal"
 msgstr "Postal code"
 
-#: models.py:43 models.py:109
+#: models.py:43 models.py:107
 msgid "Pays"
 msgstr "Country"
 
-#: models.py:44 models.py:110
+#: models.py:44 models.py:108
 msgid "e-mail"
 msgstr "e-mail"
 
@@ -113,49 +113,49 @@ msgstr "Registration date"
 msgid "Commentaires"
 msgstr "Comments"
 
-#: models.py:55 models.py:114
-msgid "Justificatif"
-msgstr "Justificative"
-
-#: models.py:56
-msgid "Justificatif valide"
-msgstr "Valid justificative"
-
-#: models.py:100
+#: models.py:98
 msgid "Numéro"
 msgstr "Number"
 
-#: models.py:104
+#: models.py:102
 msgid "Sexe"
 msgstr "Sex"
 
-#: models.py:111
+#: models.py:109
 msgid "Date de naissance"
 msgstr "Birthday"
 
-#: models.py:112
+#: models.py:110
 msgid "Autorisation parentale"
 msgstr "Parental authorization"
 
-#: models.py:113
+#: models.py:111
 msgid "Autorisation parentale valide"
 msgstr "Valid parental authorization"
 
-#: models.py:115
+#: models.py:112 models.py:117
+msgid "Justificatif"
+msgstr "Justificative"
+
+#: models.py:113
 msgid "Numéro de licence"
 msgstr "Licence Number"
 
-#: models.py:116
+#: models.py:114
 msgid "Certificat ou licence"
 msgstr "Certificat or licence"
 
-#: models.py:117
+#: models.py:115
 msgid "Certificat ou licence valide"
 msgstr "Valid certificate or license"
 
-#: models.py:118
+#: models.py:116
 msgid "Lien de parenté"
 msgstr "Family relationship"
+
+#: models.py:118
+msgid "Justificatif valide"
+msgstr "Valid justificative"
 
 #: templates/base.html:69
 msgid "Accueil"
@@ -258,68 +258,64 @@ msgid "Individuel Femme"
 msgstr "Individual Woman"
 
 #: templates/form.html:21
-msgid "Duo"
-msgstr "Duo"
+msgid "Duo Homme ou Mixte"
+msgstr "Duo Men or Mixed"
 
 #: templates/form.html:24
+msgid "Duo Femme"
+msgstr "Duo Woman"
+
+#: templates/form.html:27
 msgid "Junior"
 msgstr "Junior"
 
-#: templates/form.html:27
-msgid "Sénior Homme"
-msgstr "Senior Man"
-
 #: templates/form.html:30
-msgid "Sénior Femme"
-msgstr "Senior Woman"
+msgid "Sénior Homme ou Mixte"
+msgstr "Senior Men or Mixed"
 
 #: templates/form.html:33
-msgid "Sénior Mixte"
-msgstr "Senior Mixed"
+msgid "Sénior Femme"
+msgstr "Senior Woman"
 
 #: templates/form.html:36
 msgid "Vétéran"
 msgstr "Veteran"
 
 #: templates/form.html:39
-msgid "Super Vétéran"
-msgstr "Super Veteran"
-
-#: templates/form.html:42
 msgid "Famille"
 msgstr "Family"
 
-#: templates/form.html:45
-msgid "Entreprise"
-msgstr "Enterprise"
+#: templates/form.html:42
+msgid "Entreprise / Étudiants"
+msgstr "Enterprise / School"
 
-#: templates/form.html:91
+#: templates/form.html:88
 msgid ""
 "Si vous le pouvez, scannez l'autorisation et ajoutez la en pièce jointe "
 "(formats PDF ou JPEG)."
 msgstr "If you can, scan the authorization and add it (formats PDF or JPEG)."
 
-#: templates/form.html:91 templates/form.html.py:313
+#: templates/form.html:88 templates/form.html.py:315
 msgid "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier."
 msgstr "You alsa can upload it later or send it by mail."
 
-#: templates/form.html:104
+#: templates/form.html:101
 msgid "Licence"
 msgstr "License"
 
-#: templates/form.html:109
+#: templates/form.html:106
 msgid "Certificat médical"
 msgstr "Medical certificate"
 
-#: templates/form.html:135
+#: templates/form.html:134
 msgid "Ce nom d'équipe est déjà utilisé !"
 msgstr "This teamname is allready used!"
 
-#: templates/form.html:208
+#: templates/form.html:207
 msgid "Veuillez corriger les champs en rouge."
 msgstr "Please correct fields in red."
 
-#: templates/form.html:226
+#: templates/form.html:225
 msgid ""
 "Votre équipe n'est éligible dans aucune des catégories proposées pour cette "
 "compétition. Veuillez vous référer au réglement de la course disponible sur "
@@ -329,28 +325,28 @@ msgstr ""
 "Please refer to the rules of the race available on the site to see the "
 "criteria for each category."
 
-#: templates/form.html:273
+#: templates/form.html:275
 msgid "Vous devez choisir une catégorie"
 msgstr "Youi must choose a category."
 
-#: templates/form.html:277
+#: templates/form.html:279
 msgid "Vous devez accépter le règlement de la compétition"
 msgstr "You must accept the rules of the race"
 
-#: templates/form.html:289
+#: templates/form.html:291
 msgid "Informations générales"
 msgstr "General informations"
 
-#: templates/form.html:296
+#: templates/form.html:298
 #, python-format
 msgid "Équipier %(n)s"
 msgstr "Teammate %(n)s"
 
-#: templates/form.html:304
+#: templates/form.html:306
 msgid "Information générales"
 msgstr "General informations"
 
-#: templates/form.html:313
+#: templates/form.html:315
 msgid ""
 "Si vous le pouvez, scannez le certificat ou la licence et ajoutez le en "
 "pièce jointe (formats PDF ou JPEG)."
@@ -358,14 +354,14 @@ msgstr ""
 "If you can, scan the certificate or the license and add it (formats PDF or "
 "JPEG)."
 
-#: templates/form.html:315
+#: templates/form.html:317
 #, python-format
 msgid ""
 "Chaque équipier doit avoir plus de %(MIN_AGE)s ans au %(DAY)s/%(MONTH)s/"
 "%(YEAR)s."
 msgstr "Each teammate must be %(MIN_AGE)s at %(MONTH)s.%(DAY)s.%(YEAR)s."
 
-#: templates/form.html:316
+#: templates/form.html:318
 msgid ""
 "Chaque équipier doit avoir un certificat médical d'un an ou une licence FFRS "
 "en cours de validité pour participer."
@@ -373,28 +369,30 @@ msgstr ""
 "Each teammate must have a medical certificate or a valid FFRS license to "
 "participate."
 
-#: templates/form.html:325 templates/form.html.py:330
+#: templates/form.html:327 templates/form.html.py:332
 msgid ""
 "La catégorie que vous avez choisi nécéssite des justificatifs suplémentaires."
 msgstr "The category you choose need additional justificatives."
 
-#: templates/form.html:326
+#: templates/form.html:328
 msgid ""
 "Catégorie Famille : Veuillez le renseigner les liens de parenté pour chaque "
 "équipiers."
 msgstr "Family category: Please inform kinship for each crew."
 
-#: templates/form.html:331
+#: templates/form.html:333
 msgid ""
-"Catégorie Entreprise : Veuillez ajouter un certificat signé par l'employeur "
-"(<a href=\"http://6hdeparis.fr/certificat_employeur.pdf\" target=\"_blank"
-"\">modèle</a>)."
+"Catégorie Entreprise / Étudiants : Veuillez ajouter un certificat signé par "
+"l'employeur (un seul pour toute l'équipe, <a href=\"http://6hdeparis.fr/"
+"certificat_employeur.pdf\" target=\"_blank\">modèle</a>) ou une copie des "
+"fiches de paies ou une copie des cartes étudiants."
 msgstr ""
-"Enterprise category: Please add a certificate signed by the employer  (<a "
-"href=\"http://6hdeparis.fr/employer_certificate.pdf\" target=\"_blank"
-"\">model</a>)."
+"Enterprise / School category: Please add a certificate signed by the "
+"employer  (one for the team, <a href=\"http://6hdeparis.fr/"
+"employer_certificate.pdf\" target=\"_blank\">model</a>) or a copy of your "
+"school id cards."
 
-#: templates/form.html:335
+#: templates/form.html:337
 msgid ""
 "J'accepte le <a href=\"http://6hdeparis.fr/reglement/\" target=\"_blank"
 "\">règlement de la course</a>"
@@ -402,15 +400,15 @@ msgstr ""
 "I accept the <a href=\"http://6hdeparis.fr/reglement/\" target=\"_blank"
 "\">race rules</a>"
 
-#: templates/form.html:341
+#: templates/form.html:343
 msgid "Précédent"
 msgstr "Previous"
 
-#: templates/form.html:342
+#: templates/form.html:344
 msgid "Suivant"
 msgstr "Next"
 
-#: templates/form.html:343
+#: templates/form.html:345
 msgid "Valider"
 msgstr "Submit"
 
@@ -456,6 +454,15 @@ msgstr ""
 "Hi,%(gerant_prenom)s %(gerant_nom)s<br />\n"
 "We hace received your paiment of € %(paiement)s € for the team <strong>"
 "%(equipe)s</strong>."
+
+#~ msgid "Duo"
+#~ msgstr "Duo"
+
+#~ msgid "Sénior Mixte"
+#~ msgstr "Senior Mixed"
+
+#~ msgid "Super Vétéran"
+#~ msgstr "Super Veteran"
 
 #~ msgid "Date du certificat médical"
 #~ msgstr "Medical certificate date"

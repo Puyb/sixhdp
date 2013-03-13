@@ -18,35 +18,32 @@
             code: 'IDF', label: '{% trans 'Individuel Femme' %}', prix: 40,
             valid: function(data) { return data.nombre == 1 && data.equipiers[0].sexe == 'F' && data.equipiers.filter(age(18)).length == 1; }
         }, {
-            code: 'DUO', label: '{% trans 'Duo' %}', prix: 50,
-            valid: function(data) { return data.nombre == 2 && data.equipiers.filter(age(18)).length == 2; }
+            code: 'DUX', label: '{% trans 'Duo Homme ou Mixte' %}', prix: 50,
+            valid: function(data) { return data.nombre == 2 && data.equipiers.filter(age(18)).length == 2 && data.nombre_f < 2; }
+        }, {
+            code: 'DUF', label: '{% trans 'Duo Femme' %}', prix: 50,
+            valid: function(data) { return data.nombre == 2 && data.equipiers.filter(age(18)).length == 2 && data.nombre_f == 2; }
         }, {
             code: 'JNX', label: '{% trans 'Junior' %}', prix: 75,
-            valid: function(data) { return data.nombre == 5 && data.equipiers.filter(age(18)).length == 0 }
+            valid: function(data) { return data.nombre > 2 && data.equipiers.filter(age(18)).length == 0 }
         }, {
-            code: 'SNH', label: '{% trans 'Sénior Homme' %}', prix: 75,
-            valid: function(data) { return data.nombre > 2 && data.nombre_f == 0; }
+            code: 'SNX', label: '{% trans 'Sénior Homme ou Mixte' %}', prix: 75,
+            valid: function(data) { return data.nombre > 2 && data.nombre_f != data.nombre && data.equipiers.filter(age(18)).length > 0 && data.equipiers.filter(age(35)).length < data.nombre; }
         }, {
             code: 'SNF', label: '{% trans 'Sénior Femme' %}', prix: 75,
-            valid: function(data) { return data.nombre > 2 && data.nombre_h == 0; }
-        }, {
-            code: 'SNX', label: '{% trans 'Sénior Mixte' %}', prix: 75,
-            valid: function(data) { return data.nombre > 2 && data.nombre_h > 0 && data.nombre_f > 0; }
+            valid: function(data) { return data.nombre > 2 && data.nombre_h == 0 && data.equipiers.filter(age(18)).length > 0 && data.equipiers.filter(age(35)).length < data.nombre; }
         }, {
             code: 'VEX', label: '{% trans 'Vétéran' %}', prix: 75,
             valid: function(data) { return data.nombre > 2 && data.equipiers.filter(age(35)).length == data.nombre; }
         }, {
-            code: 'SVX', label: '{% trans 'Super Vétéran' %}', prix: 75,
-            valid: function(data) { return data.nombre > 2 && data.equipiers.filter(age(50)).length == data.nombre; }
-        }, {
             code: 'FMX', label: '{% trans 'Famille' %}', prix: 75, show: true,
             valid: function(data) { return data.nombre >= 2; }
         }, {
-            code: 'EPX', label: '{% trans 'Entreprise' %}', prix: 75, show: true,
+            code: 'EPX', label: '{% trans 'Entreprise / Étudiants' %}', prix: 75, show: true,
             valid: function(data) { return data.nombre >= 2; }
         }
     ];
-    if({{ solo }} > 40) // Limitation des solos à 30
+    if({{ solo }} > 30) // Limitation des solos à 30
         categories = categories.slice(2);
 
     function age(a) {
@@ -119,8 +116,10 @@
             var tr = e.up('tr').hide();
             $('justif_FMX').down('table').insert(tr);
         });
-        var tr = document.body.down('input[name=piece_jointe]').up('tr')
-        $('justif_EPX').down('table').insert(tr);
+        $$('input[name*=jointe2]').each(function(e) {
+            var tr = e.up('tr').hide();
+            $('justif_EPX').down('table').insert(tr);
+        });
 
         var nom_timeout;
         $('id_nom')
@@ -239,9 +238,12 @@
                 });
 
                 for(var i = 1; i < actual_part; i++) {
-                    var tr = $('justif_FMX').down('tr', i - 1);
-                    tr.show();
-                    tr.down().update($F('id_form-' + (i - 1) + '-prenom') + ' ' + $F('id_form-' + (i - 1) + '-nom'));
+                    var n = $F('id_form-' + (i - 1) + '-prenom') + ' ' + $F('id_form-' + (i - 1) + '-nom');
+                    $$('#justif_FMX', '#justif_EPX').each(function(e) {
+                        var tr = e.down('tr', i - 1);
+                        tr.show();
+                        tr.down().update(n);
+                    });
                 }
 
                 {% if update %}
@@ -252,7 +254,6 @@
                 {% endif %}
 
                 $('button_next').hide();
-                $R(actual_part, 5).each(function(i) { $('part' + i).remove(); });
                 $('id_form-TOTAL_FORMS').value = actual_part - 1;
                 $('button_submit').show();
             } else {
@@ -266,6 +267,7 @@
 
 
         $('button_submit').observe('mousedown', function(event) {
+            $R(actual_part, 5).each(function(i) { $('part' + i).remove(); });
             var categorie = $$('input[name=categorie]').filter(function(e) { return e.checked; })[0].value;
             $('id_prix').value = categories.filter(function(c) { return c.code == categorie; })[0].prix;
             if(!categorie) {
@@ -328,7 +330,7 @@
         </div>
         <div id="justif_EPX" class="justif_supp" style="display: none">
             {% trans "La catégorie que vous avez choisi nécéssite des justificatifs suplémentaires." %}<br />
-            {% blocktrans %}Catégorie Entreprise : Veuillez ajouter un certificat signé par l'employeur (<a href="http://6hdeparis.fr/certificat_employeur.pdf" target="_blank">modèle</a>).{% endblocktrans %}<br />
+            {% blocktrans %}Catégorie Entreprise / Étudiants : Veuillez ajouter un certificat signé par l'employeur (un seul pour toute l'équipe, <a href="http://6hdeparis.fr/certificat_employeur.pdf" target="_blank">modèle</a>) ou une copie des fiches de paies ou une copie des cartes étudiants.{% endblocktrans %}<br />
             <table></table>
         </div>
         <br />

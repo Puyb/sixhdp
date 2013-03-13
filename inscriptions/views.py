@@ -21,7 +21,7 @@ from datetime import datetime
 class EquipeForm(ModelForm):
     class Meta:
         model = Equipe
-        exclude = ('paiement', 'dossier_complet', 'password', 'date', 'commentaires', 'paiement_info', 'piece_jointe_valide')
+        exclude = ('paiement', 'dossier_complet', 'password', 'date', 'commentaires', 'paiement_info')
         widgets = {
             #'password': PasswordInput(),
             'categorie': HiddenInput(),
@@ -32,7 +32,7 @@ class EquipeForm(ModelForm):
 class EquipierForm(ModelForm):
     class Meta:
         model = Equipier
-        exclude = ('equipe', 'numero', 'piece_jointe_valide', 'autorisation_valide')
+        exclude = ('equipe', 'numero', 'piece_jointe_valide', 'autorisation_valide', 'piece_jointe2_valide')
         widgets = {
             'sexe':              Select(choices=SEXE_CHOICES),
             'date_de_naissance': SelectDateWidget(years=range(YEAR-MIN_AGE, YEAR-100, -1)),

@@ -52,8 +52,6 @@ class Equipe(models.Model):
     dossier_complet    = models.NullBooleanField(_(u'Dossier complet'))
     date               = models.DateTimeField(_(u"Date d'insciption"), auto_now_add=True)
     commentaires       = models.TextField(_(u'Commentaires'), blank=True)
-    piece_jointe       = models.FileField(_(u'Justificatif'), upload_to='certificats', blank=True)
-    piece_jointe_valide  = models.NullBooleanField(_(u'Justificatif valide'))
 
     def __unicode__(self):
         return u'%s - %s - %s' % (self.id, self.categorie, self.nom)
@@ -116,6 +114,8 @@ class Equipier(models.Model):
     piece_jointe      = models.FileField(_(u'Certificat ou licence'), upload_to='certificats', blank=True)
     piece_jointe_valide  = models.NullBooleanField(_(u'Certificat ou licence valide'))
     parent            = models.CharField(_(u'Lien de parenté'), max_length=200, blank=True)
+    piece_jointe2       = models.FileField(_(u'Justificatif'), upload_to='certificats', blank=True)
+    piece_jointe2_valide  = models.NullBooleanField(_(u'Justificatif valide'))
     
     def age(self):
         today = date(YEAR, MONTH, DAY)
