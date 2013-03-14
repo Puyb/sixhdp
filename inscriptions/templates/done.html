@@ -61,7 +61,7 @@
 
 {% if instance.certificat_manquantes %}
 <div class="clearfix">
-    {% trans 'Il manque les certificats médicaux de :' %}<ul>
+    {% blocktrans %}Il manque les certificats médicaux de (<a href="http://www.6hdeparis.fr/wp-content/uploads/2013/03/certificat_medical.pdf" target="_blank">modèle</a>):{% endblocktrans %}<ul>
     {% for e in instance.certificat_manquantes %}
     <li>{{ e.prenom }} {{ e.nom }}</li>
     {% endfor %}
@@ -71,7 +71,7 @@
 
 {% if instance.autorisation_manquantes %}
 <div class="clearfix">
-    {% trans 'Il manque les autorisations parentales :' %}<ul>
+    {% blocktrans %}Il manque les autorisations parentales (<a href="http://www.6hdeparis.fr/wp-content/uploads/2013/03/autorisation_parentale.pdf" target="_blank">modèle</a>) :{% endblocktrans %}<ul>
     {% for e in instance.autorisation_manquantes %}
     <li>{{ e.prenom }} {{ e.nom }}</li>
     {% endfor %}
@@ -79,12 +79,11 @@
 </div>
 {% endif %}
 
-{% if instance.categorie == "EPX" and not instance.piece_jointe_valide and not instance.piece_jointe %}
+{% if instance.categorie == "EPX" %}
 <div class="clearfix">
-{% blocktrans %}Il manque le certificat pour votre inscription en catégorie entreprise (<a href="http://6hdeparis.fr/certificat_employeur.pdf" target="_blank">modèle</a>).{% endblocktrans %}<br />
+{% blocktrans %}Catégorie Entreprise / Étudiants : Si ce n'est déjà fait, pensez à envoyer un certificat signé par l'employeur (un seul pour toute l'équipe, <a href="http://www.6hdeparis.fr/wp-content/uploads/2013/03/attestation_entreprise.pdf" target="_blank">modèle</a>) ou une copie des fiches de paies ou une copie des cartes étudiants.{% endblocktrans %}
 </div>
 {% endif %}
-
 <br />
 <br />
 <br />

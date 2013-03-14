@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sixhdp\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-13 17:09+0100\n"
-"PO-Revision-Date: 2013-03-13 17:11+0100\n"
+"POT-Creation-Date: 2013-03-14 18:00+0100\n"
+"PO-Revision-Date: 2013-03-14 18:02+0100\n"
 "Last-Translator: Puyb <puyb@puyb.net>\n"
 "Language-Team: English <LL@li.org>\n"
 "Language: English\n"
@@ -206,27 +206,43 @@ msgid "Il manque les licences de :"
 msgstr "Missing licenses:"
 
 #: templates/done.html:64 templates/mail_inscription.html:17
-msgid "Il manque les certificats médicaux de :"
-msgstr "Missing medical certificate:"
+msgid ""
+"Il manque les certificats médicaux de (<a href=\"http://www.6hdeparis.fr/wp-"
+"content/uploads/2013/03/certificat_medical.pdf\" target=\"_blank\">modèle</"
+"a>):"
+msgstr ""
+"Missing medical certificate (<a href=\"http://www.6hdeparis.fr/wp-content/"
+"uploads/2013/03/certificat_medical.pdf\" target=\"_blank\">model in french</"
+"a>)."
 
 #: templates/done.html:74 templates/mail_inscription.html:25
-msgid "Il manque les autorisations parentales :"
-msgstr "Missing parental authorization:"
+msgid ""
+"Il manque les autorisations parentales (<a href=\"http://www.6hdeparis.fr/wp-"
+"content/uploads/2013/03/autorisation_parentale.pdf\" target=\"_blank"
+"\">modèle</a>) :"
+msgstr ""
+"Missing parental authorization  (<a href=\"http://www.6hdeparis.fr/wp-"
+"content/uploads/2013/03/autorisation_parentale.pdf\" target=\"_blank\">model "
+"in french</a>)."
 
 #: templates/done.html:84 templates/mail_inscription.html:33
 msgid ""
-"Il manque le certificat pour votre inscription en catégorie entreprise (<a "
-"href=\"http://6hdeparis.fr/certificat_employeur.pdf\" target=\"_blank"
-"\">modèle</a>)."
+"Catégorie Entreprise / Étudiants : Si ce n'est déjà fait, pensez à envoyer "
+"un certificat signé par l'employeur (un seul pour toute l'équipe, <a href="
+"\"http://www.6hdeparis.fr/wp-content/uploads/2013/03/attestation_entreprise."
+"pdf\" target=\"_blank\">modèle</a>) ou une copie des fiches de paies ou une "
+"copie des cartes étudiants."
 msgstr ""
-"Missing enterprise certificate (<a href=\"http://6hdeparis.fr/"
-"enterprise_certificate.pdf\" target=\"_blank\">model</a>)."
+"Enterprise / School category: Please add a certificate signed by the "
+"employer  (one for the team, <a href=\"http://www.6hdeparis.fr/wp-content/"
+"uploads/2013/03/attestation_entreprise.pdf\" target=\"_blank\">model</a>) or "
+"a copy of your school id cards."
 
-#: templates/done.html:93 templates/mail_inscription.html:37
+#: templates/done.html:92 templates/mail_inscription.html:37
 msgid "Vous pouvez envoyer le paiement et les justificatifs à"
 msgstr "You can send paiment and justificatives to"
 
-#: templates/done.html:94 templates/mail_inscription.html:38
+#: templates/done.html:93 templates/mail_inscription.html:38
 msgid ""
 "PUC - 6h Roller de Paris\n"
 "17 avenue Pierre de Coubertin\n"
@@ -236,7 +252,7 @@ msgstr ""
 "17 avenue Pierre de Coubertin\n"
 "75013 Paris"
 
-#: templates/done.html:98 templates/mail_inscription.html:42
+#: templates/done.html:97 templates/mail_inscription.html:42
 msgid ""
 "En précisant le nom de votre équipe et le numéro d'inscription ci dessus."
 msgstr "Specifying the name of your team and the registration number above."
@@ -295,9 +311,15 @@ msgid ""
 "(formats PDF ou JPEG)."
 msgstr "If you can, scan the authorization and add it (formats PDF or JPEG)."
 
-#: templates/form.html:88 templates/form.html.py:315
-msgid "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier."
-msgstr "You alsa can upload it later or send it by mail."
+#: templates/form.html:88
+msgid ""
+"Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier (<a "
+"href=\\\"http://www.6hdeparis.fr/wp-content/uploads/2013/03/"
+"autorisation_parentale.pdf\\\" target=\\\"_blank\\\">modèle</a>)."
+msgstr ""
+"You can also upload it later or send it by mail (<a href=\\\"http://"
+"www.6hdeparis.fr/wp-content/uploads/2013/03/autorisation_parentale.pdf\\\" "
+"target=\\\"_blank\\\">model in french</a>)."
 
 #: templates/form.html:101
 msgid "Licence"
@@ -307,15 +329,15 @@ msgstr "License"
 msgid "Certificat médical"
 msgstr "Medical certificate"
 
-#: templates/form.html:134
+#: templates/form.html:131
 msgid "Ce nom d'équipe est déjà utilisé !"
 msgstr "This teamname is allready used!"
 
-#: templates/form.html:207
+#: templates/form.html:209
 msgid "Veuillez corriger les champs en rouge."
 msgstr "Please correct fields in red."
 
-#: templates/form.html:225
+#: templates/form.html:227
 msgid ""
 "Votre équipe n'est éligible dans aucune des catégories proposées pour cette "
 "compétition. Veuillez vous référer au réglement de la course disponible sur "
@@ -325,43 +347,51 @@ msgstr ""
 "Please refer to the rules of the race available on the site to see the "
 "criteria for each category."
 
-#: templates/form.html:275
+#: templates/form.html:277
 msgid "Vous devez choisir une catégorie"
 msgstr "Youi must choose a category."
 
-#: templates/form.html:279
+#: templates/form.html:281
 msgid "Vous devez accépter le règlement de la compétition"
 msgstr "You must accept the rules of the race"
 
-#: templates/form.html:291
+#: templates/form.html:293
 msgid "Informations générales"
 msgstr "General informations"
 
-#: templates/form.html:298
+#: templates/form.html:300
 #, python-format
 msgid "Équipier %(n)s"
 msgstr "Teammate %(n)s"
 
-#: templates/form.html:306
+#: templates/form.html:308
 msgid "Information générales"
 msgstr "General informations"
 
-#: templates/form.html:315
+#: templates/form.html:317
 msgid ""
 "Si vous le pouvez, scannez le certificat ou la licence et ajoutez le en "
-"pièce jointe (formats PDF ou JPEG)."
+"pièce jointe (formats PDF ou JPEG, <a href=\"http://www.6hdeparis.fr/wp-"
+"content/uploads/2013/03/certificat_medical.pdf\" target=\"_blank\">modèle de "
+"certificat</a>)."
 msgstr ""
 "If you can, scan the certificate or the license and add it (formats PDF or "
-"JPEG)."
+"JPEG, <a href=\"http://www.6hdeparis.fr/wp-content/uploads/2013/03/"
+"certificat_medical.pdf\" target=\"_blank\">medial certificat model in "
+"french</a>)."
 
 #: templates/form.html:317
+msgid "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier."
+msgstr "You alsa can upload it later or send it by mail."
+
+#: templates/form.html:319
 #, python-format
 msgid ""
 "Chaque équipier doit avoir plus de %(MIN_AGE)s ans au %(DAY)s/%(MONTH)s/"
 "%(YEAR)s."
 msgstr "Each teammate must be %(MIN_AGE)s at %(MONTH)s.%(DAY)s.%(YEAR)s."
 
-#: templates/form.html:318
+#: templates/form.html:320
 msgid ""
 "Chaque équipier doit avoir un certificat médical d'un an ou une licence FFRS "
 "en cours de validité pour participer."
@@ -369,46 +399,50 @@ msgstr ""
 "Each teammate must have a medical certificate or a valid FFRS license to "
 "participate."
 
-#: templates/form.html:327 templates/form.html.py:332
+#: templates/form.html:329 templates/form.html.py:334
 msgid ""
 "La catégorie que vous avez choisi nécéssite des justificatifs suplémentaires."
 msgstr "The category you choose need additional justificatives."
 
-#: templates/form.html:328
+#: templates/form.html:330
 msgid ""
 "Catégorie Famille : Veuillez le renseigner les liens de parenté pour chaque "
 "équipiers."
 msgstr "Family category: Please inform kinship for each crew."
 
-#: templates/form.html:333
+#: templates/form.html:335
 msgid ""
 "Catégorie Entreprise / Étudiants : Veuillez ajouter un certificat signé par "
-"l'employeur (un seul pour toute l'équipe, <a href=\"http://6hdeparis.fr/"
-"certificat_employeur.pdf\" target=\"_blank\">modèle</a>) ou une copie des "
-"fiches de paies ou une copie des cartes étudiants."
+"l'employeur (un seul pour toute l'équipe, <a href=\"http://www.6hdeparis.fr/"
+"wp-content/uploads/2013/03/attestation_entreprise.pdf\" target=\"_blank"
+"\">modèle</a>) ou une copie des fiches de paies ou une copie des cartes "
+"étudiants."
 msgstr ""
 "Enterprise / School category: Please add a certificate signed by the "
-"employer  (one for the team, <a href=\"http://6hdeparis.fr/"
-"employer_certificate.pdf\" target=\"_blank\">model</a>) or a copy of your "
-"school id cards."
+"employer  (one for the team, <a href=\"http://www.6hdeparis.fr/wp-content/"
+"uploads/2013/03/attestation_entreprise.pdf\" target=\"_blank\">model</a>) or "
+"a copy of your school id cards."
 
-#: templates/form.html:337
+#: templates/form.html:339
+#, python-format
 msgid ""
-"J'accepte le <a href=\"http://6hdeparis.fr/reglement/\" target=\"_blank"
+"J'accepte le <a href=\"http://www.6hdeparis.fr/wp-content/uploads/2013/03/"
+"Reglement%%206%%20Heures%%20Roller%%20Paris%%202013.pdf\" target=\"_blank"
 "\">règlement de la course</a>"
 msgstr ""
-"I accept the <a href=\"http://6hdeparis.fr/reglement/\" target=\"_blank"
+"I accept the <a href=\"http://www.6hdeparis.fr/wp-content/uploads/2013/03/"
+"Reglement%%206%%20Heures%%20Roller%%20Paris%%202013.pdf\" target=\"_blank"
 "\">race rules</a>"
 
-#: templates/form.html:343
+#: templates/form.html:345
 msgid "Précédent"
 msgstr "Previous"
 
-#: templates/form.html:344
+#: templates/form.html:346
 msgid "Suivant"
 msgstr "Next"
 
-#: templates/form.html:345
+#: templates/form.html:347
 msgid "Valider"
 msgstr "Submit"
 
@@ -454,6 +488,17 @@ msgstr ""
 "Hi,%(gerant_prenom)s %(gerant_nom)s<br />\n"
 "We hace received your paiment of € %(paiement)s € for the team <strong>"
 "%(equipe)s</strong>."
+
+#~ msgid ""
+#~ "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier "
+#~ "(<a href="
+#~ msgstr "You also can upload it later or send it by mail."
+
+#~ msgid "Il manque les certificats médicaux de :"
+#~ msgstr "Missing medical certificate:"
+
+#~ msgid "Il manque les autorisations parentales :"
+#~ msgstr "Missing parental authorization:"
 
 #~ msgid "Duo"
 #~ msgstr "Duo"

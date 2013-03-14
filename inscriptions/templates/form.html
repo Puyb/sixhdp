@@ -85,7 +85,7 @@
                 .insert({
                     after: new Element('tr')
                             .insert(new Element('td', { colspan: 2 })
-                            .update("{% trans "Si vous le pouvez, scannez l'autorisation et ajoutez la en pièce jointe (formats PDF ou JPEG)." %}<br />{% trans "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier." %}"))
+                            .update("{% trans "Si vous le pouvez, scannez l'autorisation et ajoutez la en pièce jointe (formats PDF ou JPEG)." %}<br />{% blocktrans %}Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier (<a href=\"http://www.6hdeparis.fr/wp-content/uploads/2013/03/autorisation_parentale.pdf\" target=\"_blank\">modèle</a>).{% endblocktrans %}"))
                 });
             }
         
@@ -314,7 +314,7 @@
         <h2>Equipier {{ forloop.counter }}</h2>
         <table>
             {{ equipier_form.as_table }}
-            <tr style="display: none"><td colspan="2">{% trans 'Si vous le pouvez, scannez le certificat ou la licence et ajoutez le en pièce jointe (formats PDF ou JPEG).' %}<br />{% trans "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier." %}</td></tr>
+            <tr style="display: none"><td colspan="2">{% blocktrans %}Si vous le pouvez, scannez le certificat ou la licence et ajoutez le en pièce jointe (formats PDF ou JPEG, <a href="http://www.6hdeparis.fr/wp-content/uploads/2013/03/certificat_medical.pdf" target="_blank">modèle de certificat</a>).{% endblocktrans %}<br />{% trans "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier." %}</td></tr>
         </table><br />
         {% blocktrans with MIN_AGE=MIN_AGE DAY=DAY MONTH=MONTH YEAR=YEAR %}Chaque équipier doit avoir plus de {{ MIN_AGE }} ans au {{ DAY }}/{{ MONTH }}/{{ YEAR }}.{% endblocktrans %}<br />
         {% trans "Chaque équipier doit avoir un certificat médical d'un an ou une licence FFRS en cours de validité pour participer." %}<br />
@@ -332,11 +332,11 @@
         </div>
         <div id="justif_EPX" class="justif_supp" style="display: none">
             {% trans "La catégorie que vous avez choisi nécéssite des justificatifs suplémentaires." %}<br />
-            {% blocktrans %}Catégorie Entreprise / Étudiants : Veuillez ajouter un certificat signé par l'employeur (un seul pour toute l'équipe, <a href="http://6hdeparis.fr/certificat_employeur.pdf" target="_blank">modèle</a>) ou une copie des fiches de paies ou une copie des cartes étudiants.{% endblocktrans %}<br />
+            {% blocktrans %}Catégorie Entreprise / Étudiants : Veuillez ajouter un certificat signé par l'employeur (un seul pour toute l'équipe, <a href="http://www.6hdeparis.fr/wp-content/uploads/2013/03/attestation_entreprise.pdf" target="_blank">modèle</a>) ou une copie des fiches de paies ou une copie des cartes étudiants.{% endblocktrans %}<br />
             <table></table>
         </div>
         <br />
-        <input type="checkbox" name="conditions" id="id_conditions" /><label for="id_conditions">{% blocktrans %}J'accepte le <a href="http://6hdeparis.fr/reglement/" target="_blank">règlement de la course</a>{% endblocktrans %}</label>
+        <input type="checkbox" name="conditions" id="id_conditions" /><label for="id_conditions">{% blocktrans %}J'accepte le <a href="http://www.6hdeparis.fr/wp-content/uploads/2013/03/Reglement%206%20Heures%20Roller%20Paris%202013.pdf" target="_blank">règlement de la course</a>{% endblocktrans %}</label>
         <br />
     </div>
 
