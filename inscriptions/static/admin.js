@@ -1,4 +1,6 @@
 Event.observe(window, 'load', function() {
+    if(!$('equipe_form')) return;
+
     $$('.field-piece_jointe p', '.field-piece_jointe2 p', '.field-autorisation p').each(function(p) {
         if(p.textContent == '')
             p.innerHTML = 'Aucun fichier joint';

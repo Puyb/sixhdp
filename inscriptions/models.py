@@ -9,6 +9,7 @@ from django.db import models
 from settings import *
 from datetime import date
 from decimal import Decimal
+from django.utils.safestring import mark_safe
 
 # CATEGORIES = {
 #     'SLH': { 'prix' : 50 },
@@ -48,7 +49,7 @@ class Equipe(models.Model):
     nombre             = models.IntegerField(_(u"Nombre d'équipiers"))
     paiement_info      = models.CharField(_(u'Détails'), max_length=30, blank=True)
     prix               = models.DecimalField(_(u'Prix'), max_digits=5, decimal_places=2)
-    paiement           = models.DecimalField(_(u'Paiement'), max_digits=5, decimal_places=2, null=True, blank=True)
+    paiement           = models.DecimalField(_(u'Paiement reçu'), max_digits=5, decimal_places=2, null=True, blank=True)
     dossier_complet    = models.NullBooleanField(_(u'Dossier complet'))
     date               = models.DateTimeField(_(u"Date d'insciption"), auto_now_add=True)
     commentaires       = models.TextField(_(u'Commentaires'), blank=True)
@@ -66,7 +67,19 @@ class Equipe(models.Model):
         return [equipier for equipier in self.equipier_set.all() if equipier.age() < 18 and not equipier.autorisation_valide and not equipier.autorisation ]
 
     def paiement_complet(self):
-        return self.paiement >= self.prix
+        return self.paiement >= self.prix and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
+    paiement_complet.allow_tags = True
+    paiement_complet.short_description = '€'
+    
+    def nombre2(self):
+        return self.nombre
+    nombre2.short_description = u'☺'
+
+    def dossier_complet2(self):
+        return self.dossier_complet and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
+    dossier_complet2.allow_tags = True
+    dossier_complet2.short_description = mark_safe(u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""")
+
 
     def frais_paypal(self):
         return self.prix * Decimal('0.034') + Decimal('0.25')
