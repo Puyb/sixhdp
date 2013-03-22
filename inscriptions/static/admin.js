@@ -1,10 +1,16 @@
 Event.observe(window, 'load', function() {
-    $$('.field-piece_jointe p', '.field-autorisation p').each(function(p) {
+    $$('.field-piece_jointe p', '.field-piece_jointe2 p', '.field-autorisation p').each(function(p) {
         if(p.textContent == '')
             p.innerHTML = 'Aucun fichier joint';
         else
             p.innerHTML = '<a href="/uploads/' + p.textContent + '" target="_blank">' + p.textContent + '</a>';
     });
+
+    if($$('.field-categorie p')[0].textContent != 'EPX')
+        $$('.field-piece_jointe2').invoke('hide');
+
+    if($$('.field-categorie p')[0].textContent != 'FMX')
+        $$('.field-parent').invoke('hide');
 
     $$('.add-row, .delete').invoke('remove');
 

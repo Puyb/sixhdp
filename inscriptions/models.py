@@ -114,7 +114,7 @@ class Equipier(models.Model):
     piece_jointe      = models.FileField(_(u'Certificat ou licence'), upload_to='certificats', blank=True)
     piece_jointe_valide  = models.NullBooleanField(_(u'Certificat ou licence valide'))
     parent            = models.CharField(_(u'Lien de parenté'), max_length=200, blank=True)
-    piece_jointe2       = models.FileField(_(u'Justificatif'), upload_to='certificats', blank=True)
+    piece_jointe2       = models.FileField(_(u'Justificatif entreprise / etudiant'), upload_to='certificats', blank=True)
     piece_jointe2_valide  = models.NullBooleanField(_(u'Justificatif valide'))
     
     def age(self):
