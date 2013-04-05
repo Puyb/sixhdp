@@ -124,7 +124,7 @@
         var nom_timeout;
         function check_nom(wait) {
             new Ajax.Request('{% url inscriptions.check_name %}', {
-                parameters: { nom: $F('id_nom') },
+                parameters: { nom: $F('id_nom'), id: '0{{ instance.id }}' },
                 asynchronous: !wait,
                 onSuccess: function(r) {
                     if(r.responseText != '0')
