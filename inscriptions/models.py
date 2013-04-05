@@ -67,9 +67,11 @@ class Equipe(models.Model):
         return [equipier for equipier in self.equipier_set.all() if equipier.age() < 18 and not equipier.autorisation_valide and not equipier.autorisation ]
 
     def paiement_complet(self):
+        return self.paiement >= self.prix
+    def paiement_complet2(self):
         return self.paiement >= self.prix and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
-    paiement_complet.allow_tags = True
-    paiement_complet.short_description = '€'
+    paiement_complet2.allow_tags = True
+    paiement_complet2.short_description = '€'
     
     def nombre2(self):
         return self.nombre

@@ -94,7 +94,7 @@
 17 avenue Pierre de Coubertin
 75013 Paris{% endblocktrans %}</pre>
 <br />
-{% trans "En précisant le nom de votre équipe et le numéro d'inscription ci dessus." %}
+{% blocktrans with id=instance.id %}En précisant le nom de votre équipe et le numéro d'inscription <b>{{ id }}</b>.{% endblocktrans %}
 {% endif %}
 
 {% endblock %}

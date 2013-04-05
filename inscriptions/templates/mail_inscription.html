@@ -5,6 +5,16 @@
 <p>{% blocktrans with nom=instance.gerant_nom prenom=instance.gerant_prenom equipe=instance.nom %}Bonjour,{{ gerant_prenom }} {{ gerant_nom }}<br />
 Votre équipe <strong>{{ equipe }}</strong> est inscrite aux premiers 6h de Paris, le 4 août 2013 sous réserve de la réception et de la validation du paiement et des justificatifs.{% endblocktrans %}</p>
 
+<p>{% if not instance.paiement_complet %}
+{% trans 'Pour régler votre inscription vous pouvez payer par internet :' %}<a href="{{ url2 }}">{% trans 'Paypal ou Carte bancaire' %}</a>.<br />
+{% blocktrans with frais=instance.frais_paypal|floatformat:2 %}Pour tout paiement par internet, {{ frais }} € de frais seront ajoutés.{% endblocktrans %}<br />
+<br />
+{% blocktrans with prix=instance.prix %}Ou envoyer un chèque de {{ prix }} € à l'ordre du "Paris Université Club".{% endblocktrans %}<br />
+{% else %}
+{% blocktrans with prix=instance.paiement %}Votre paiement de {{ prix }} € à bien été reçu.{% endblocktrans %}
+{% endif %}
+</p>
+
 <p>{% if instance.licence_manquantes %}
     {% trans 'Il manque les licences de :' %} <ul>
     {% for e in instance.licence_manquantes %}
@@ -33,13 +43,13 @@ Votre équipe <strong>{{ equipe }}</strong> est inscrite aux premiers 6h de Pari
 {% blocktrans %}Catégorie Entreprise / Étudiants : Si ce n'est déjà fait, pensez à envoyer un certificat signé par l'employeur (un seul pour toute l'équipe, <a href="http://www.6hdeparis.fr/wp-content/uploads/2013/03/attestation_entreprise.pdf" target="_blank">modèle</a>) ou une copie des fiches de paies ou une copie des cartes étudiants.{% endblocktrans %}
 {% endif %}
 
-{% if not instance.paiement or instance.licence_manquantes or instance.certificat_manquantes or instance.autorisation_manquantes %}
+{% if not instance.paiement_complet or instance.licence_manquantes or instance.certificat_manquantes or instance.autorisation_manquantes %}
 {% trans 'Vous pouvez envoyer le paiement et les justificatifs à' %} <br />
 <pre>{% blocktrans %}PUC - 6h Roller de Paris
 17 avenue Pierre de Coubertin
 75013 Paris{% endblocktrans %}</pre>
 <br />
-{% trans "En précisant le nom de votre équipe et le numéro d'inscription ci dessus." %}
+{% blocktrans with id=instance.id %}En précisant le nom de votre équipe et le numéro d'inscription <b>{{ id }}</b>.{% endblocktrans %}
 {% endif %}</p>
 
 <p>{% trans 'Nous vous tiendrons au courant dès que votre inscription sera définitive.' %}</p>

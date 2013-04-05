@@ -93,6 +93,11 @@ def form(request, id=None, code=None):
                         'code': new_instance.password
                     }
                 )),
+                "url2": request.build_absolute_uri(reverse(
+                    'inscriptions.done', kwargs={
+                        'id': new_instance.id,
+                    }
+                )),
                 'url_admin': request.build_absolute_uri(reverse( 
                     'admin:inscriptions_equipe_change', 
                     args=[new_instance.id]
