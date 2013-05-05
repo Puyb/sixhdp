@@ -1,5 +1,7 @@
 from django.conf.urls.defaults import *
 from django.views.generic import TemplateView
+from django.views.generic import ListView
+from django.contrib.auth.decorators import login_required
 from models import Equipe
 
 urlpatterns = patterns('inscriptions.views',
@@ -9,5 +11,6 @@ urlpatterns = patterns('inscriptions.views',
     (r'^$', 'form', {}, 'inscriptions.create'),
     (r'^ipn/$', 'ipn', {}, 'inscriptions.ipn'),
     (r'^check_name/$', 'check_name', {}, 'inscriptions.check_name'),
+    (r'^list/$', login_required(ListView.as_view(model=Equipe, ))),
 
 )
