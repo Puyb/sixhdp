@@ -66,6 +66,15 @@ class Equipe(models.Model):
     def autorisation_manquantes(self):
         return [equipier for equipier in self.equipier_set.all() if equipier.age() < 18 and not equipier.autorisation_valide and not equipier.autorisation ]
 
+    def verifier(self):
+        return len([equipier for equipier in self.equipier_set.all() 
+                if (equipier.piece_jointe and equipier.piece_jointe_valide == None) or
+                   (equipier.autorisation and equipier.autorisation_valide == None)]) > 0
+    def verifier2(self):
+        return self.verifier() and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u''
+    verifier2.allow_tags = True
+    verifier2.short_description = 'V'
+
     def paiement_complet(self):
         return self.paiement >= self.prix
     def paiement_complet2(self):
@@ -81,6 +90,16 @@ class Equipe(models.Model):
         return self.dossier_complet and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
     dossier_complet2.allow_tags = True
     dossier_complet2.short_description = mark_safe(u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""")
+
+    def dossier_complet_auto(self):
+        return self.categorie not in ['EPX', 'FMX'] and len([equipier for equipier in self.equipier_set.all()
+                    if (not equipier.piece_jointe_valide) or
+                       (equipier.age() < 18 and not equipier.autorisation_valide)]) == 0
+    def dossier_complet_auto2(self):
+        return self.dossier_complet_auto() and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
+    dossier_complet_auto2.allow_tags = True
+    dossier_complet_auto2.short_description = mark_safe(u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""")
+
 
 
     def frais_paypal(self):

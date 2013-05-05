@@ -22,6 +22,9 @@
         var nbpaye = 0;
         var paye = 0;
         var nbcomplet = 0;
+        var nbaverifier = 0;
+        var nbcertifenattente = 0;
+        var nbdossierscertifenattente = 0;
     </script>
     <table width="100%">
         <tr>
@@ -48,7 +51,7 @@
             <td>{{ equipe.date }}</td>
             <td>{{ equipe.prix }}€ {{ equipe.paiement_complet2|safe }}</td>
             <td>
-                {{ equipe.dossier_complet2|safe }}
+                {{ equipe.dossier_complet_auto2|safe }}
                 <script>
                     clubs['{{ equipe.club|lower|escapejs }}' || 'Sans club'] = (clubs['{{ equipe.club|lower|escapejs }}' || 'Sans club'] || 0) + 1
                     categories['{{ equipe.categorie|escapejs }}'] = (categories['{{ equipe.categorie|escapejs }}'] || 0) + 1
@@ -58,7 +61,10 @@
                     prix += {{ equipe.prix }};
                     nbpaye += {{ equipe.paiement_complet|yesno:"1,0,0" }};
                     paye += {{ equipe.paiement|default:0 }};
-                    nbcomplet += {{ equipe.dossier_complet|yesno:"1,0,0" }};
+                    nbcomplet += {{ equipe.dossier_complet_auto|yesno:"1,0,0" }};
+                    nbaverifier += {{ equipe.dossier_complet_auto|yesno:"1,0,0" }};
+                    nbdossierscertifenattente += ({{ equipe.licence_manquantes|length }} + {{ equipe.certificat_manquantes|length }} + {{ equipe.autorisation_manquantes|length }}) ? 1 : 0;
+                    nbcertifenattente += ({{ equipe.licence_manquantes|length }} + {{ equipe.certificat_manquantes|length }} + {{ equipe.autorisation_manquantes|length }});
                 </script>
             </td>
         </tr>
@@ -75,7 +81,12 @@
             <td><script>document.write(nbcomplet);</script><img alt="None" src="/static/admin/img/icon-yes.gif"></td>
         </tr>
     </table>
+    <div>
+        <script>document.write(nbaverifier);</script> dossiers avec documents éléctroniques à vérifier.<br />
+        <script>document.write(nbcertifenattente);</script> documents en attente sur <script>document.write(nbdossierscertifenattente);</script> dossiers.<br />
+
     <div id="stats">
+        <canvas id="canvas_time"></canvas>
         <script>
             var s = '<div><canvas id="canvas_pays"></canvas><table><tr><th>Pays</th><th>#</th><th>%</th></tr>';
             for(var k in pays)
@@ -94,8 +105,44 @@
             document.write(s);
         </script>
         <script src="{{ STATIC_URL }}/js-class.js"></script>
-        <script src="{{ STATIC_URL }}/bluff-min.js"></script>
+        <script src="{{ STATIC_URL }}/bluff-src.js"></script>
         <script>
+            var g = new Bluff.StackedArea('canvas_time', 900);
+            g.theme_pastel();
+            g.title = 'Historique';
+            g.tooltips = true;
+            g.marker_font_size = 12;
+            g.y_axis_increment = 10;
+            var d = {};
+            var i = 0;
+            for(var k in categories) d[k] = [0];
+            {% for equipe in object_list %}
+            var f = Math.round((new Date('{{ equipe.date|date:"c" }}').getTime() - new Date(2013, 2, 15).getTime()) / 86400000);
+            for(var k in d) {
+                var j = i + 1;
+                while(j <= f) {
+                    d[k].push(d[k][j - 1] || 0);
+                    j++;
+                }
+            }
+            d['{{ equipe.categorie }}'][f] = d['{{ equipe.categorie }}'][f] + 1;
+            i = f;
+            {% endfor %}
+            for(var k in d)
+                g.data(k, d[k]);
+            g.labels = {};
+            for(var i = 0; i < f; i += 7) {
+                var d = new Date(2013, 2, 15 + i)
+                g.labels[i] = d.getDate() + '/' + (d.getMonth() + 1);
+            }
+            g.draw();
+            g._d.stroke = 'white';
+            g._d.stroke_width = 1;
+            for(var index in g.labels) {
+                var x = g._graph_left + (g._x_increment * index);
+                g._d.line(x, g._graph_bottom, x, g._graph_top);
+            }
+
             ['pays', 'villes', 'categories', 'clubs'].forEach(function(i) {
                 var g = new Bluff.Pie('canvas_' + i, 400);
                 g.theme_pastel();
