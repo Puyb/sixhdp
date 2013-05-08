@@ -4,7 +4,7 @@ from django_countries import CountryField
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
-import os
+import os, re, urllib, urlparse, simplejson
 from django.db import models
 from settings import *
 from datetime import date
@@ -32,6 +32,58 @@ JUSTIFICATIF_CHOICES = (
     ('certificat', _(u'Certificat médical établi après le 4/08/2012'))
 )
 
+class Ville(models.Model):
+    lat = models.DecimalField(max_digits=10, decimal_places=7)
+    lng = models.DecimalField(max_digits=10, decimal_places=7)
+    nom = models.CharField(max_length=200)
+    region = models.CharField(max_length=200)
+    pays = models.CharField(max_length=200)
+    response = models.CharField(max_length=65535)
+
+def lookup_ville(nom, pays):
+    nom = nom.lower()
+    nom = re.sub('[- ,/]+', ' ', nom)
+    try:
+        return Ville.objects.get(nom=nom)
+    except Ville.DoesNotExist, e:
+        pass
+
+    def urlEncodeNonAscii(b):
+        return re.sub('[\x80-\xFF]', lambda c: '%%%02x' % ord(c.group(0)), b)
+
+    def iriToUri(iri):
+        parts = urlparse.urlparse(iri)
+        return urlparse.urlunparse(
+            part.encode('idna') if parti==1 else urlEncodeNonAscii(part.encode('utf-8'))
+            for parti, part in enumerate(parts)
+        )
+
+    f = urllib.urlopen(iriToUri('http://open.mapquestapi.com/geocoding/v1/address?key=%s&location=%s' % (MAPQUEST_API_KEY, nom + ', ' + str(pays))))
+    data = simplejson.load(f)
+    f.close()
+
+    if('results' not in data or
+       not len(data['results']) or
+       'locations' not in data['results'][0] or
+       not len(data['results'][0]['locations'])):
+        return None
+
+    data = data['results'][0]['locations'][0]
+    try:
+        return Ville.objects.get(lat=data['latLng']['lat'], lng=data['latLng']['lng'])
+    except Ville.DoesNotExist, e:
+        pass
+    obj = Ville(
+        lat      = data['latLng']['lat'],
+        lng      = data['latLng']['lng'],
+        nom      = data['adminArea5'],
+        region   = data['adminArea3'],
+        pays     = data['adminArea1'],
+        response = simplejson.dumps(data)
+    )
+    obj.save()
+    return obj
+
 class Equipe(models.Model):
     nom                = models.CharField(_(u"Nom d'équipe"), max_length=30)
     club               = models.CharField(_(u'Club'), max_length=30, blank=True)
@@ -53,6 +105,7 @@ class Equipe(models.Model):
     dossier_complet    = models.NullBooleanField(_(u'Dossier complet'))
     date               = models.DateTimeField(_(u"Date d'insciption"), auto_now_add=True)
     commentaires       = models.TextField(_(u'Commentaires'), blank=True)
+    gerant_ville2      = models.ForeignKey(Ville, null=True)
 
     def __unicode__(self):
         return u'%s - %s - %s' % (self.id, self.categorie, self.nom)
@@ -126,6 +179,9 @@ class Equipe(models.Model):
                 msg.send()
 
         super(Equipe, self).save(*args, **kwargs)
+        if not self.gerant_ville2:
+            self.gerant_ville2 = lookup_ville(self.gerant_ville, self.gerant_pays)
+            super(Equipe, self).save(*args, **kwargs)
     
 
 class Equipier(models.Model):
@@ -150,6 +206,7 @@ class Equipier(models.Model):
     parent            = models.CharField(_(u'Lien de parenté'), max_length=200, blank=True)
     piece_jointe2       = models.FileField(_(u'Justificatif entreprise / etudiant'), upload_to='certificats', blank=True)
     piece_jointe2_valide  = models.NullBooleanField(_(u'Justificatif valide'))
+    ville2            = models.ForeignKey(Ville, null=True)
     
     def age(self):
         today = date(YEAR, MONTH, DAY)
@@ -161,5 +218,13 @@ class Equipier(models.Model):
 
     def __unicode__(self):
         return u'%d' % self.numero
+
+    def save(self, *args, **kwargs):
+        super(Equipier, self).save(*args, **kwargs)
+        if not self.ville2:
+            self.ville2 = lookup_ville(self.ville, self.pays)
+            super(Equipier, self).save(*args, **kwargs)
+
+
 
 

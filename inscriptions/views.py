@@ -1,5 +1,5 @@
 import sys
-from models import Equipe, Equipier, SEXE_CHOICES, JUSTIFICATIF_CHOICES
+from models import Equipe, Equipier, Ville, SEXE_CHOICES, JUSTIFICATIF_CHOICES
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, Http404
@@ -13,6 +13,7 @@ from django.utils.translation import ugettext as _
 from django.core.mail import EmailMessage
 from django.utils.http import urlencode
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Count
 import urllib2
 import random
 from settings import *
@@ -199,3 +200,10 @@ def confirm_ipn_data(data, PP_URL):
 @csrf_exempt
 def check_name(request):
     return HttpResponse(Equipe.objects.filter(nom__iexact=request.POST['nom']).exclude(id=request.POST['id']).count(), content_type="text/plain")
+
+def list(request):
+    return render_to_response('list.html', RequestContext(request, {
+       'object_list': Equipe.objects.all(),
+       'villes': Ville.objects.all().annotate(equipiers=Count('equipier')),
+       'equipiers': Equipier.objects.all(),
+    }))

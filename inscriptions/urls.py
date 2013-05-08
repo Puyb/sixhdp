@@ -11,6 +11,6 @@ urlpatterns = patterns('inscriptions.views',
     (r'^$', 'form', {}, 'inscriptions.create'),
     (r'^ipn/$', 'ipn', {}, 'inscriptions.ipn'),
     (r'^check_name/$', 'check_name', {}, 'inscriptions.check_name'),
-    (r'^list/$', login_required(ListView.as_view(model=Equipe, ))),
+    (r'^list/$', 'list', {}, 'inscriptions.list'),
 
 )
