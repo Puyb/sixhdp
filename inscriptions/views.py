@@ -23,7 +23,7 @@ from threading import Thread
 class EquipeForm(ModelForm):
     class Meta:
         model = Equipe
-        exclude = ('paiement', 'dossier_complet', 'password', 'date', 'commentaires', 'paiement_info')
+        exclude = ('paiement', 'dossier_complet', 'password', 'date', 'commentaires', 'paiement_info', 'gerant_ville2')
         widgets = {
             #'password': PasswordInput(),
             'categorie': HiddenInput(),
@@ -34,7 +34,7 @@ class EquipeForm(ModelForm):
 class EquipierForm(ModelForm):
     class Meta:
         model = Equipier
-        exclude = ('equipe', 'numero', 'piece_jointe_valide', 'autorisation_valide', 'piece_jointe2_valide')
+        exclude = ('equipe', 'numero', 'piece_jointe_valide', 'autorisation_valide', 'piece_jointe2_valide', 'ville2')
         widgets = {
             'sexe':              Select(choices=SEXE_CHOICES),
             'date_de_naissance': SelectDateWidget(years=range(YEAR-MIN_AGE, YEAR-100, -1)),
@@ -204,6 +204,6 @@ def check_name(request):
 def list(request):
     return render_to_response('list.html', RequestContext(request, {
        'object_list': Equipe.objects.all(),
-       'villes': Ville.objects.all().annotate(equipiers=Count('equipier')),
+       'villes': Ville.objects.all().order_by('nom').annotate(equipiers=Count('equipier')),
        'equipiers': Equipier.objects.all(),
     }))
