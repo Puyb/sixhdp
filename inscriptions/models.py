@@ -10,7 +10,6 @@ from settings import *
 from datetime import date
 from decimal import Decimal
 from django.utils.safestring import mark_safe
-from threading import Thread
 
 # CATEGORIES = {
 #     'SLH': { 'prix' : 50 },
@@ -67,7 +66,15 @@ def lookup_ville(nom, cp, pays):
        not len(data['results']) or
        'locations' not in data['results'][0] or
        not len(data['results'][0]['locations'])):
-        return None
+        f = urllib.urlopen(iriToUri('http://open.mapquestapi.com/geocoding/v1/address?key=%s&location=%s' % (MAPQUEST_API_KEY, nom + ', ' + str(pays))))
+        data = simplejson.load(f)
+        f.close()
+
+        if('results' not in data or
+           not len(data['results']) or
+           'locations' not in data['results'][0] or
+           not len(data['results'][0]['locations'])):
+            return None
 
     data = data['results'][0]['locations'][0]
     data['latLng']['lat'] = str(data['latLng']['lat'])
@@ -86,16 +93,6 @@ def lookup_ville(nom, cp, pays):
     )
     obj.save()
     return obj
-
-class DifferThread(Thread):
-    def __init__ (self, obj, name):
-        Thread.__init__(self)
-        self.obj = obj
-        self.name = name
-
-    def run(self):  
-        getattr(self.obj, self.name)()
-        self.obj.save()
 
 class Equipe(models.Model):
     nom                = models.CharField(_(u"Nom d'équipe"), max_length=30)
@@ -178,29 +175,24 @@ class Equipe(models.Model):
         if self.id:
             paiement = Equipe.objects.get(id=self.id).paiement
             if paiement != self.paiement:
-                DifferThread(self, 'differTask2').start()
+                ctx = { "instance": self, }
+                subject = '[6h de Paris 2013] Paiement reçu'
+                message = render_to_string( 'mail_paiement.html', ctx)
+                msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ self.gerant_email ])
+                msg.content_subtype = "html"
+                msg.send()
+
+                subject = '[6h de Paris 2013] Paiement reçu %s' % (self.id, )
+                message = render_to_string( 'mail_paiement_admin.html', ctx)
+                msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ 'inscriptions@6hdeparis.fr' ])
+                msg.content_subtype = "html"
+                msg.send()
 
         super(Equipe, self).save(*args, **kwargs)
         if not self.gerant_ville2:
-            DifferThread(self, 'differTask').start()
-    
-    def differTask(self):
-        self.gerant_ville2 = lookup_ville(self.gerant_ville, self.gerant_code_postal, self.gerant_pays)
-        super(Equipe, self).save()
+            self.gerant_ville2 = lookup_ville(self.gerant_ville, self.gerant_code_postal, self.gerant_pays)
+            super(Equipe, self).save()
 
-    def differTask2(self):
-        ctx = { "instance": self, }
-        subject = '[6h de Paris 2013] Paiement reçu'
-        message = render_to_string( 'mail_paiement.html', ctx)
-        msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ self.gerant_email ])
-        msg.content_subtype = "html"
-        msg.send()
-
-        subject = '[6h de Paris 2013] Paiement reçu %s' % (self.id, )
-        message = render_to_string( 'mail_paiement_admin.html', ctx)
-        msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ 'inscriptions@6hdeparis.fr' ])
-        msg.content_subtype = "html"
-        msg.send()
 
 class Equipier(models.Model):
     numero            = models.IntegerField(_(u'Numéro'))
@@ -240,11 +232,8 @@ class Equipier(models.Model):
     def save(self, *args, **kwargs):
         super(Equipier, self).save(*args, **kwargs)
         if not self.ville2:
-            DifferThread(self, 'differTask').start()
-    
-    def differTask(self):
-        self.ville2 = lookup_ville(self.ville, self.code_postal, self.pays)
-        super(Equipier, self).save()
+            self.ville2 = lookup_ville(self.ville, self.code_postal, self.pays)
+            super(Equipier, self).save()
 
 
 
