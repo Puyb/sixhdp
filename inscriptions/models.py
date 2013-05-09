@@ -186,7 +186,6 @@ class Equipe(models.Model):
     
     def differTask(self):
         self.gerant_ville2 = lookup_ville(self.gerant_ville, self.gerant_code_postal, self.gerant_pays)
-        print 'Found:' + self.gerant_ville2.nom
         super(Equipe, self).save()
 
     def differTask2(self):
