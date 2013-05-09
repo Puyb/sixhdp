@@ -17,9 +17,13 @@
         #map {width: 600px; height: 600px; float: right; margin-top: 10px; }
         #map img { border: none; padding: 0; margin: 0; }
         hr { clear: both; margin: 30px auto; width: 40%; }
+        .entry-content { overflow: hidden; }
     </style>
     <h1>Inscrits</h1>
     <script>
+        function _v(o) { var a = []; for(var k in o) a.push(o[k]); return a; }
+        Array.prototype.sum = function() { var s = 0; for(var i = 0; i < this.length; i++) s += this[i]; return s };
+        Array.prototype.pluck = function(p) { var a = []; for(var i = 0; i < this.length; i++) a.push(this[i][p]); return a };
         var clubs = {};
         var categories = {};
         var villes = {};
@@ -89,10 +93,10 @@
         {% endfor %}
         <tr>
             <td colspan="2">{{ object_list|length }} inscriptions</td>
-            <td><script>var nbclubs = 0; for(var k in clubs) nbclubs++; document.write(nbclubs);</script> clubs</td>
+            <td><script>document.write(_v(clubs).length);</script> clubs</td>
             <td></td>
-            <td><script>var nbvilles = 0; for(var k in villes) nbvilles++; document.write(nbvilles);</script> villes</td>
-            <td><script>var nbpays = 0; for(var k in pays) nbpays++; document.write(nbpays);</script> pays</td>
+            <td><script>document.write(_v(villes).length);</script> villes</td>
+            <td><script>document.write(_v(pays).length);</script> pays</td>
             {% if user.is_staff %}
             <td><script>document.write(nombre);</script></td>
             <td colspan="2" style="text-align: right;"><script>document.write(paye);</script>€ / <script>document.write(prix);</script>€ (<script>document.write(nbpaye);</script><img alt="None" src="/static/admin/img/icon-yes.gif">)</td>
@@ -130,9 +134,7 @@
                     pays: '{{ v.pays|escapejs|lower }}'
                 }{% if not loop.last %},{% endif %}
 {% endif %}{% endfor %}            };
-            var nbcount = 0;
-            for(var k in villes)
-                nbcount += villes[k].count;
+            var nbcount = _v(villes).pluck('count').sum();
             var pays = {};
             for(var k in villes) {
                 var r = villes[k].pays == 'fr' ? villes[k].region : villes[k].pays
@@ -281,6 +283,71 @@
             });
 
 
+        </script>
+        <hr />
+        <h1>Particpants</h1>
+        <div style="font-weight: bold; transform: translate(535px, 365px);">Age</div>
+        <canvas id="canvas_sexe"></canvas>
+        <canvas id="canvas_hommes" style=""></canvas>
+        <canvas id="canvas_femmes" style=""></canvas>
+        <script>
+            var h = {}, f = {};
+            for(var i = 1; i < 10; i++) h[i] = f[i] = 0;
+            {% for e in equipiers %}
+            {% if e.sexe == 'H' %}h{% else %}f{% endif %}[{{ e.age|get_digit:2 }}] ++;
+            {% endfor %}
+            var _h = _v(h).sum(), _f = _v(f).sum();
+            var g = new Bluff.Pie('canvas_sexe', 400);
+            g.theme_pastel();
+            g.title = '';
+            g.tooltips = true;
+            g.data('Hommes', _h);
+            g.data('Femmes', _f, '#daaea9');
+            g.draw();
+
+            var g1 = new Bluff.Bar('canvas_hommes', 400);
+            g1.theme_pastel();
+            g1.title = '';
+            g1.tooltips = true;
+            g1.hide_legend = true;
+            g1.labels = {}
+            
+            var g2 = new Bluff.Bar('canvas_femmes', 400);
+            g2.theme_pastel();
+            g2.title = '';
+            g2.tooltips = true;
+            g2.hide_legend = true;
+            var a1 = [], a2 = [], max = 0;;
+            for(var k = 1; k < 10; k++) {
+                a1.push(h[k])
+                a2.push(f[k])
+                if(h[k] > max) max = h[k];
+                if(f[k] > max) max = f[k];
+                g1.labels[k - 1] = k * 10;
+            }
+            g1.data('Hommes', a1);
+            g2.data('Femmes', a2, '#daaea9');
+            g1.maximum_value = g2.maximum_value = max;
+            g1.draw();
+            g2.draw();
+
+            var ds = document.getElementById('canvas_sexe').parentNode;
+            var dh = document.getElementById('canvas_hommes').parentNode;
+            var df = document.getElementById('canvas_femmes').parentNode;
+            ds.style.marginRight =  '-120px';
+            ds.style.marginLeft =  '-80px';
+            ds.style.cssFloat = 'left';
+            dh.style.transformOrigin = '50% 50% 0';
+            dh.style.transform = 'rotate(270deg)';
+            dh.style.marginBottom = '100px';
+            dh.style.clear = 'none';
+            dh.style.cssFloat = 'left';
+            df.style.transformOrigin = '50% 50% 0';
+            df.style.transform = 'rotate(270deg) scaleY(-1) translate(0, 100px)';
+            df.style.marginBottom = '100px';
+            df.style.marginRight = '-200px';
+            df.style.clear = 'none';
+            df.style.cssFloat = 'left';
         </script>
     </div>
 {% endblock %}
