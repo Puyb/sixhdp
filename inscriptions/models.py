@@ -69,6 +69,8 @@ def lookup_ville(nom, pays):
         return None
 
     data = data['results'][0]['locations'][0]
+    data['latLng']['lat'] = str(data['latLng']['lat'])
+    data['latLng']['lng'] = str(data['latLng']['lng'])
     try:
         return Ville.objects.get(lat=data['latLng']['lat'], lng=data['latLng']['lng'])
     except Ville.DoesNotExist, e:
