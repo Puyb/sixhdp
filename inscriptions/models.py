@@ -129,6 +129,10 @@ class Equipe(models.Model):
     def autorisation_manquantes(self):
         return [equipier for equipier in self.equipier_set.all() if equipier.age() < 18 and not equipier.autorisation_valide and not equipier.autorisation ]
 
+    def documents_manquants2(self):
+        return (len(self.licence_manquantes()) + len(self.certificat_manquantes()) + len(self.autorisation_manquantes())) or ''
+    documents_manquants2.short_description = u'✉'
+
     def verifier(self):
         return len([equipier for equipier in self.equipier_set.all() 
                 if (equipier.piece_jointe and equipier.piece_jointe_valide == None) or
