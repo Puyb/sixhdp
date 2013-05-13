@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load l10n %}
 {% block content %}
 <h1>{% trans 'Votre inscription est enregistrée' %}</h1>
 <table>
@@ -23,9 +24,9 @@
         <input type="hidden" name="cmd"           value="_cart" />
         <input type="hidden" name="upload"        value="1" />
         <input type="hidden" name="no_shipping"   value="1" />
-        <input type="hidden" name="invoice"       value="{{ instance.id }}" />
         <input type="hidden" name="item_name_1"   value="6H de Paris - {{ instance.categorie }}" />
-        <input type="hidden" name="amount_1"      value="{{ instance.prix_paypal|floatformat:2 }}" />
+        <input type="hidden" name="invoice"       value="{{ instance.id }}{{ hour }}" />
+        <input type="hidden" name="amount_1"      value="{{ instance.prix_paypal|stringformat:".2f" }}" />
         <input type="hidden" name="quantity_1"    value="1" />
         {# LEAVE THE HANDLING CHARGE ALONE!  PAYPAL SHIPPING WILL INEVITABLY BE MESSED UP IF YOU USE THEIR SHIPPING METHODS #}
         {# To work around their bizarre system, we are telling Paypal "no shipping" and adding all shipping charges as handling #}

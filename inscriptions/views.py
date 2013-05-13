@@ -145,6 +145,7 @@ def done(request, id):
             }
         )),
         "paypal_ipn_url": request.build_absolute_uri(reverse('inscriptions.ipn')),
+        "hour": datetime.now().strftime('%H%M'),
     })
     return render_to_response('done.html', ctx)
 
@@ -164,7 +165,7 @@ def ipn(request):
             # We want to respond to anything that isn't a payment - but we won't insert into our database.
              return HttpResponse()
 
-        equipe = get_object_or_404(Equipe, id=data['invoice'])
+        equipe = get_object_or_404(Equipe, id=data['invoice'][0:-4])
         equipe.paiement = data['mc_gross']
         equipe.paiement_info = 'Paypal %s %s' % (datetime.now(), data['txn_id'])
         equipe.save()

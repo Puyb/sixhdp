@@ -18,6 +18,50 @@
         #map img { border: none; padding: 0; margin: 0; }
         hr { clear: both; margin: 30px auto; width: 40%; }
         .entry-content { overflow: hidden; }
+        #d_canvas_sexe {
+            margin-right:  -120px;
+            margin-left:  -80px;
+            float: left;
+        }
+        #stats>#d_canvas_hommes,
+        #stats>#d_canvas_femmes {
+            clear: none;
+            margin-bottom: 100px;
+            float: left;
+        }
+        #d_canvas_hommes {
+            transform-origin: 50% 50% 0;
+            transform: rotate(270deg);
+            -webkit-transform-origin: 50% 50% 0;
+            -webkit-transform: rotate(270deg);
+            -ms-transform-origin: 50% 50% 0;
+            -ms-transform: rotate(270deg);
+        }
+        #d_canvas_femmes {
+            transform-origin: 50% 50% 0;
+            transform: rotate(270deg) scaleY(-1) translate(0, 100px);
+            -webkit-transform-origin: 50% 50% 0;
+            -webkit-transform: rotate(270deg) scaleY(-1) translate(0, 100px);
+            -ms-transform-origin: 50% 50% 0;
+            -ms-transform: rotate(270deg) scaleY(-1) translate(0, 100px);
+            margin-right: -200px;
+        }
+        #d_canvas_hommes .bluff-text {
+            transform-origin: 50% 50% 0;
+            transform: rotate(90deg);
+            -webkit-transform-origin: 50% 50% 0;
+            -webkit-transform: rotate(90deg);
+            -ms-transform-origin: 50% 50% 0;
+            -ms-transform: rotate(90deg);
+        }
+        #d_canvas_femmes .bluff-text {
+            transform-origin: 50% 50% 0;
+            transform: rotate(270deg) scaleY(-1);
+            -webkit-transform-origin: 50% 50% 0;
+            -webkit-transform: rotate(270deg) scaleY(-1);
+            -ms-transform-origin: 50% 50% 0;
+            -ms-transform: rotate(270deg) scaleY(-1);
+        }
     </style>
     <h1>Inscrits</h1>
     <script>
@@ -188,7 +232,9 @@
                 if(villes[k].lng < minlng) minlng = villes[k].lng;
                 if(villes[k].lng > maxlng) maxlng = villes[k].lng;
             }
-            map.fitBounds([[minlat, minlng], [maxlat, maxlng]]);
+            var marginlat = (maxlat - minlat) * .05;
+            var marginlng = (maxlng - minlng) * .05;
+            map.fitBounds([[minlat - marginlat, minlng - marginlng], [maxlat + marginlat, maxlng + marginlng]]);
 
 
 
@@ -285,8 +331,8 @@
 
         </script>
         <hr />
-        <h1>Particpants</h1>
-        <div style="font-weight: bold; transform: translate(535px, 365px);">Age</div>
+        <h1>Participants</h1>
+        <div style="font-weight: bold; transform: translate(535px, 365px); -webkit-transform: translate(535px, 365px); -ms-transform: translate(535px, 365px);">Age</div>
         <canvas id="canvas_sexe"></canvas>
         <canvas id="canvas_hommes" style=""></canvas>
         <canvas id="canvas_femmes" style=""></canvas>
@@ -331,23 +377,9 @@
             g1.draw();
             g2.draw();
 
-            var ds = document.getElementById('canvas_sexe').parentNode;
-            var dh = document.getElementById('canvas_hommes').parentNode;
-            var df = document.getElementById('canvas_femmes').parentNode;
-            ds.style.marginRight =  '-120px';
-            ds.style.marginLeft =  '-80px';
-            ds.style.cssFloat = 'left';
-            dh.style.transformOrigin = '50% 50% 0';
-            dh.style.transform = 'rotate(270deg)';
-            dh.style.marginBottom = '100px';
-            dh.style.clear = 'none';
-            dh.style.cssFloat = 'left';
-            df.style.transformOrigin = '50% 50% 0';
-            df.style.transform = 'rotate(270deg) scaleY(-1) translate(0, 100px)';
-            df.style.marginBottom = '100px';
-            df.style.marginRight = '-200px';
-            df.style.clear = 'none';
-            df.style.cssFloat = 'left';
+            ['canvas_sexe', 'canvas_hommes', 'canvas_femmes'].forEach(function(k) {
+                document.getElementById(k).parentNode.id = 'd_' + k;
+            });
         </script>
     </div>
 {% endblock %}
