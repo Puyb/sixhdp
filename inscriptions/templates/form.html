@@ -43,8 +43,10 @@
             valid: function(data) { return data.nombre >= 2; }
         }
     ];
+    {% if instance.categorie != 'IDH' and instance.categorie != 'IDF' %}
     if({{ solo }} > 30) // Limitation des solos à 30
         categories = categories.slice(2);
+    {% endif %}
 
     function age(a) {
         return function(eq) {
@@ -174,7 +176,11 @@
                     //password:           {% if create %}/^.{6,}$/i{% else %}/^(|.{6,})$/i{% endif %},
                     //password2:          function() { return this.password == $F('id_password2'); },
                     //nombre:             /^[12345]$/i,
+                    {% if instance.categorie != 'IDH' and instance.categorie != 'IDF' %}
+                    nombre:             function(k) { if({{ solo }} > 30 && this.nombre == 1) { alert("{% trans "Désolé, il n'y a plus de places en catégorie individuel." %}"); return false; } return true; },
+                    {% endif %}
                     gerant_telephone:   /^\+?[0-9]{10,15}$/i
+
                 };
             } else {
                 function check_date(k) {

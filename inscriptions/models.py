@@ -170,7 +170,7 @@ class Equipe(models.Model):
 
 
     def frais_paypal(self):
-        return self.prix * Decimal('0.034') + Decimal('0.25')
+        return ( self.prix + Decimal('0.25') ) / ( Decimal('1.000') - Decimal('0.034') ) - self.prix
 
     def prix_paypal(self):
         return self.prix + self.frais_paypal()

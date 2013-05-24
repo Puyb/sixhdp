@@ -169,15 +169,15 @@
                 'FMX': '{% trans 'Famille' %}',
                 'EPX': '{% trans 'Entreprise / Étudiants' %}'
             };
-            villes = {
-{% for v in villes %}{% if v.equipiers > 0 %}                '{{ v.nom|escapejs }}': {
-                lat: {{ v.lat|stringformat:"f" }},
+            villes = {};
+            {% for v in villes %}{% if v.equipiers > 0 %}           if(villes['{{ v.nom|escapejs }}']) villes['{{ v.nom|escapejs }}'].count += {{ v.equipiers }}; else villes['{{ v.nom|escapejs }}'] = {
+                    lat: {{ v.lat|stringformat:"f" }},
                     lng: {{ v.lng|stringformat:"f" }},
                     count: {{ v.equipiers }},
                     region: '{{ v.region|escapejs }}',
                     pays: '{{ v.pays|escapejs|lower }}'
-                }{% if not loop.last %},{% endif %}
-{% endif %}{% endfor %}            };
+                };
+{% endif %}{% endfor %}
             var nbcount = _v(villes).pluck('count').sum();
             var pays = {};
             for(var k in villes) {
