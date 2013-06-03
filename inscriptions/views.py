@@ -132,6 +132,7 @@ def form(request, id=None, code=None):
         "create": not instance,
         "update": not not instance,
         "solo": Equipe.objects.filter(categorie__startswith='ID').count(),
+        "max_solo": datetime(2013, 6, 8) <= datetime.now() and 49 or 30,
     }))
 
 def done(request, id):

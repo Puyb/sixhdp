@@ -8,6 +8,7 @@
 <script src="{{ STATIC_URL }}prototype.js"></script>
 <script>
 (function() {
+    var max_solo = {{ max_solo }};
 
     var actual_part = 0;
     var categories = [
@@ -44,7 +45,7 @@
         }
     ];
     {% if instance.categorie != 'IDH' and instance.categorie != 'IDF' %}
-    if({{ solo }} > 30) // Limitation des solos à 30
+    if({{ solo }} > max_solo) // Limitation des solos à 30
         categories = categories.slice(2);
     {% endif %}
 
@@ -177,7 +178,7 @@
                     //password2:          function() { return this.password == $F('id_password2'); },
                     //nombre:             /^[12345]$/i,
                     {% if instance.categorie != 'IDH' and instance.categorie != 'IDF' %}
-                    nombre:             function(k) { if({{ solo }} > 30 && this.nombre == 1) { alert("{% trans "Désolé, il n'y a plus de places en catégorie individuel." %}"); return false; } return true; },
+                    nombre:             function(k) { if({{ solo }} > max_solo && this.nombre == 1) { alert("{% trans "Désolé, il n'y a plus de places en catégorie individuel." %}"); return false; } return true; },
                     {% endif %}
                     gerant_telephone:   /^\+?[0-9]{10,15}$/i
 

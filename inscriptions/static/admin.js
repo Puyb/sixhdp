@@ -30,15 +30,7 @@ Event.observe(window, 'load', function() {
         if(birthday.getDay() != d[0])
             birthday = new Date(YEAR, d[1], d[0] - 1);
 
-        var age = today.getFullYear() - date_de_naissance.getFullYear() - (birthday > today ? 1 : 0)
-
-
-        p.up().addClassName('field-box field-date_de_naissance');
-        p.up().insert({after: '<div class="field-box">' +
-            '<label class="inline">Age pendant la course:</label>' +
-            '<p>' + age + ' ans</p>' +
-            '</div>' })
-        if(age > 18) {
+        if(parseFloat($$('.field-age>p')[0].textContent) > 18) {
             p.up('.form-row').next().hide();
         }
     

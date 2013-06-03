@@ -79,6 +79,7 @@
         var paye = 0;
         var nbcomplet = 0;
         var nbaverifier = 0;
+        var nberror = 0;
         var nbcertifenattente = 0;
         var nbdossierscertifenattente = 0;
         var pays_names = {};
@@ -127,7 +128,8 @@
                     nbpaye += {{ equipe.paiement_complet|yesno:"1,0,0" }};
                     paye += {{ equipe.paiement|default:0 }};
                     nbcomplet += {{ equipe.dossier_complet_auto|yesno:"1,0,0" }};
-                    nbaverifier += {{ equipe.dossier_complet_auto|yesno:"1,0,0" }};
+                    nbaverifier += {{ equipe.verifier|yesno:"1,0,0" }};
+                    nberror += {{ equipe.dossier_complet_auto|yesno:"0,1,0" }};
                     nbdossierscertifenattente += ({{ equipe.licence_manquantes|length }} + {{ equipe.certificat_manquantes|length }} + {{ equipe.autorisation_manquantes|length }}) ? 1 : 0;
                     nbcertifenattente += ({{ equipe.licence_manquantes|length }} + {{ equipe.certificat_manquantes|length }} + {{ equipe.autorisation_manquantes|length }});
                 </script>
@@ -152,6 +154,7 @@
         Note: Le nom et le placement des villes est determinée par une recherche automatique. Il est possible que le resultat de cette recherche soit erronné. Votre inscription est prise en compte avec la bonne ville même si ce n'est pas affiché correctement dans cette liste. Contactez nous si vous voyez une erreur que vous souhaitez corriger.<br />
         {% if user.is_staff %}
         <script>document.write(nbaverifier);</script> dossiers avec documents éléctroniques à vérifier.<br />
+        <script>document.write(nberror);</script> dossiers avec documents invalides.<br />
         <script>document.write(nbcertifenattente);</script> documents en attente sur <script>document.write(nbdossierscertifenattente);</script> dossiers.<br />
         {% endif %}
 

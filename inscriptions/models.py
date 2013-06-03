@@ -159,11 +159,22 @@ class Equipe(models.Model):
     dossier_complet2.short_description = mark_safe(u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""")
 
     def dossier_complet_auto(self):
-        return self.categorie not in ['EPX', 'FMX'] and len([equipier for equipier in self.equipier_set.all()
+        if len([equipier for equipier in self.equipier_set.all()
                     if (not equipier.piece_jointe_valide) or
-                       (equipier.age() < 18 and not equipier.autorisation_valide)]) == 0
+                    (equipier.age() < 18 and not equipier.autorisation_valide)]) == 0:
+            return True
+        if len([equipier for equipier in self.equipier_set.all()
+                    if equipier.piece_jointe_valide == False or
+                    (equipier.age() < 18 and equipier.autorisation_valide == False)]) > 0:
+            return False
+        return None
     def dossier_complet_auto2(self):
-        return self.dossier_complet_auto() and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
+        auto = self.dossier_complet_auto()
+        if auto:
+            return u"""<img alt="None" src="/static/admin/img/icon-yes.gif">"""
+        if auto == False:
+            return u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
+        return u""
     dossier_complet_auto2.allow_tags = True
     dossier_complet_auto2.short_description = mark_safe(u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""")
 
