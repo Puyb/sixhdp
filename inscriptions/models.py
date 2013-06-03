@@ -109,7 +109,7 @@ class Equipe(models.Model):
     gerant_telephone   = models.CharField(_(u'Téléphone'), max_length=200, blank=True)
     categorie          = models.CharField(_(u'Catégorie'), max_length=10)
     nombre             = models.IntegerField(_(u"Nombre d'équipiers"))
-    paiement_info      = models.CharField(_(u'Détails'), max_length=30, blank=True)
+    paiement_info      = models.CharField(_(u'Détails'), max_length=200, blank=True)
     prix               = models.DecimalField(_(u'Prix'), max_digits=5, decimal_places=2)
     paiement           = models.DecimalField(_(u'Paiement reçu'), max_digits=5, decimal_places=2, null=True, blank=True)
     dossier_complet    = models.NullBooleanField(_(u'Dossier complet'))
