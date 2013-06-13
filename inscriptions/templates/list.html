@@ -65,7 +65,9 @@
     </style>
     <h1>Inscrits</h1>
     <script>
+        function _k(o) { var a = []; for(var k in o) a.push(k); return a; }
         function _v(o) { var a = []; for(var k in o) a.push(o[k]); return a; }
+        function _each(o, c, f) { var a = _k(o); a.sort(f || function(x, y) { return o[y] - o[x]; }); for(var i=0; i < a.length; i++) c(a[i], o[a[i]], i); }
         Array.prototype.sum = function() { var s = 0; for(var i = 0; i < this.length; i++) s += this[i]; return s };
         Array.prototype.pluck = function(p) { var a = []; for(var i = 0; i < this.length; i++) a.push(this[i][p]); return a };
         var clubs = {};
@@ -191,28 +193,32 @@
             }
             var s = '';
             s += '<div><h1>Origine des participants</h1><table><tr><th colspan="2">Villes</th><th>#</th><th>%</th></tr>';
-            for(var k in villes) {
-                s+= '<tr><td>' + k + '</td><td><img src="/static/flags/' + villes[k].pays + '.png" alt="' + pays_names[villes[k].pays] + '" /></td><td>' + villes[k].count + '</td><td>' + Math.round(villes[k].count / nbcount * 100) + '%</td></tr>';
-            }
+            _each(villes, function(k) {
+                if(villes[k].count > 1)
+                    s+= '<tr><td>' + k + '</td><td><img src="/static/flags/' + villes[k].pays + '.png" alt="' + pays_names[villes[k].pays] + '" /></td><td>' + villes[k].count + '</td><td>' + Math.round(villes[k].count / nbcount * 100) + '%</td></tr>';
+            }, function(x, y) { return villes[y].count - villes[x].count; });
             s += '</table><div id="map"></div>';
 
 
             s += '<canvas id="canvas_pays"></canvas><table style="float: right;"><tr><th>Origine</th><th>#</th><th>%</th></tr>';
-            for(var k in pays)
+            _each(pays, function(k) {
                 s+= '<tr><td><img src="/static/flags/' + pays[k].pays + '.png" alt="' + pays_names[pays[k].pays] + '" /> ' + (pays_names[k] || k) + '</td><td>' + pays[k].count + '</td><td>' + Math.round(pays[k].count / nbcount * 100) + '%</td></tr>';
+            });
             s += '</table></div>';
 
 
         s += '<hr /><div><h1>Catégories</h1><table><tr><th>Code</th><th>Catégorie</th><th>#</th><th>%</th></tr>';
-            for(var k in categories)
+            _each(categories, function(k) {
                 s+= '<tr><td>' + k + '</td><td>' + categories_names[k] + '</td><td>' + categories[k] + '</td><td>' + Math.round(categories[k] / nbequipe * 100) + '%</td></tr>';
-            s += '</table><canvas id="canvas_categories"></canvas><canvas id="canvas_time"></canvas></div>';
+            });
+            s += '</table><canvas id="canvas_categories"></canvas><canvas id="canvas_time"></canvas><canvas id="canvas_time2"></canvas></div>';
 
 
         s += '<hr /><div><canvas id="canvas_clubs"></canvas><table><tr><th>Clubs</th><th>#</th><th>%</th></tr>';
-            for(var k in clubs)
+            _each(clubs, function(k) {
                 if(clubs[k] > 1)
                     s+= '<tr><td>' + k + '</td><td>' + clubs[k] + '</td><td>' + Math.round(clubs[k] / nbequipe * 100) + '%</td></tr>';
+            });
             s += '</table></div>';
             document.write(s);
         </script>
@@ -255,7 +261,7 @@
             var i = 0;
             for(var k in categories) d[k] = [0];
             {% for equipe in object_list %}
-            var f = Math.round((new Date('{{ equipe.date|date:"c" }}').getTime() - new Date(2013, 2, 15).getTime()) / 86400000);
+            var f = Math.round((new Date('{{ equipe.date|date:"c" }}'.split('T')[0]).getTime() - new Date(2013, 2, 15).getTime()) / 86400000);
             for(var k in d) {
                 var j = i + 1;
                 while(j <= f) {
@@ -284,6 +290,52 @@
                 var x = g._graph_left + (g._x_increment * index);
                 g._d.line(x, g._graph_bottom, x, g._graph_top);
             }
+
+
+            var g = new Bluff.StackedBar('canvas_time2', 900);
+            g.theme_pastel();
+            g.title = '';
+            g.tooltips = true;
+            g.marker_font_size = 12;
+            g.y_axis_increment = 10;
+            var d = {};
+            var i = 0;
+            for(var k in categories) d[k] = [0];
+            {% for equipe in object_list %}
+            var f = Math.round((new Date('{{ equipe.date|date:"c" }}'.split('T')[0]).getTime() - new Date(2013, 2, 15).getTime()) / 86400000);
+            for(var k in d) {
+                var j = i + 1;
+                while(j <= f) {
+                    d[k].push(0);
+                    j++;
+                }
+            }
+            d['{{ equipe.categorie }}'][f] = d['{{ equipe.categorie }}'][f] + 1;
+            i = f;
+            {% endfor %}
+            var i = 0;
+            for(var k in d) {
+                g.data(k, d[k]);
+                colors.categories[k] = g.colors[i];
+                i++;
+            }
+            g.labels = {};
+            for(var i = 0; i < f; i += 7) {
+                var d = new Date(2013, 2, 15 + i)
+                g.labels[i] = d.getDate() + '/' + (d.getMonth() + 1);
+            }
+            g.draw();
+            g._d.stroke = '#ccc';
+            g._d.stroke_width = 1;
+            for(var index in g.labels) {
+                var x = g._graph_left + (g._x_increment * index);
+                g._d.line(x, g._graph_bottom, x, g._graph_top);
+            }
+            var e = document.getElementById('canvas_time').parentNode;
+            var e2 = document.getElementById('canvas_time2').parentNode;
+            e2.style.display = 'none';
+            e.addEventListener('click', function() { e.style.display = 'none', e2.style.display = 'block'; });
+            e2.addEventListener('click', function() { e2.style.display = 'none', e.style.display = 'block'; });
 
             var autres = 0;
             for(var k in clubs)

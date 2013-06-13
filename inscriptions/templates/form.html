@@ -8,6 +8,13 @@
 <script src="{{ STATIC_URL }}prototype.js"></script>
 <script>
 (function() {
+    if(![].map)
+        Array.prototype.map = function(fn) {
+            var r = [];
+            for(var i = 0; i < this.length; i++)
+                r.push(fn(this[i], i));
+            return r;
+        };
     var max_solo = {{ max_solo }};
 
     var actual_part = 0;
@@ -83,13 +90,16 @@
             var n = event.element().name.split('-')[1];
             if(age(18)(data.equipiers[n])) {
                 $('id_form-' + n + '-autorisation').up('tr').hide();
+                if(!$('tr-autorisation-warning'))
+                    $('tr-autorisation-warning').hide()
             } else {
-                $('id_form-' + n + '-autorisation').up('tr').show()
-                .insert({
-                    after: new Element('tr')
-                            .insert(new Element('td', { colspan: 2 })
-                            .update("{% trans "Si vous le pouvez, scannez l'autorisation et ajoutez la en pièce jointe (formats PDF ou JPEG)." %}<br />{% blocktrans %}Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier (<a href=\"http://www.6hdeparis.fr/wp-content/uploads/2013/03/autorisation_parentale.pdf\" target=\"_blank\">modèle</a>).{% endblocktrans %}"))
-                });
+                var e = $('id_form-' + n + '-autorisation').up('tr').show();
+                if(!$('tr-autorisation-warning'))
+                    e.insert({
+                        after: new Element('tr', { id: 'tr-autorisation-warning' })
+                                .insert(new Element('td', { colspan: 2 })
+                                .update("{% trans "Si vous le pouvez, scannez l'autorisation et ajoutez la en pièce jointe (formats PDF ou JPEG)." %}<br />{% blocktrans %}Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier (<a href=\"http://www.6hdeparis.fr/wp-content/uploads/2013/03/autorisation_parentale.pdf\" target=\"_blank\">modèle</a>).{% endblocktrans %}"))
+                    });
             }
         
         });
@@ -111,8 +121,8 @@
                 }
             };
             $(id + '-justificatif_0').up('li').remove();
-            $(id + '-justificatif_1').observe('change', handler);
-            $(id + '-justificatif_2').observe('change', handler);
+            $(id + '-justificatif_1').observe(Prototype.Browser.IE ? 'click' : 'change', handler);
+            $(id + '-justificatif_2').observe(Prototype.Browser.IE ? 'click' : 'change', handler);
             handler();
         })
         $$('input[name*=parent]').each(function(e) {
@@ -223,7 +233,9 @@
             if(actual_part > parseInt($F('id_nombre'))) {
                 // last page
                 $('partlast').show();
-                $('partlast').down('input').focus();
+                try {
+                    $('partlast').down('input').focus();
+                } catch(e) {}
 
                 actual_categories = categories.filter(function(c) {
                     return c.valid(data);

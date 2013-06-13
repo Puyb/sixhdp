@@ -8,7 +8,9 @@
     <tr><th>{% trans "Numéro d'inscription :" %}</th><td>{{ instance.id }}</td></tr>
 </table>
 <br />
+{% if create %}
 {% trans 'Un email de confirmation vient de vous être envoyé.' %}<br />
+{% endif %}
 <br />
 <br />
 <br />
