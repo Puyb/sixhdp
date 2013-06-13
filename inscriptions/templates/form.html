@@ -90,8 +90,8 @@
             var n = event.element().name.split('-')[1];
             if(age(18)(data.equipiers[n])) {
                 $('id_form-' + n + '-autorisation').up('tr').hide();
-                if(!$('tr-autorisation-warning'))
-                    $('tr-autorisation-warning').hide()
+                if($('tr-autorisation-warning'))
+                    $('tr-autorisation-warning').remove()
             } else {
                 var e = $('id_form-' + n + '-autorisation').up('tr').show();
                 if(!$('tr-autorisation-warning'))
