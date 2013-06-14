@@ -324,6 +324,12 @@
         {% endfor %}
     </div>
     <div id="part0" class="parts">
+        {% blocktrans %}Inscrivez votre équipe, votre duo en quelques étapes. Laissez vous guider.{% endblocktrans%}<br />
+        <br />
+        {% blocktrans %}Vous pouvez envoyez vos justificatifs par internet ou par courrier. Vous pouvez payer votre inscription par internet ou par chèque. Une fois votre inscription terminée, vous recevrez un email de confirmation.{% endblocktrans%}<br />
+        {% blocktrans %}Mon pouvez modifier votre inscription, ajouter ou enlever des coéquipiers, envoyer les certificats, changer de catégorie jusqu'au 21 juillet 2013 inclus.{% endblocktrans%}<br />
+        {% blocktrans %}Si vous rencontrez des problèmes lors de votre inscription, <a href="http://www.6hdeparis.fr/contact/">contactez nous</a>{% endblocktrans%}<br />
+
         <h2>{%trans 'Information générales' %}</h2>
         <table>{{ equipe_form.as_table }}</table>
     </div>
