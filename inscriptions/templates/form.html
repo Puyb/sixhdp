@@ -55,6 +55,11 @@
     if({{ solo }} > max_solo) // Limitation des solos à 30
         categories = categories.slice(2);
     {% endif %}
+    {% if prix2 %}
+    categories.map(function(c) {
+        c.prix = { 40: 50, 50: 60, 75: 90 }[c.prix];
+    });
+    {% endif %}
 
     function age(a) {
         return function(eq) {

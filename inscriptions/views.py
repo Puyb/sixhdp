@@ -18,6 +18,7 @@ import urllib2
 import random
 from settings import *
 from datetime import datetime
+from django.utils import timezone
 from threading import Thread
 
 class EquipeForm(ModelForm):
@@ -125,6 +126,7 @@ def form(request, id=None, code=None):
             equipier_formset = EquipierFormset(queryset=instance.equipier_set.all())
         else:
             equipier_formset = EquipierFormset(queryset=Equipier.objects.none())
+    date_prix2 = timezone.make_aware(datetime(2013, 6, 17), timezone.get_default_timezone())
     return render_to_response("form.html", RequestContext(request, {
         "equipe_form": equipe_form,
         "equipier_formset": equipier_formset,
@@ -133,6 +135,7 @@ def form(request, id=None, code=None):
         "update": not not instance,
         "solo": Equipe.objects.filter(categorie__startswith='ID').count(),
         "max_solo": datetime(2013, 6, 8) <= datetime.now() and 49 or 30,
+        "prix2": date_prix2 <= timezone.now() and (not instance or instance.date >= date_prix2)
     }))
 
 def done(request, id):
