@@ -85,6 +85,7 @@
         var nbcertifenattente = 0;
         var nbdossierscertifenattente = 0;
         var pays_names = {};
+        var pc = 0, pi = 0, pe = 0, pv = 0, ipc = 0, ipi = 0, ipe = 0, ipv = 0;
     </script>
     <table width="100%">
         <tr>
@@ -134,6 +135,7 @@
                     nberror += {{ equipe.dossier_complet_auto|yesno:"0,1,0" }};
                     nbdossierscertifenattente += ({{ equipe.licence_manquantes|length }} + {{ equipe.certificat_manquantes|length }} + {{ equipe.autorisation_manquantes|length }}) ? 1 : 0;
                     nbcertifenattente += ({{ equipe.licence_manquantes|length }} + {{ equipe.certificat_manquantes|length }} + {{ equipe.autorisation_manquantes|length }});
+                    {% if not equipe.paiement_complet %}i{% endif %}p{% if equipe.verifier %}v{% else %}{{ equipe.dossier_complet_auto|yesno:"c,e,i" }}{% endif %} += 1;
                 </script>
             </td>
             {% endif %}
@@ -154,13 +156,91 @@
     </table>
     <div>
         Note: Le nom et le placement des villes est determinée par une recherche automatique. Il est possible que le resultat de cette recherche soit erronné. Votre inscription est prise en compte avec la bonne ville même si ce n'est pas affiché correctement dans cette liste. Contactez nous si vous voyez une erreur que vous souhaitez corriger.<br />
+    </div>
+    <div id="stats">
         {% if user.is_staff %}
         <script>document.write(nbaverifier);</script> dossiers avec documents éléctroniques à vérifier.<br />
         <script>document.write(nberror);</script> dossiers avec documents invalides.<br />
         <script>document.write(nbcertifenattente);</script> documents en attente sur <script>document.write(nbdossierscertifenattente);</script> dossiers.<br />
+        <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+        <script src="{{ STATIC_URL }}/js-class.js"></script>
+        <script src="{{ STATIC_URL }}/bluff-src.js"></script>
+        <div>
+            <canvas id="canvas_admin" style="float: right;"></canvas>
+            <table>
+                <tr>
+                    <th>Statut</th>
+                    <th></th>
+                    <th>#</th>
+                    <th>%</th>
+                </tr>
+                <tr>
+                    <td>Payé et complet</td>
+                    <td><div style="width: 10px; height: 10px; background: #00ff00"></div></td>
+                    <td><script>document.write(pc);</script></td>
+                    <td><script>document.write(Math.round(pc / nombre * 100))</script></td>
+                </tr>
+                <tr>
+                    <td>Payé et incomplet</td>
+                    <td><div style="width: 10px; height: 10px; background: #99ff99"></div></td>
+                    <td><script>document.write(pi);</script></td>
+                    <td><script>document.write(Math.round(pi / nombre * 100))</script></td>
+                </tr>
+                <tr>
+                    <td>Payé et erreur</td>
+                    <td><div style="width: 10px; height: 10px; background: #ff9999"></div></td>
+                    <td><script>document.write(pe);</script></td>
+                    <td><script>document.write(Math.round(pe / nombre * 100))</script></td>
+                </tr>
+                <tr>
+                    <td>Payé et a vérifier</td>
+                    <td><div style="width: 10px; height: 10px; background: #ccffcc"></div></td>
+                    <td><script>document.write(pv);</script></td>
+                    <td><script>document.write(Math.round(pv / nombre * 100))</script></td>
+                </tr>
+                <tr>
+                    <td>Impayé et complet</td>
+                    <td><div style="width: 10px; height: 10px; background: #0000ff"></div></td>
+                    <td><script>document.write(ipc);</script></td>
+                    <td><script>document.write(Math.round(ipc / nombre * 100))</script></td>
+                </tr>
+                <tr>
+                    <td>Impayé et incomplet</td>
+                    <td><div style="width: 10px; height: 10px; background: #9999ff"></div></td>
+                    <td><script>document.write(ipi);</script></td>
+                    <td><script>document.write(Math.round(ipi / nombre * 100))</script></td>
+                </tr>
+                <tr>
+                    <td>Impayé et erreur</td>
+                    <td><div style="width: 10px; height: 10px; background: #ff0000"></div></td>
+                    <td><script>document.write(ipe);</script></td>
+                    <td><script>document.write(Math.round(ipe / nombre * 100))</script></td>
+                </tr>
+                <tr>
+                    <td>Impayé et a vérifier</td>
+                    <td><div style="width: 10px; height: 10px; background: #ccccff"></div></td>
+                    <td><script>document.write(ipv);</script></td>
+                    <td><script>document.write(Math.round(ipv / nombre * 100))</script></td>
+                </tr>
+            </table>
+            <script>
+                var g = new Bluff.Pie('canvas_admin', 400);
+                g.theme_pastel();
+                g.title = '';
+                g.tooltips = true;
+                g.data('Payé et complet', pc, '#00ff00');
+                g.data('Payé et incomplet', pi, '#99ff99');
+                g.data('Payé et erreur', pe, '#ff9999');
+                g.data('Payé et a vérifier', pv, '#ccffcc');
+                g.data('Impayé et complet', ipc, '#0000ff');
+                g.data('Impayé et incomplet', ipi, '#9999ff');
+                g.data('Impayé et erreur', ipe, '#ff0000');
+                g.data('Impayé et a vérifier', ipv, '#ccccff');
+                g.draw();
+            </script>
+        </div>
         {% endif %}
 
-    <div id="stats">
         <hr />
         <script>
             var categories_names = {
@@ -222,9 +302,6 @@
             s += '</table></div>';
             document.write(s);
         </script>
-        <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
-        <script src="{{ STATIC_URL }}/js-class.js"></script>
-        <script src="{{ STATIC_URL }}/bluff-src.js"></script>
         <script>
             var map = L.map('map').setView([51.505, -0.09], 13);
             L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {

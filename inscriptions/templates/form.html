@@ -273,7 +273,10 @@
                 }
 
                 {% if update %}
-                $('id_categorie-{{ instance.categorie }}').checked = true;
+                if(!$('id_categorie-{{ instance.categorie }}'))
+                    alert('{% trans "Vos modifications impliquent un changement de catégorie. Veuillez sélectionner la nouvelle catégorie." %}');
+                else
+                    $('id_categorie-{{ instance.categorie }}').checked = true;
                 {% else %}
                 $$('input[name=categorie]')[0].checked = true;
                 $('id_prix').value = actual_categories[0].prix;
