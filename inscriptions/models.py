@@ -208,6 +208,15 @@ class Equipe(models.Model):
             self.gerant_ville2 = lookup_ville(self.gerant_ville, self.gerant_code_postal, self.gerant_pays)
             super(Equipe, self).save()
 
+    def send_mail_relance(self, mail=None):
+        #if self.paiement_complet and self.dossier_complet_auto:
+        #    return
+        ctx = { "instance": self, }
+        subject = '[6h de Paris 2013] Votre inscription / Your registration'
+        message = render_to_string( 'mail_relance.html', ctx)
+        msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ mail or self.gerant_email ])
+        msg.content_subtype = "html"
+        msg.send()
 
 class Equipier(models.Model):
     numero            = models.IntegerField(_(u'Numéro'))

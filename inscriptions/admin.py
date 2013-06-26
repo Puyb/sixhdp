@@ -78,7 +78,7 @@ class EquipeAdminMini(admin.ModelAdmin):
         css = {"all": ("admin.css",)}
         js  = ('/vars.js', 'prototype.js', 'admin.js', )
     readonly_fields = [ 'id', 'nom', 'club', 'gerant_nom', 'gerant_prenom', 'gerant_adresse1', 'gerant_adress2', 'gerant_ville', 'gerant_code_postal', 'gerant_pays', 'gerant_email', 'gerant_telephone', 'categorie', 'nombre', 'prix', 'date', 'password']
-    list_display = ['id', 'categorie', 'nom', 'club', 'gerant_email', 'paiement_complet2', 'dossier_complet2', 'nombre2', 'date', 'documents_manquants2', 'verifier2', 'dossier_complet_auto2']
+    list_display = ['id', 'categorie', 'nom', 'club', 'gerant_email', 'date', 'nombre2', 'paiement_complet2', 'documents_manquants2', 'verifier2', 'dossier_complet_auto2']
     list_display_links = ['id', 'categorie', 'nom', 'club', ]
     list_filter = ['categorie', 'dossier_complet', 'nombre', 'date']
     ordering = ['-date', ]
@@ -86,13 +86,14 @@ class EquipeAdminMini(admin.ModelAdmin):
 
     fieldsets = (
         ("Instructions", { 'description': HELP_TEXT, 'classes': ('collapse', 'collapsed'), 'fields': () }),
-        (None, { 'fields': (('id', 'nom', 'club'), ('categorie', 'nombre'), ('paiement', 'prix', 'paiement_info'), 'dossier_complet', 'commentaires')}),
+        (None, { 'fields': (('id', 'nom', 'club'), ('categorie', 'nombre'), ('paiement', 'prix', 'paiement_info'), 'commentaires')}),
         (u'Gérant', { 'classes': ('collapse', 'collapsed'), 'fields': (('gerant_nom', 'gerant_prenom'), 'gerant_adresse1', 'gerant_adress2', ('gerant_ville', 'gerant_code_postal'), 'gerant_pays', 'gerant_email', 'gerant_telephone', 'password') }),
         ("Autre", { 'description': '<div id="autre"></div>', 'classes': ('collapse', 'collapsed'), 'fields': () }),
 
     )
     actions = []
     search_fields = ('id', 'nom', 'club', 'gerant_nom', 'gerant_prenom', 'equipier__nom', 'equipier__prenom')
+    list_per_page = 500
 
 
 from django.contrib.admin.models import LogEntry
