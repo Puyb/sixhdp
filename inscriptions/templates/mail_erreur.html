@@ -1,0 +1,47 @@
+<p>Bonjour {{ instance.gerant_prenom }} {{ instance.gerant_nom }},</p>
+
+<p>Nous avons correctement reçu votre demande d’inscription aux 6h de Paris, le 4 août 2013 pour l’équipe {{ instance.nom }} sous le numéro {{ instance.id }}.</p>
+
+{% if message %}
+<p>Nous avons rencontrer une erreur en traitant votre dossier.
+{{ message }}
+</p>
+{% endif %}
+
+{% if not instance.paiement_complet %}
+<p>A ce jour, nous n’avons pas encore reçu le paiement de {{ instance.prix }} €. Vous devez impérativement effectuer ce règlement avant le 21 juillet 2013.</p>
+
+<p>Pour cela, vous pouvez payer par internet en <a href="http://inscription.6hdeparis.fr/{{ instance.id }}/done/">cliquant ici</a>, ou envoyer un chèque de {{ instance.prix }} € à l’ordre de Paris Université Club, en précisant le numéro d’inscription {{ instance.id }}, à l’adresse :<p>
+<pre>PUC - 6h Roller de Paris
+17 avenue Pierre de Coubertin
+75013 Paris</pre>
+{% else %}
+<p>Nous avons bien reçu votre paiement de {{ instance.prix }} €.</p>
+{% endif %}
+
+{% if not instance.dossier_complet_auto %}
+<p>A ce jour, nous n’avons pas reçu les justificatifs suivants :</p>
+<ul>
+{% for equipier in instance.equipier_set.all %}
+{% if not equipier.piece_jointe_valide %}
+{% if equipier.justificatif == 'licence' %}<li>Licence FFRS 2013 avec mention compétition pour {{ equipier.prenom }} {{ equipier.nom }}</li>{% endif %}
+{% if equipier.justificatif == 'certificat' %}<li>Certificat médicale pour {{ equipier.prenom }} {{ equipier.nom }}</li>{% endif %}
+{% endif %}
+{% if equipier.age < 18  and not equipier.autorisation_valide %}<li>Autorisation parentale pour {{ equipier.prenom }} {{ equipier.nom }}</li>{% endif %}
+{% endfor %}</ul>
+<p>Les certificats médicaux doivent être établis après le 4 aout 2012 et indiquer qu'il n'y a pas de contre indications à la pratique du roller en compétition.</li>
+<li>Vous pouvez les envoyer par internet en <a href="http://inscription.6hdeparis.fr/{{ instance.id }}/{{ instance.password }}/">cliquant ici</a> ou les envoyer par courrier à l’adresse suivante :</li>
+<pre>PUC - 6h Roller de Paris
+17 avenue Pierre de Coubertin
+75013 Paris</pre>
+
+<p>Si vous ne nous avez toujours pas fourni ces pièces le jour de la course, ces personnes ne seront pas autorisées à participer.</p>
+{% endif %}
+
+<p>Si vous avez déjà rempli ces formalités, c’est sans doute que nous n’avons pas encore eu le temps de terminer de traiter votre dossier. Contactez-nous dans quelques jours pour avoir confirmation.</p>
+
+<p>Si vous avez des questions, ou que vous rencontrez une difficulté technique avec le système d’inscription, n’hésitez pas à nous contacter à <a href="mailto:organisation@6hdeparis.fr">organisation@6hdeparis.fr</a>.</p>
+
+<p>--<br />
+L’équipe d’organisation des 6h de Paris<br />
+PUC Roller</p>

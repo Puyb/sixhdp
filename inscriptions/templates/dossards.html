@@ -1,0 +1,38 @@
+<html>
+    <head>
+        <style>
+            .IDH, .IDF { color: red; }
+            .DUX, .DUF { color: green; }
+            .b { font-weight: bold; }
+            .r { text-align: right; }
+        </style>
+    </head>
+    <body>
+        <table>
+            <tr>
+                <th>Insc.</th>
+                <th>Doss. 1</th>
+                <th>Doss. 2</th>
+                <th>Cat.</th>
+                <th>Equipe</th>
+                <th>Nom</th>
+                <th>Prenom</th>
+                <th>Dt. Naiss.</th>
+            </tr>
+            {% for e in equipiers %}
+            <tr>
+                <td class="r">{{ e.equipe.id }}</td>
+                <td class="{{ e.equipe.categorie }} b r">{{ e.equipe.id }}{{ e.numero }}</td>
+                <td class="{{ e.equipe.categorie }} b r">{{ e.dossard }}</td>
+                <td>{{ e.equipe.categorie }}</td>
+                <td>{{ e.equipe.nom }}</td>
+                <td>{{ e.nom }}</td>
+                <td>{{ e.prenom }}</td>
+                <td>{{ e.date_de_naissance }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>
+        
+

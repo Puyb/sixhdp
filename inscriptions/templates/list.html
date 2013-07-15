@@ -86,6 +86,18 @@
         var nbdossierscertifenattente = 0;
         var pays_names = {};
         var pc = 0, pi = 0, pe = 0, pv = 0, ipc = 0, ipi = 0, ipe = 0, ipv = 0;
+        var statut = {
+            IDH: { pc: 0, pi: 0, pe: 0, pv: 0, ipc: 0, ipi: 0, ipe: 0, ipv: 0 },
+            IDF: { pc: 0, pi: 0, pe: 0, pv: 0, ipc: 0, ipi: 0, ipe: 0, ipv: 0 },
+            DUX: { pc: 0, pi: 0, pe: 0, pv: 0, ipc: 0, ipi: 0, ipe: 0, ipv: 0 },
+            DUF: { pc: 0, pi: 0, pe: 0, pv: 0, ipc: 0, ipi: 0, ipe: 0, ipv: 0 },
+            SNX: { pc: 0, pi: 0, pe: 0, pv: 0, ipc: 0, ipi: 0, ipe: 0, ipv: 0 },
+            SNF: { pc: 0, pi: 0, pe: 0, pv: 0, ipc: 0, ipi: 0, ipe: 0, ipv: 0 },
+            VEX: { pc: 0, pi: 0, pe: 0, pv: 0, ipc: 0, ipi: 0, ipe: 0, ipv: 0 },
+            JNX: { pc: 0, pi: 0, pe: 0, pv: 0, ipc: 0, ipi: 0, ipe: 0, ipv: 0 },
+            FMX: { pc: 0, pi: 0, pe: 0, pv: 0, ipc: 0, ipi: 0, ipe: 0, ipv: 0 },
+            EPX: { pc: 0, pi: 0, pe: 0, pv: 0, ipc: 0, ipi: 0, ipe: 0, ipv: 0 }
+        };
     </script>
     <table width="100%">
         <tr>
@@ -136,6 +148,7 @@
                     nbdossierscertifenattente += ({{ equipe.licence_manquantes|length }} + {{ equipe.certificat_manquantes|length }} + {{ equipe.autorisation_manquantes|length }}) ? 1 : 0;
                     nbcertifenattente += ({{ equipe.licence_manquantes|length }} + {{ equipe.certificat_manquantes|length }} + {{ equipe.autorisation_manquantes|length }});
                     {% if not equipe.paiement_complet %}i{% endif %}p{% if equipe.verifier %}v{% else %}{{ equipe.dossier_complet_auto|yesno:"c,e,i" }}{% endif %} += 1;
+                    statut.{{ equipe.categorie }}.{% if not equipe.paiement_complet %}i{% endif %}p{% if equipe.verifier %}v{% else %}{{ equipe.dossier_complet_auto|yesno:"c,e,i" }}{% endif %} += 1;
                 </script>
             </td>
             {% endif %}
@@ -158,13 +171,13 @@
         Note: Le nom et le placement des villes est determinée par une recherche automatique. Il est possible que le resultat de cette recherche soit erronné. Votre inscription est prise en compte avec la bonne ville même si ce n'est pas affiché correctement dans cette liste. Contactez nous si vous voyez une erreur que vous souhaitez corriger.<br />
     </div>
     <div id="stats">
+        <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+        <script src="{{ STATIC_URL }}/js-class.js"></script>
+        <script src="{{ STATIC_URL }}/bluff-src.js"></script>
         {% if user.is_staff %}
         <script>document.write(nbaverifier);</script> dossiers avec documents éléctroniques à vérifier.<br />
         <script>document.write(nberror);</script> dossiers avec documents invalides.<br />
         <script>document.write(nbcertifenattente);</script> documents en attente sur <script>document.write(nbdossierscertifenattente);</script> dossiers.<br />
-        <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
-        <script src="{{ STATIC_URL }}/js-class.js"></script>
-        <script src="{{ STATIC_URL }}/bluff-src.js"></script>
         <div>
             <canvas id="canvas_admin" style="float: right;"></canvas>
             <table>
@@ -173,54 +186,63 @@
                     <th></th>
                     <th>#</th>
                     <th>%</th>
+                    <script>for(var k in categories) { document.write('<td>' + k + '</td>'); } </script>
                 </tr>
                 <tr>
                     <td>Payé et complet</td>
                     <td><div style="width: 10px; height: 10px; background: #00ff00"></div></td>
                     <td><script>document.write(pc);</script></td>
-                    <td><script>document.write(Math.round(pc / nombre * 100))</script></td>
+                    <td><script>document.write(Math.round(pc / {{ object_list|length }} * 100))</script></td>
+                    <script>for(var k in categories) { document.write('<td>'+statut[k].pc + '</td>'); } </script>
                 </tr>
                 <tr>
                     <td>Payé et incomplet</td>
                     <td><div style="width: 10px; height: 10px; background: #99ff99"></div></td>
                     <td><script>document.write(pi);</script></td>
-                    <td><script>document.write(Math.round(pi / nombre * 100))</script></td>
+                    <td><script>document.write(Math.round(pi / {{ object_list|length }} * 100))</script></td>
+                    <script>for(var k in categories) { document.write('<td>'+statut[k].pi + '</td>'); } </script>
                 </tr>
                 <tr>
                     <td>Payé et erreur</td>
                     <td><div style="width: 10px; height: 10px; background: #ff9999"></div></td>
                     <td><script>document.write(pe);</script></td>
-                    <td><script>document.write(Math.round(pe / nombre * 100))</script></td>
+                    <td><script>document.write(Math.round(pe / {{ object_list|length }} * 100))</script></td>
+                    <script>for(var k in categories) { document.write('<td>'+statut[k].pe + '</td>'); } </script>
                 </tr>
                 <tr>
                     <td>Payé et a vérifier</td>
                     <td><div style="width: 10px; height: 10px; background: #ccffcc"></div></td>
                     <td><script>document.write(pv);</script></td>
-                    <td><script>document.write(Math.round(pv / nombre * 100))</script></td>
+                    <td><script>document.write(Math.round(pv / {{ object_list|length }} * 100))</script></td>
+                    <script>for(var k in categories) { document.write('<td>'+statut[k].pv + '</td>'); } </script>
                 </tr>
                 <tr>
                     <td>Impayé et complet</td>
                     <td><div style="width: 10px; height: 10px; background: #0000ff"></div></td>
                     <td><script>document.write(ipc);</script></td>
-                    <td><script>document.write(Math.round(ipc / nombre * 100))</script></td>
+                    <td><script>document.write(Math.round(ipc / {{ object_list|length }} * 100))</script></td>
+                    <script>for(var k in categories) { document.write('<td>'+statut[k].ipc + '</td>'); } </script>
                 </tr>
                 <tr>
                     <td>Impayé et incomplet</td>
                     <td><div style="width: 10px; height: 10px; background: #9999ff"></div></td>
                     <td><script>document.write(ipi);</script></td>
-                    <td><script>document.write(Math.round(ipi / nombre * 100))</script></td>
+                    <td><script>document.write(Math.round(ipi / {{ object_list|length }} * 100))</script></td>
+                    <script>for(var k in categories) { document.write('<td>'+statut[k].ipi + '</td>'); } </script>
                 </tr>
                 <tr>
                     <td>Impayé et erreur</td>
                     <td><div style="width: 10px; height: 10px; background: #ff0000"></div></td>
                     <td><script>document.write(ipe);</script></td>
-                    <td><script>document.write(Math.round(ipe / nombre * 100))</script></td>
+                    <td><script>document.write(Math.round(ipe / {{ object_list|length }} * 100))</script></td>
+                    <script>for(var k in categories) { document.write('<td>'+statut[k].ipe + '</td>'); } </script>
                 </tr>
                 <tr>
                     <td>Impayé et a vérifier</td>
                     <td><div style="width: 10px; height: 10px; background: #ccccff"></div></td>
                     <td><script>document.write(ipv);</script></td>
-                    <td><script>document.write(Math.round(ipv / nombre * 100))</script></td>
+                    <td><script>document.write(Math.round(ipv / {{ object_list|length }} * 100))</script></td>
+                    <script>for(var k in categories) { document.write('<td>'+statut[k].ipv + '</td>'); } </script>
                 </tr>
             </table>
             <script>

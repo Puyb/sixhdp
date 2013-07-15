@@ -116,6 +116,7 @@ class Equipe(models.Model):
     date               = models.DateTimeField(_(u"Date d'insciption"), auto_now_add=True)
     commentaires       = models.TextField(_(u'Commentaires'), blank=True)
     gerant_ville2      = models.ForeignKey(Ville, null=True)
+    numero             = models.IntegerField(_(u'Numéro'))
 
     def __unicode__(self):
         return u'%s - %s - %s' % (self.id, self.categorie, self.nom)
@@ -202,6 +203,9 @@ class Equipe(models.Model):
                 msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ 'inscriptions@6hdeparis.fr' ])
                 msg.content_subtype = "html"
                 msg.send()
+        else:
+            if not self.numero:
+                self.numero = self.getNumero()
 
         super(Equipe, self).save(*args, **kwargs)
         if not self.gerant_ville2:
@@ -217,6 +221,31 @@ class Equipe(models.Model):
         msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ mail or self.gerant_email ])
         msg.content_subtype = "html"
         msg.send()
+
+    def send_mail_erreur(self, message='', mail=None):
+        #if self.paiement_complet and self.dossier_complet_auto:
+        #    return
+        ctx = { "instance": self, 'message': message }
+        subject = '[6h de Paris 2013] Votre inscription / Your registration'
+        message = render_to_string( 'mail_erreur.html', ctx)
+        msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ mail or self.gerant_email ])
+        msg.content_subtype = "html"
+        msg.send()
+
+    def getNumero(self):
+        if self.numero:
+            return self.numero
+        if self.categorie.startswith('ID'):
+            m = Equipe.objects.filter(categorie__startswith='ID').aggregate(models.Max('numero'))['numero__max']
+        elif self.categorie.startswith('DU'):
+            m = Equipe.objects.filter(categorie__startswith='DU').aggregate(models.Max('numero'))['numero__max']
+            if not m:
+                m = 10
+        else:
+            m = Equipe.objects.exclude(categorie__startswith='ID').exclude(categorie__startswith='DU').aggregate(models.Max('numero'))['numero__max']
+            if not m:
+                m = 100
+        return m + 1
 
 class Equipier(models.Model):
     numero            = models.IntegerField(_(u'Numéro'))
@@ -258,6 +287,11 @@ class Equipier(models.Model):
         if not self.ville2:
             self.ville2 = lookup_ville(self.ville, self.code_postal, self.pays)
             super(Equipier, self).save()
+
+    def dossard(self):
+        if self.equipe.categorie.startswith('ID'):
+            return self.equipe.numero
+        return self.equipe.numero * 10 + self.numero
 
 
 

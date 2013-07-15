@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys
 from models import Equipe, Equipier, Ville, SEXE_CHOICES, JUSTIFICATIF_CHOICES
 from django.shortcuts import render_to_response, get_object_or_404, redirect
@@ -14,17 +15,20 @@ from django.core.mail import EmailMessage
 from django.utils.http import urlencode
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 import urllib2
 import random
 from settings import *
 from datetime import datetime
 from django.utils import timezone
 from threading import Thread
+import imaplib, csv, re, cStringIO
 
 class EquipeForm(ModelForm):
     class Meta:
         model = Equipe
-        exclude = ('paiement', 'dossier_complet', 'password', 'date', 'commentaires', 'paiement_info', 'gerant_ville2')
+        exclude = ('paiement', 'dossier_complet', 'password', 'date', 'commentaires', 'paiement_info', 'gerant_ville2', 'numero')
         widgets = {
             #'password': PasswordInput(),
             'categorie': HiddenInput(),
@@ -212,3 +216,61 @@ def list(request):
        'villes': Ville.objects.all().order_by('nom').annotate(equipiers=Count('equipier')),
        'equipiers': Equipier.objects.all(),
     }))
+
+@login_required
+def send_mail(request, id, template='mail_relance.html'):
+    instance = get_object_or_404(Equipe, id=id)
+
+    if request.method == 'POST':
+        msg = EmailMessage(request.POST['subject'], request.POST['message'], request.POST['sender'], [ request.POST['mail'] ])
+        msg.content_subtype = "html"
+        msg.send()
+        messages.add_message(request, messages.INFO, u'Message envoyé à %s' % (request.POST['mail'], ))
+        return redirect('/admin/inscriptions/equipe/%s/' % (instance.id, ))
+
+    message = render_to_string(template or 'mail_relance.html', { "instance": instance, })
+
+    return render_to_response('send_mail.html', RequestContext(request, {
+        'message': message,
+        'sender': 'organisation@6hdeparis.fr',
+        'mail': instance.gerant_email,
+        'subject': '[6h de Paris 2013] Votre inscription / Your registration'
+    }))
+
+@login_required
+def bene(request):
+    server = 'localhost'
+    login  = ''
+    passwd = ''
+
+    c = imaplib.IMAP4(server)
+    c.login(login, passwd)
+
+    data={}
+    out = cStringIO.StringIO()
+    o=csv.writer(out)
+    # Archive INBOX
+    c.select()
+    code, (list,) = c.search(None, 'ALL')
+    for i in list.split():
+        try:
+            msg = c.fetch(i, '(RFC822)')[1][0][1]
+            if type(msg) == tuple:
+                msg = ''.join(msg)
+            msg = "\r\n".join(msg.split("\r\n\r\n")[1:])
+            row = [':' in i and i.split(': ')[1] or i for i in msg.split("\r\n")]
+            row[4] = re.sub('([0-9]{2})', '\\1 ', ''.join(row[4].split(' ')))
+            o.writerow(row)
+        except:
+            pass
+    c.close()
+    r = HttpResponse(out.getvalue(), mimetype='text/csv')
+    out.close()
+    return r
+
+@login_required
+def dossards(request):
+    return render_to_response('dossards.html', RequestContext(request, {
+        'equipiers': Equipier.objects.all()
+    }))
+

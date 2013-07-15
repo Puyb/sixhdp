@@ -27,7 +27,8 @@ Event.observe(window, 'load', function() {
     });
 
     $('autre').innerHTML = '<a href="/' + $$('.field-id p')[0].textContent + '/done/">Lien de paiement</a><br />' +
-                           '<a href="/' + $$('.field-id p')[0].textContent + '/' + $$('.field-password p')[0].textContent + '/">Lien de modification</a><br />';
+                           '<a href="/' + $$('.field-id p')[0].textContent + '/' + $$('.field-password p')[0].textContent + '/">Lien de modification</a><br />'+
+                           '<a href="/' + $$('.field-id p')[0].textContent + '/send/">Envoyer une relance</a><br />';
 
 });
 
