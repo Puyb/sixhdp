@@ -274,3 +274,38 @@ def dossards(request):
         'equipiers': Equipier.objects.all()
     }))
 
+@login_required
+def dossardsCSV(request):
+    code = 'utf-8'
+    out = cStringIO.StringIO()
+    o=csv.writer(out)
+    o.writerow([
+        'inscription',
+        'equipe',
+        'nom',
+        'categorie',
+        'dossard',
+        'nom',
+        'prenom',
+        'sexe',
+        'date_de_naissance',
+        'num_licence',
+    ])
+    for e in Equipier.objects.all():
+        o.writerow([
+            e.equipe.id,
+            e.equipe.numero,
+            e.equipe.nom.encode(code),
+            e.equipe.categorie.encode(code),
+            e.dossard(),
+            e.nom.encode(code),
+            e.prenom.encode(code),
+            e.sexe.encode(code),
+            e.date_de_naissance,
+            e.num_licence,
+        ])
+
+    r = HttpResponse(out.getvalue(), mimetype='text/csv')
+    out.close()
+    return r
+

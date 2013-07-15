@@ -14,5 +14,6 @@ urlpatterns = patterns('inscriptions.views',
     (r'^list/$', 'list', {}, 'inscriptions.list'),
     (r'^bene/$', 'bene', {}, 'inscriptions.bene'),
     (r'^dossards/$', 'dossards', {}, 'inscriptions.dossards'),
+    (r'^dossards.csv$', 'dossardsCSV', {}, 'inscriptions.dossardsCSV'),
 
 )
