@@ -274,7 +274,7 @@ def dossards(request):
         'equipiers': Equipier.objects.all()
     }))
 
-@login_required
+#@login_required
 def dossardsCSV(request):
     code = 'utf-8'
     out = cStringIO.StringIO()
