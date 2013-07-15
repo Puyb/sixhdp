@@ -276,7 +276,7 @@ def dossards(request):
 
 #@login_required
 def dossardsCSV(request):
-    code = 'utf-8'
+    code = request.GET.get('code', 'utf-8')
     out = cStringIO.StringIO()
     o=csv.writer(out)
     o.writerow([
@@ -290,20 +290,32 @@ def dossardsCSV(request):
         'sexe',
         'date_de_naissance',
         'num_licence',
+        'gerant_nom',
+        'gerant_prenom',
+        'gerant_ville',
+        'gerant_code_postal',
+        'gerant_code_pays',
     ])
     for e in Equipier.objects.all():
-        o.writerow([
+        row = [
             e.equipe.id,
             e.equipe.numero,
-            e.equipe.nom.encode(code),
-            e.equipe.categorie.encode(code),
+            e.equipe.nom,
+            e.equipe.categorie,
             e.dossard(),
-            e.nom.encode(code),
-            e.prenom.encode(code),
-            e.sexe.encode(code),
+            e.nom,
+            e.prenom,
+            e.sexe,
             e.date_de_naissance,
             e.num_licence,
-        ])
+            e.equipe.gerant_nom,
+            e.equipe.gerant_prenom,
+            e.equipe.gerant_ville,
+            e.equipe.gerant_code_postal,
+            e.equipe.gerant_pays,
+        ]
+        row = [ type(i) == unicode and i.encode(code) or i for i in row ]
+        o.writerow(row)
 
     r = HttpResponse(out.getvalue(), mimetype='text/csv')
     out.close()

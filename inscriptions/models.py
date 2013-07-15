@@ -237,14 +237,16 @@ class Equipe(models.Model):
             return self.numero
         if self.categorie.startswith('ID'):
             m = Equipe.objects.filter(categorie__startswith='ID').aggregate(models.Max('numero'))['numero__max']
+            if not m:
+                m = 200
         elif self.categorie.startswith('DU'):
             m = Equipe.objects.filter(categorie__startswith='DU').aggregate(models.Max('numero'))['numero__max']
             if not m:
-                m = 10
+                m = 300
         else:
             m = Equipe.objects.exclude(categorie__startswith='ID').exclude(categorie__startswith='DU').aggregate(models.Max('numero'))['numero__max']
             if not m:
-                m = 100
+                m = 0
         return m + 1
 
 class Equipier(models.Model):
@@ -289,10 +291,17 @@ class Equipier(models.Model):
             super(Equipier, self).save()
 
     def dossard(self):
-        if self.equipe.categorie.startswith('ID'):
-            return self.equipe.numero
+        #if self.equipe.categorie.startswith('ID'):
+        #    return self.equipe.numero
         return self.equipe.numero * 10 + self.numero
 
 
+def renumerote():
+    for e in Equipe.objects.all():
+        e.numero = 0
+        e.save()
+    for e in Equipe.objects.all():
+        e.numero = e.getNumero()
+        e.save()
 
 
