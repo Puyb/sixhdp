@@ -39,7 +39,7 @@ class EquipeForm(ModelForm):
 class EquipierForm(ModelForm):
     class Meta:
         model = Equipier
-        exclude = ('equipe', 'numero', 'piece_jointe_valide', 'autorisation_valide', 'piece_jointe2_valide', 'ville2')
+        exclude = ('equipe', 'numero', 'piece_jointe_valide', 'autorisation_valide', 'piece_jointe2_valide', 'ville2', 'code_eoskates')
         widgets = {
             'sexe':              Select(choices=SEXE_CHOICES),
             'date_de_naissance': SelectDateWidget(years=range(YEAR-MIN_AGE, YEAR-100, -1)),
@@ -60,6 +60,7 @@ class mailThread(Thread):
 def form(request, id=None, code=None):
     instance = None
     old_password = None
+    equipier_count = Equipier.objects.count()
     if id:
         instance = get_object_or_404(Equipe, id=id)
         old_password = instance.password
@@ -75,6 +76,8 @@ def form(request, id=None, code=None):
         if instance:
             equipier_formset = EquipierFormset(request.POST, request.FILES, queryset=instance.equipier_set.all())
         else:
+            if datetime.now() >= datetime(CLOSE_YEAR, CLOSE_MONTH, CLOSE_DAY) or equipier_count >= MAX_EQUIPIER:
+                return redirect('/')
             equipier_formset = EquipierFormset(request.POST, request.FILES)
         if equipe_form.is_valid() and equipier_formset.is_valid():
             new_instance = equipe_form.save(commit=False)
@@ -139,6 +142,7 @@ def form(request, id=None, code=None):
         "update": not not instance,
         "solo": Equipe.objects.filter(categorie__startswith='ID').count(),
         "max_solo": datetime(2013, 6, 8) <= datetime.now() and 49 or 30,
+        "equipier_count": equipier_count,
         "prix2": date_prix2 <= timezone.now() and (not instance or instance.date >= date_prix2)
     }))
 

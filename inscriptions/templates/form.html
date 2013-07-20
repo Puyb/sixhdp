@@ -72,7 +72,16 @@
     }
 
     function serialize() {
+        $$('input, select').each(function(e) {
+            e.disabled = false;
+        });
         var data = Form.serialize(document.body, true);
+        if(new Date() >= new Date({{ CLOSE_YEAR }},{{ CLOSE_MONTH }}-1,{{ CLOSE_DAY }}) || {{ equipier_count }} >= {{ MAX_EQUIPIER }}) {
+            $$('input, select').each(function(e) {
+                if(e.type != 'file' && e.type != 'button' && e.type != 'submit' && e.type != 'radio' && !/num_licence$/.test(e.name))
+                    e.disabled = true;
+            });
+        }
         data.equipiers = [{}, {}, {}, {}, {}];
         data.nombre = parseFloat(data.nombre);
         for(var k in data)
@@ -138,6 +147,12 @@
             var tr = e.up('tr').hide();
             $('justif_EPX').down('table').insert(tr);
         });
+        if(new Date() >= new Date({{ CLOSE_YEAR }},{{ CLOSE_MONTH }}-1,{{ CLOSE_DAY }}) || {{ equipier_count }} >= {{ MAX_EQUIPIER }}) {
+            $$('input, select').each(function(e) {
+                if(e.type != 'file' && e.type != 'button' && e.type != 'submit' && e.type != 'radio' && !/num_licence$/.test(e.name))
+                    e.disabled = true;
+            });
+        }
 
         var nom_timeout;
         function check_nom(wait) {
@@ -254,6 +269,11 @@
                 $('catwrapper').innerHTML = actual_categories.map(function(c) {
                     return '<input type="radio" value="#{code}" name="categorie" id="id_categorie-#{code}"><label for="id_categorie-#{code}">#{label} - #{prix} €</label><br />'.interpolate(c);
                 }).join('');
+                if(new Date() >= new Date({{ CLOSE_YEAR }},{{ CLOSE_MONTH }}-1,{{ CLOSE_DAY }}) || {{ equipier_count }} >= {{ MAX_EQUIPIER }}) {
+                    $$('#catwrapper input').each(function(e) {
+                        e.disabled = true;
+                    });
+                }
                 $$('input[name=categorie]').invoke('observe', 'change', function(event) {
                     var categorie = $$('input[name=categorie]').filter(function(e) { return e.checked; })[0].value;
                     var d = categories.filter(function(c) { return c.code == categorie; })[0];
@@ -307,9 +327,21 @@
                 event.stop();
                 alert("{% trans 'Vous devez accépter le règlement de la compétition' %}");
             }
+            $$('input, select').each(function(e) {
+                e.disabled = false;
+            });
         });
     });
 
+    {% if not update %}
+    if(new Date() >= new Date({{ CLOSE_YEAR }},{{ CLOSE_MONTH }}-1,{{ CLOSE_DAY }})) {
+        alert("Désolé, les inscriptions sont fermée. Il n'est plus possible de s'incrire à la course");
+        location.href = "http://www.6hdeparis.fr/";
+    } else if({{ equipier_count }} >= {{ MAX_EQUIPIER }}) {
+        alert("Désolé, la course est complete, il n'y a plus de place disponible.");
+        location.href = "http://www.6hdeparis.fr/";
+    }
+    {% endif %}
 
 
 })()
@@ -369,7 +401,7 @@
             <table></table>
         </div>
         <br />
-        <input type="checkbox" name="conditions" id="id_conditions" /><label for="id_conditions">{% blocktrans %}J'accepte le <a href="http://www.6hdeparis.fr/wp-content/uploads/2013/03/Reglement%206%20Heures%20Roller%20Paris%202013.pdf" target="_blank">règlement de la course</a>{% endblocktrans %}</label>
+        <input type="checkbox" name="conditions" id="id_conditions" {% if update %}checked {% endif %}/><label for="id_conditions">{% blocktrans %}J'accepte le <a href="http://www.6hdeparis.fr/wp-content/uploads/2013/03/Reglement%206%20Heures%20Roller%20Paris%202013.pdf" target="_blank">règlement de la course</a>{% endblocktrans %}</label>
         <br />
     </div>
 

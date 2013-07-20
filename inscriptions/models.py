@@ -272,6 +272,7 @@ class Equipier(models.Model):
     piece_jointe2       = models.FileField(_(u'Justificatif entreprise / etudiant'), upload_to='certificats', blank=True)
     piece_jointe2_valide  = models.NullBooleanField(_(u'Justificatif valide'))
     ville2            = models.ForeignKey(Ville, null=True)
+    code_eoskates     = models.CharField(_(u'Code EOSkates'), max_length=20, blank=True)
     
     def age(self):
         today = date(YEAR, MONTH, DAY)
