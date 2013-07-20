@@ -310,6 +310,13 @@
         });
     });
 
+    if(new Date() >= new Date({{ CLOSE_YEAR }},{{ CLOSE_MONTH }}-1,{{ CLOSE_DAY }})) {
+        alert("Désolé, les inscriptions sont fermée. Il n'est plus possible de s'incrire à la course");
+        location.href = "http://www.6hdeparis.fr/";
+    } else if({{ equipier_count }} >= {{ MAX_EQUIPIER }}) {
+        alert("Désolé, la course est complete, il n'y a plus de place disponible.");
+        location.href = "http://www.6hdeparis.fr/";
+    }
 
 
 })()
