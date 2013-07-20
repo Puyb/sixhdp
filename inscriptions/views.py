@@ -274,6 +274,11 @@ def dossards(request):
         'equipiers': Equipier.objects.all()
     }))
 
+def equipiers(request):
+    return render_to_response('equipiers.html', RequestContext(request, {
+        'equipiers': Equipier.objects.all()
+    }))
+
 #@login_required
 def dossardsCSV(request):
     code = request.GET.get('code', 'utf-8')
@@ -313,6 +318,70 @@ def dossardsCSV(request):
             e.equipe.gerant_ville,
             e.equipe.gerant_code_postal,
             e.equipe.gerant_pays,
+        ]
+        row = [ type(i) == unicode and i.encode(code) or i for i in row ]
+        o.writerow(row)
+
+    r = HttpResponse(out.getvalue(), mimetype='text/csv')
+    out.close()
+    return r
+
+def dossardsEquipesCSV(request):
+    code = request.GET.get('code', 'utf-8')
+    out = cStringIO.StringIO()
+    o=csv.writer(out)
+    o.writerow([
+        'inscription',
+        'equipe',
+        'nom',
+        'categorie',
+        'gerant_nom',
+        'gerant_prenom',
+        'gerant_ville',
+        'gerant_code_postal',
+        'gerant_code_pays',
+    ])
+    for e in Equipe.objects.all():
+        row = [
+            e.id,
+            e.numero,
+            e.nom,
+            e.categorie,
+            e.gerant_nom,
+            e.gerant_prenom,
+            e.gerant_ville,
+            e.gerant_code_postal,
+            e.gerant_pays,
+        ]
+        row = [ type(i) == unicode and i.encode(code) or i for i in row ]
+        o.writerow(row)
+
+    r = HttpResponse(out.getvalue(), mimetype='text/csv')
+    out.close()
+    return r
+
+def dossardsEquipiersCSV(request):
+    code = request.GET.get('code', 'utf-8')
+    out = cStringIO.StringIO()
+    o=csv.writer(out)
+    o.writerow([
+        'equipe',
+        'dossard',
+        'nom',
+        'prenom',
+        'sexe',
+        'date_de_naissance',
+        'num_licence',
+    ])
+    for e in Equipier.objects.all():
+        row = [
+            e.equipe.numero,
+            e.dossard(),
+            e.nom,
+            e.prenom,
+            e.sexe,
+            e.date_de_naissance,
+            e.num_licence,
         ]
         row = [ type(i) == unicode and i.encode(code) or i for i in row ]
         o.writerow(row)
