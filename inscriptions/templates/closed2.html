@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load l10n %}
+{% block content %}
+<h1>{% trans 'Votre inscription est enregistrée' %}</h1>
+<table>
+    <tr><th>{% trans 'Equipe : ' %}</th><td>{{ instance.nom }}</td></tr>
+    <tr><th>{% trans "Numéro d'inscription :" %}</th><td>{{ instance.id }}</td></tr>
+</table>
+<br />
+{% if create %}
+{% trans 'Un email de confirmation vient de vous être envoyé.' %}<br />
+{% endif %}
+<br />
+<br />
+<br />
+<br />
+{% if not instance.paiement_complet %}
+<p> Nous n'avons pas reçu votre paiement. Ammenez votre chèque de {{ instance.prix }} le jour de la course.</p>
+{% else %}
+{% blocktrans with prix=instance.paiement %}Votre paiement de {{ prix }} € à bien été reçu.{% endblocktrans %}
+{% endif %}
+
+<br />
+<br />
+<br />
+<br />
+{% if instance.licence_manquantes %}
+<div class="clearfix">
+    {% trans 'Il manque les licences de :' %} <ul>
+    {% for e in instance.licence_manquantes %}
+    <li>{{ e.prenom }} {{ e.nom }}</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if instance.certificat_manquantes %}
+<div class="clearfix">
+    {% blocktrans %}Il manque les certificats médicaux de (<a href="http://www.6hdeparis.fr/wp-content/uploads/2013/03/certificat_medical.pdf" target="_blank">modèle</a>):{% endblocktrans %}<ul>
+    {% for e in instance.certificat_manquantes %}
+    <li>{{ e.prenom }} {{ e.nom }}</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if instance.autorisation_manquantes %}
+<div class="clearfix">
+    {% blocktrans %}Il manque les autorisations parentales (<a href="http://www.6hdeparis.fr/wp-content/uploads/2013/03/autorisation_parentale.pdf" target="_blank">modèle</a>) :{% endblocktrans %}<ul>
+    {% for e in instance.autorisation_manquantes %}
+    <li>{{ e.prenom }} {{ e.nom }}</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if instance.categorie == "EPX" %}
+<div class="clearfix">
+{% blocktrans %}Catégorie Entreprise / Étudiants : Si ce n'est déjà fait, pensez à envoyer un certificat signé par l'employeur (un seul pour toute l'équipe, <a href="http://www.6hdeparis.fr/wp-content/uploads/2013/03/attestation_entreprise.pdf" target="_blank">modèle</a>) ou une copie des fiches de paies ou une copie des cartes étudiants.{% endblocktrans %}
+</div>
+{% endif %}
+<br />
+<br />
+<br />
+<br />
+{% if not instance.paiement or instance.licence_manquantes or instance.certificat_manquantes or instance.autorisation_manquantes %}
+<p>Ammenez les justificatifs manquant le jour de la course</p>
+{% endif %}
+
+{% endblock %}

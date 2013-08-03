@@ -10,10 +10,11 @@
     <body>
         <table>
             <tr>
+                <th></th>
                 <th>Insc.</th>
-                <th>Doss. 1</th>
-                <th>Doss. 2</th>
+                <th>Doss.</th>
                 <th>Cat.</th>
+                <th>Club</th>
                 <th>Equipe</th>
                 <th>Nom</th>
                 <th>Prenom</th>
@@ -21,10 +22,11 @@
             </tr>
             {% for e in equipiers %}
             <tr>
+                <td class="r">{{ forloop.counter }}</td>
                 <td class="r">{{ e.equipe.id }}</td>
-                <td class="{{ e.equipe.categorie }} b r">{{ e.equipe.id }}{{ e.numero }}</td>
                 <td class="{{ e.equipe.categorie }} b r">{{ e.dossard }}</td>
                 <td>{{ e.equipe.categorie }}</td>
+                <td>{{ e.equipe.club }}</td>
                 <td>{{ e.equipe.nom }}</td>
                 <td>{{ e.nom }}</td>
                 <td>{{ e.prenom }}</td>

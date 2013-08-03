@@ -77,7 +77,8 @@ def form(request, id=None, code=None):
             equipier_formset = EquipierFormset(request.POST, request.FILES, queryset=instance.equipier_set.all())
         else:
             if datetime.now() >= datetime(CLOSE_YEAR, CLOSE_MONTH, CLOSE_DAY) or equipier_count >= MAX_EQUIPIER:
-                return redirect('/')
+                if not request.user.is_staff:
+                    return redirect('/')
             equipier_formset = EquipierFormset(request.POST, request.FILES)
         if equipe_form.is_valid() and equipier_formset.is_valid():
             new_instance = equipe_form.save(commit=False)
@@ -134,6 +135,10 @@ def form(request, id=None, code=None):
         else:
             equipier_formset = EquipierFormset(queryset=Equipier.objects.none())
     date_prix2 = timezone.make_aware(datetime(2013, 6, 17), timezone.get_default_timezone())
+    if instance:
+        return done(request, instance.id)
+    return render_to_response("closed.html", RequestContext(request, {}))
+
     return render_to_response("form.html", RequestContext(request, {
         "equipe_form": equipe_form,
         "equipier_formset": equipier_formset,
@@ -159,6 +164,7 @@ def done(request, id):
         "paypal_ipn_url": request.build_absolute_uri(reverse('inscriptions.ipn')),
         "hour": datetime.now().strftime('%H%M'),
     })
+    return render_to_response('closed2.html', ctx)
     return render_to_response('done.html', ctx)
 
 @csrf_exempt
@@ -244,11 +250,9 @@ def send_mail(request, id, template='mail_relance.html'):
 @login_required
 def bene(request):
     server = 'localhost'
-    login  = ''
-    passwd = ''
 
     c = imaplib.IMAP4(server)
-    c.login(login, passwd)
+    c.login(MAIL_LOGIN, MAIL_PASSWD)
 
     data={}
     out = cStringIO.StringIO()
@@ -261,6 +265,8 @@ def bene(request):
             msg = c.fetch(i, '(RFC822)')[1][0][1]
             if type(msg) == tuple:
                 msg = ''.join(msg)
+            if '\r\nSubject: Inscription b' not in msg:
+                next
             msg = "\r\n".join(msg.split("\r\n\r\n")[1:])
             row = [':' in i and i.split(': ')[1] or i for i in msg.split("\r\n")]
             row[4] = re.sub('([0-9]{2})', '\\1 ', ''.join(row[4].split(' ')))
@@ -275,7 +281,26 @@ def bene(request):
 @login_required
 def dossards(request):
     return render_to_response('dossards.html', RequestContext(request, {
-        'equipiers': Equipier.objects.all()
+        'equipiers': Equipier.objects.all().order_by(*request.GET.get('order','equipe__numero,numero').split(','))
+    }))
+
+@login_required
+def listing(request, template='listing.html'):
+    return render_to_response(template, RequestContext(request, {
+        'equipes': Equipe.objects.all().order_by(*request.GET.get('order','id').split(','))
+    }))
+
+@login_required
+def listing_dossards(request, template='listing_dossards.html'):
+    equipes = Equipe.objects.exclude(categorie__startswith='ID').order_by(*request.GET.get('order','id').split(','))
+    return render_to_response(template, RequestContext(request, {
+        'solo': Equipe.objects.filter(categorie__startswith='ID').order_by(*request.GET.get('order','id').split(',')),
+        'equipes': {
+            u'1 à 100':   equipes.filter(id__lt=101),
+            u'101 à 145': equipes.filter(id__gt=100, id__lt=146),
+            u'146 à 190': equipes.filter(id__gt=145, id__lt=191),
+            u'191 à 239': equipes.filter(id__gt=190),
+        }
     }))
 
 def equipiers(request):
