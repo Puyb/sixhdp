@@ -1,16 +1,25 @@
 from settings import *
+from models import Course
+from django.db.models import Min, Max
 
-def settings(req):
+def settings(request):
+    course = (Course.objects
+        .prefetch_related('categories')
+        .annotate(min_age=Min('categories__min_age'), max_equipiers=Max('categories__max_equipiers'))
+        .filter(uid=request.path.split('/')[1]))
+    if not len(course):
+        return ()
     return {
-        'YEAR':    YEAR,
-        'MONTH':   MONTH,
-        'DAY':     DAY,
-        'TITLE':   TITLE,
-        'MIN_AGE': MIN_AGE,
-        'MAX_EQUIPIER': MAX_EQUIPIER,
-        'CLOSE_YEAR':  CLOSE_YEAR,
-        'CLOSE_MONTH': CLOSE_MONTH,
-        'CLOSE_DAY':   CLOSE_DAY,
+        'COURSE':          course[0],
+        'YEAR':            course[0].date.year,
+        'MONTH':           course[0].date.month,
+        'DAY':             course[0].date.day,
+        'TITLE':           course[0].nom,
+        'MIN_AGE':         course[0].min_age,
+        'MAX_EQUIPIERS':   course[0].max_equipiers,
+        'CLOSE_YEAR':      course[0].date_fermeture.year,
+        'CLOSE_MONTH':     course[0].date_fermeture.month,
+        'CLOSE_DAY':       course[0].date_fermeture.day,
+        'PAYPAL_BUSINESS': course[0].paypal,
         'PAYPAL_URL':      PAYPAL_URL,
-        'PAYPAL_BUSINESS': PAYPAL_BUSINESS,
     }

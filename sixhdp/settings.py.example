@@ -177,3 +177,5 @@ LANGUAGES = (
     ('fr', u'Français'),
     ('en', u'English'),
 )
+
+AUTH_PROFILE_MODULE = "inscription.UserProfile"

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from inscriptions.models import Equipe, Equipier
+from inscriptions.models import *
 from django.contrib import admin
 
 HELP_TEXT = """
@@ -53,19 +53,6 @@ class EquipierInline(admin.StackedInline):
     model = Equipier
     extra = 0
     max_num = 5
-
-class EquipeAdmin(admin.ModelAdmin):
-    #exclude = [ 'password', ]
-    list_display = ['categorie', 'nom', 'club', 'gerant_email', 'paiement', 'dossier_complet', 'nombre', 'date']
-    list_display_links = ['categorie', 'nom', 'club', ]
-    list_filter = ['categorie', 'paiement', 'dossier_complet', 'nombre', 'date']
-    ordering = ['-date', ]
-    inlines = [ EquipierInline ]
-
-class EquipierInlineMini(admin.StackedInline):
-    model = Equipier
-    extra = 0
-    max_num = 5
     readonly_fields = [ 'nom', 'prenom', 'sexe', 'adresse1', 'adresse2', 'ville', 'code_postal', 'pays', 'email', 'date_de_naissance', 'autorisation', 'justificatif', 'num_licence', 'piece_jointe', 'piece_jointe2', 'age']
     fieldsets = (
         (None, { 'fields': (('nom', 'prenom', 'sexe'), ) }),
@@ -73,7 +60,13 @@ class EquipierInlineMini(admin.StackedInline):
         (None, { 'classes': ('wide', ), 'fields': (('date_de_naissance', 'age', ), ('autorisation_valide', 'autorisation'), ('justificatif', 'num_licence', ), ('piece_jointe_valide', 'piece_jointe'), ('piece_jointe2_valide', 'piece_jointe2')) }),
     )
 
-class EquipeAdminMini(admin.ModelAdmin):
+class EquipeAdmin(admin.ModelAdmin):
+    def queryset(self, request):
+        qs = super(EquipeAdmin, self).queryset(request)
+        courses = request.user.profile.course.all()
+        if len(courses):
+            qs = qs.filter(course__in=courses)
+        return qs
     class Media:
         css = {"all": ("admin.css",)}
         js  = ('/vars.js', 'prototype.js', 'admin.js', )
@@ -82,7 +75,7 @@ class EquipeAdminMini(admin.ModelAdmin):
     list_display_links = ['id', 'categorie', 'nom', 'club', ]
     list_filter = ['categorie', 'dossier_complet', 'nombre', 'date']
     ordering = ['-date', ]
-    inlines = [ EquipierInlineMini ]
+    inlines = [ EquipierInline ]
 
     fieldsets = (
         ("Instructions", { 'description': HELP_TEXT, 'classes': ('collapse', 'collapsed'), 'fields': () }),
@@ -94,6 +87,39 @@ class EquipeAdminMini(admin.ModelAdmin):
     actions = []
     search_fields = ('id', 'nom', 'club', 'gerant_nom', 'gerant_prenom', 'equipier__nom', 'equipier__prenom')
     list_per_page = 500
+
+    def documents_manquants2(self):
+        return (len(self.licence_manquantes()) + len(self.certificat_manquantes()) + len(self.autorisation_manquantes())) or ''
+    documents_manquants2.short_description = u'✉'
+
+    def verifier2(self):
+        return self.verifier() and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u''
+    verifier2.allow_tags = True
+    verifier2.short_description = 'V'
+
+    def paiement_complet2(self):
+        return self.paiement_complet() and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
+    paiement_complet2.allow_tags = True
+    paiement_complet2.short_description = '€'
+    
+    def nombre2(self):
+        return self.nombre
+    nombre2.short_description = u'☺'
+
+    def dossier_complet2(self):
+        return self.dossier_complet and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
+    dossier_complet2.allow_tags = True
+    dossier_complet2.short_description = mark_safe(u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""")
+
+    def dossier_complet_auto2(self):
+        auto = self.dossier_complet_auto()
+        if auto:
+            return u"""<img alt="None" src="/static/admin/img/icon-yes.gif">"""
+        if auto == False:
+            return u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
+        return u""
+    dossier_complet_auto2.allow_tags = True
+    dossier_complet_auto2.short_description = mark_safe(u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""")
 
 
 from django.contrib.admin.models import LogEntry
@@ -125,6 +151,46 @@ class LogAdmin(admin.ModelAdmin):
 admin.site.register(LogEntry, LogAdmin)
 
 
-admin.site.disable_action('delete_selected')
-#admin.site.register(Equipe, EquipeAdmin)
-admin.site.register(Equipe, EquipeAdminMini)
+#admin.site.disable_action('delete_selected')
+admin.site.register(Equipe, EquipeAdmin)
+
+
+class CourseAdmin(admin.ModelAdmin):
+    pass
+admin.site.register(Course, CourseAdmin)
+
+
+class CategorieAdmin(admin.ModelAdmin):
+    def queryset(self, request):
+        qs = super(CategorieAdmin, self).queryset(request)
+        courses = request.user.profile.course.all()
+        if len(courses):
+            qs = qs.filter(course__in=courses)
+        return qs
+    pass
+admin.site.register(Categorie, CategorieAdmin)
+
+
+class TemplateMailAdmin(admin.ModelAdmin):
+    def queryset(self, request):
+        qs = super(EquipeAdmin, self).queryset(request)
+        courses = request.user.profile.course.all()
+        if len(courses):
+            qs = qs.filter(course__in=courses)
+        return qs
+    list_display = ('sujet', )
+admin.site.register(TemplateMail, TemplateMailAdmin)
+
+
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin
+
+admin.site.unregister(User)
+
+class UserProfileInline(admin.StackedInline):
+    model = UserProfile
+
+class UserProfileAdmin(UserAdmin):
+    inlines = [ UserProfileInline, ]
+
+admin.site.register(User, UserProfileAdmin)

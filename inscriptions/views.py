@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 from models import Equipe, Equipier, Ville, SEXE_CHOICES, JUSTIFICATIF_CHOICES
+from decorators import open_closed
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, Http404
@@ -15,15 +16,12 @@ from django.core.mail import EmailMessage
 from django.utils.http import urlencode
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 import urllib2
 import random
 from settings import *
 from datetime import datetime
 from django.utils import timezone
 from threading import Thread
-import imaplib, csv, re, cStringIO
 
 class EquipeForm(ModelForm):
     class Meta:
@@ -42,7 +40,7 @@ class EquipierForm(ModelForm):
         exclude = ('equipe', 'numero', 'piece_jointe_valide', 'autorisation_valide', 'piece_jointe2_valide', 'ville2', 'code_eoskates')
         widgets = {
             'sexe':              Select(choices=SEXE_CHOICES),
-            'date_de_naissance': SelectDateWidget(years=range(YEAR-MIN_AGE, YEAR-100, -1)),
+            'date_de_naissance': SelectDateWidget(years=range(datetime.now().year , datetime.now().year - 100, -1)),
             'justificatif':      RadioSelect(choices=JUSTIFICATIF_CHOICES),
         }
 
@@ -57,12 +55,16 @@ class mailThread(Thread):
     def run(self):  
         self.msg.send()
 
-def form(request, id=None, code=None):
+@open_closed
+def form(request, course_uid, id=None, code=None):
+    course = get_object_or_404(Course, uid=request.path.split('/')[1])
     instance = None
     old_password = None
     equipier_count = Equipier.objects.count()
     if id:
         instance = get_object_or_404(Equipe, id=id)
+        if instance.course != course:
+            raise Http404()
         old_password = instance.password
         #if 'password' not in request.session or instance.password != request.session['password']:
         #    return render_to_response('login.html', RequestContext(request, {
@@ -76,12 +78,17 @@ def form(request, id=None, code=None):
         if instance:
             equipier_formset = EquipierFormset(request.POST, request.FILES, queryset=instance.equipier_set.all())
         else:
-            if datetime.now() >= datetime(CLOSE_YEAR, CLOSE_MONTH, CLOSE_DAY) or equipier_count >= MAX_EQUIPIER:
+            if datetime.now() >= datetime(CLOSE_YEAR, CLOSE_MONTH, CLOSE_DAY) or equipier_count >= MAX_EQUIPIERS:
                 if not request.user.is_staff:
                     return redirect('/')
             equipier_formset = EquipierFormset(request.POST, request.FILES)
+
+        # FIXME: change date naissance years
+        # years=range(course.date.year - course.min_age, course.date.year - 120, -1)
+
         if equipe_form.is_valid() and equipier_formset.is_valid():
             new_instance = equipe_form.save(commit=False)
+            new_instance.course = course
             new_instance.password = old_password
             if not instance:
                 new_instance.password = '%06x' % random.randrange(0x100000, 0xffffff)
@@ -136,8 +143,7 @@ def form(request, id=None, code=None):
             equipier_formset = EquipierFormset(queryset=Equipier.objects.none())
     date_prix2 = timezone.make_aware(datetime(2013, 6, 17), timezone.get_default_timezone())
     if instance:
-        return done(request, instance.id)
-    return render_to_response("closed.html", RequestContext(request, {}))
+        return done(request, course_uid, instance.id)
 
     return render_to_response("form.html", RequestContext(request, {
         "equipe_form": equipe_form,
@@ -148,11 +154,14 @@ def form(request, id=None, code=None):
         "solo": Equipe.objects.filter(categorie__startswith='ID').count(),
         "max_solo": datetime(2013, 6, 8) <= datetime.now() and 49 or 30,
         "equipier_count": equipier_count,
-        "prix2": date_prix2 <= timezone.now() and (not instance or instance.date >= date_prix2)
     }))
 
-def done(request, id):
+@open_closed
+def done(request, course_uid, id):
+    course = get_object_or_404(Course, uid=request.path.split('/')[1])
     instance = get_object_or_404(Equipe, id=id)
+    if instance.course != course:
+        raise Http404()
     ctx = RequestContext(request, {
         "instance": instance,
         "url": request.build_absolute_uri(reverse(
@@ -164,11 +173,10 @@ def done(request, id):
         "paypal_ipn_url": request.build_absolute_uri(reverse('inscriptions.ipn')),
         "hour": datetime.now().strftime('%H%M'),
     })
-    return render_to_response('closed2.html', ctx)
     return render_to_response('done.html', ctx)
 
 @csrf_exempt
-def ipn(request):
+def ipn(request, course_uid):
     """PayPal IPN (Instant Payment Notification)
     Cornfirms that payment has been completed and marks invoice as paid.
     Adapted from IPN cgi script provided at http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/456361"""
@@ -183,7 +191,7 @@ def ipn(request):
             # We want to respond to anything that isn't a payment - but we won't insert into our database.
              return HttpResponse()
 
-        equipe = get_object_or_404(Equipe, id=data['invoice'][0:-4])
+        equipe = get_object_or_404(Equipe, id=data['invoice'][0:-4], course__uid=course_uid)
         equipe.paiement = data['mc_gross']
         equipe.paiement_info = 'Paypal %s %s' % (datetime.now(), data['txn_id'])
         equipe.save()
@@ -217,205 +225,13 @@ def confirm_ipn_data(data, PP_URL):
     return True
 
 @csrf_exempt
-def check_name(request):
+def check_name(request, course_uid):
     return HttpResponse(Equipe.objects.filter(nom__iexact=request.POST['nom']).exclude(id=request.POST['id']).count(), content_type="text/plain")
 
-def list(request):
+def list(request, course_uid):
     return render_to_response('list.html', RequestContext(request, {
-       'object_list': Equipe.objects.all(),
-       'villes': Ville.objects.all().order_by('nom').annotate(equipiers=Count('equipier')),
-       'equipiers': Equipier.objects.all(),
+       'object_list': Equipe.objects.filter(course__uid=course_uid),
+       'villes': Ville.objects.filter(equipier_set__equipe__course__uid=course_uid).order_by('nom').annotate(equipiers=Count('equipier')),
+       'equipiers': Equipier.objects.filter(equipe__course__uid=course_uid),
     }))
-
-@login_required
-def send_mail(request, id, template='mail_relance.html'):
-    instance = get_object_or_404(Equipe, id=id)
-
-    if request.method == 'POST':
-        msg = EmailMessage(request.POST['subject'], request.POST['message'], request.POST['sender'], [ request.POST['mail'] ])
-        msg.content_subtype = "html"
-        msg.send()
-        messages.add_message(request, messages.INFO, u'Message envoyé à %s' % (request.POST['mail'], ))
-        return redirect('/admin/inscriptions/equipe/%s/' % (instance.id, ))
-
-    message = render_to_string(template or 'mail_relance.html', { "instance": instance, })
-
-    return render_to_response('send_mail.html', RequestContext(request, {
-        'message': message,
-        'sender': 'organisation@6hdeparis.fr',
-        'mail': instance.gerant_email,
-        'subject': '[6h de Paris 2013] Votre inscription / Your registration'
-    }))
-
-@login_required
-def bene(request):
-    server = 'localhost'
-
-    c = imaplib.IMAP4(server)
-    c.login(MAIL_LOGIN, MAIL_PASSWD)
-
-    data={}
-    out = cStringIO.StringIO()
-    o=csv.writer(out)
-    # Archive INBOX
-    c.select()
-    code, (list,) = c.search(None, 'ALL')
-    for i in list.split():
-        try:
-            msg = c.fetch(i, '(RFC822)')[1][0][1]
-            if type(msg) == tuple:
-                msg = ''.join(msg)
-            if '\r\nSubject: Inscription b' not in msg:
-                next
-            msg = "\r\n".join(msg.split("\r\n\r\n")[1:])
-            row = [':' in i and i.split(': ')[1] or i for i in msg.split("\r\n")]
-            row[4] = re.sub('([0-9]{2})', '\\1 ', ''.join(row[4].split(' ')))
-            o.writerow(row)
-        except:
-            pass
-    c.close()
-    r = HttpResponse(out.getvalue(), mimetype='text/csv')
-    out.close()
-    return r
-
-@login_required
-def dossards(request):
-    return render_to_response('dossards.html', RequestContext(request, {
-        'equipiers': Equipier.objects.all().order_by(*request.GET.get('order','equipe__numero,numero').split(','))
-    }))
-
-@login_required
-def listing(request, template='listing.html'):
-    return render_to_response(template, RequestContext(request, {
-        'equipes': Equipe.objects.all().order_by(*request.GET.get('order','id').split(','))
-    }))
-
-@login_required
-def listing_dossards(request, template='listing_dossards.html'):
-    equipes = Equipe.objects.exclude(categorie__startswith='ID').order_by(*request.GET.get('order','id').split(','))
-    return render_to_response(template, RequestContext(request, {
-        'solo': Equipe.objects.filter(categorie__startswith='ID').order_by(*request.GET.get('order','id').split(',')),
-        'equipes': {
-            u'1 à 100':   equipes.filter(id__lt=101),
-            u'101 à 145': equipes.filter(id__gt=100, id__lt=146),
-            u'146 à 190': equipes.filter(id__gt=145, id__lt=191),
-            u'191 à 239': equipes.filter(id__gt=190),
-        }
-    }))
-
-def equipiers(request):
-    return render_to_response('equipiers.html', RequestContext(request, {
-        'equipiers': Equipier.objects.all()
-    }))
-
-#@login_required
-def dossardsCSV(request):
-    code = request.GET.get('code', 'utf-8')
-    out = cStringIO.StringIO()
-    o=csv.writer(out)
-    o.writerow([
-        'inscription',
-        'equipe',
-        'nom',
-        'categorie',
-        'dossard',
-        'nom',
-        'prenom',
-        'sexe',
-        'date_de_naissance',
-        'num_licence',
-        'gerant_nom',
-        'gerant_prenom',
-        'gerant_ville',
-        'gerant_code_postal',
-        'gerant_code_pays',
-    ])
-    for e in Equipier.objects.all():
-        row = [
-            e.equipe.id,
-            e.equipe.numero,
-            e.equipe.nom,
-            e.equipe.categorie,
-            e.dossard(),
-            e.nom,
-            e.prenom,
-            e.sexe,
-            e.date_de_naissance,
-            e.num_licence,
-            e.equipe.gerant_nom,
-            e.equipe.gerant_prenom,
-            e.equipe.gerant_ville,
-            e.equipe.gerant_code_postal,
-            e.equipe.gerant_pays,
-        ]
-        row = [ type(i) == unicode and i.encode(code) or i for i in row ]
-        o.writerow(row)
-
-    r = HttpResponse(out.getvalue(), mimetype='text/csv')
-    out.close()
-    return r
-
-def dossardsEquipesCSV(request):
-    code = request.GET.get('code', 'utf-8')
-    out = cStringIO.StringIO()
-    o=csv.writer(out)
-    o.writerow([
-        'inscription',
-        'equipe',
-        'nom',
-        'categorie',
-        'gerant_nom',
-        'gerant_prenom',
-        'gerant_ville',
-        'gerant_code_postal',
-        'gerant_code_pays',
-    ])
-    for e in Equipe.objects.all():
-        row = [
-            e.id,
-            e.numero,
-            e.nom,
-            e.categorie,
-            e.gerant_nom,
-            e.gerant_prenom,
-            e.gerant_ville,
-            e.gerant_code_postal,
-            e.gerant_pays,
-        ]
-        row = [ type(i) == unicode and i.encode(code) or i for i in row ]
-        o.writerow(row)
-
-    r = HttpResponse(out.getvalue(), mimetype='text/csv')
-    out.close()
-    return r
-
-def dossardsEquipiersCSV(request):
-    code = request.GET.get('code', 'utf-8')
-    out = cStringIO.StringIO()
-    o=csv.writer(out)
-    o.writerow([
-        'equipe',
-        'dossard',
-        'nom',
-        'prenom',
-        'sexe',
-        'date_de_naissance',
-        'num_licence',
-    ])
-    for e in Equipier.objects.all():
-        row = [
-            e.equipe.numero,
-            e.dossard(),
-            e.nom,
-            e.prenom,
-            e.sexe,
-            e.date_de_naissance,
-            e.num_licence,
-        ]
-        row = [ type(i) == unicode and i.encode(code) or i for i in row ]
-        o.writerow(row)
-
-    r = HttpResponse(out.getvalue(), mimetype='text/csv')
-    out.close()
-    return r
 

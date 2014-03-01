@@ -10,34 +10,104 @@ from settings import *
 from datetime import date
 from decimal import Decimal
 from django.utils.safestring import mark_safe
+from django.contrib.auth.models import User
 
-# CATEGORIES = {
-#     'SLH': { 'prix' : 50 },
-#     'SLF': { 'prix' : 50 },
-#     'DUO': { 'prix' : 80 },
-#     'SNH': { 'prix' : 80 },
-#     'SNF': { 'prix' : 80 },
-#     'SNX': { 'prix' : 80 },
-#     'VEH': { 'prix' : 80 },
-#     'VEF': { 'prix' : 80 },
-# }
 
 SEXE_CHOICES = (
     ('H', _(u'Homme')),
-    ('F', _(u'Femme'))
+    ('F', _(u'Femme')),
+)
+
+MIXITE_CHOICES = (
+    ('H', _(u'Homme')),
+    ('F', _(u'Femme')),
+    ('MX', _(u'Homme ou Mixte')),
+    ('FX', _(u'Femme ou Mixte')),
+    ('X', _(u'Mixte')),
 )
 
 JUSTIFICATIF_CHOICES = (
     ('licence',    _(u'Licence FFRS 2013')),
-    ('certificat', _(u'Certificat médical établi après le 4/08/2012'))
+    ('certificat', _(u'Certificat médical établi après le 4/08/2012')),
 )
 
+ROLE_CHOICES = (
+    ('admin', _(u'Administrateur')),
+    ('organisateur', _(u'Organisateur')),
+    ('validateur', _(u'Validateur')),
+)
+
+CONNU_CHOICES = (
+    (u'Roller en LIgne', _(u'Roller en Ligne')),
+    (u'Facebook', _('Facebook')),
+    (u'Presse', _(u'Presse')),
+    (u'Bouche à oreille', _(u'Bouche à oreille')),
+    (u'Flyer pendant une course', _(u'Fley pendant une course')),
+    (u'Flyer pendant une randonnée', _(u'Flyer pendant une randonnée')),
+    (u'Affiche', _(u'Affiche')),
+    (u'Informations de la Mairie de Paris', _(u'Information de la Maire de Paris')),
+)
+
+TAILLES_CHOICES = (
+    ('XS', _('XS')),
+    ('S', _('S')),
+    ('M', _('M')),
+    ('L', _('L')),
+    ('XL', _('XL')),
+    ('XXL', _('XXL')),
+)
+
+#class Chalenge(model.Model):
+#    nom = models.CharField(_('Nom'), max=200)
+
+class Course(models.Model):
+    nom                 = models.CharField(_(u'Nom'), max_length=200)
+    uid                 = models.CharField(_(u'uid'), max_length=200)
+    ville               = models.CharField(_(u'Ville'), max_length=200)
+#    challenge           = models.ForeignKey(Challenge, blank=True, null=True)
+    date                = models.DateField(_(u'Date'))
+    date_ouverture      = models.DateField(_(u"Date d'ouverture des inscriptionss"))
+    date_augmentation   = models.DateField(_(u"Date d'augmentation dss tarifs"))
+    date_fermeture      = models.DateField(_(u"Date de fermeture des inscriptions"))
+    limite_participants = models.DecimalField(_(u"Limite du nombre de participants"), max_digits=6, decimal_places=0)
+    limite_solo         = models.DecimalField(_(u"Limite du nombre de solo"), max_digits=6, decimal_places=0)
+    paypal              = models.EmailField(_(u'Adresse paypal'))
+    ordre               = models.CharField(_(u'Ordre des chèques'), max_length=200)
+    adresse             = models.TextField(_(u'Adresse'), blank=True)
+    url                 = models.URLField(_(u'URL'))
+    url_reglement       = models.URLField(_(u'URL Réglement'))
+    email_contact       = models.EmailField(_(u'Email contact'))
+
+    def save(self, *args, **kwargs):
+        if not self.uid:
+            self.uid = self.nom.lower().replace(' ', '_')
+        super(Course, self).save(*args, **kwargs)
+
+    def __unicode__(self):
+        return '%s (%s)' % (self.nom, self.date)
+
+class Categorie(models.Model):
+    course          = models.ForeignKey(Course, related_name='categories')
+    nom             = models.CharField(_(u'Nom'), max_length=200)
+    code            = models.CharField(_(u'Code'), max_length=10)
+    prix1           = models.DecimalField(_(u"Prix normal"), max_digits=7, decimal_places=2)
+    prix2           = models.DecimalField(_(u"Prix augmenté"), max_digits=7, decimal_places=2)
+    min_equipiers   = models.IntegerField(_(u"Nombre minimum d'équipiers"))
+    max_equipiers   = models.IntegerField(_(u"Nombre maximum d'équipiers"))
+    min_age         = models.IntegerField(_(u'Age minimum'), default=12)
+    sexe            = models.CharField(_(u'Sexe'), max_length=2, choices=MIXITE_CHOICES)
+    validation      = models.TextField(_(u'Validation function (javascript)'))
+    numero_dossard  = models.IntegerField(_(u'Numero de dossard (début)'), default=0)
+
+    def __unicode__(self):
+        return '%s (%s)' % (self.nom, self.code)
+
 class Ville(models.Model):
-    lat = models.DecimalField(max_digits=10, decimal_places=7)
-    lng = models.DecimalField(max_digits=10, decimal_places=7)
-    nom = models.CharField(max_length=200)
-    region = models.CharField(max_length=200)
-    pays = models.CharField(max_length=200)
+    lat      = models.DecimalField(max_digits=10, decimal_places=7)
+    lng      = models.DecimalField(max_digits=10, decimal_places=7)
+    nom      = models.CharField(max_length=200)
+    region   = models.CharField(max_length=200)
+    pays     = models.CharField(max_length=200)
     response = models.CharField(max_length=65535)
 
 def lookup_ville(nom, cp, pays):
@@ -45,7 +115,7 @@ def lookup_ville(nom, cp, pays):
     nom = re.sub('[- ,/]+', ' ', nom)
     try:
         return Ville.objects.get(nom=nom)
-    except Ville.DoesNotExist, e:
+    except (Ville.DoesNotExist, e):
         pass
 
     def urlEncodeNonAscii(b):
@@ -81,7 +151,7 @@ def lookup_ville(nom, cp, pays):
     data['latLng']['lng'] = str(data['latLng']['lng'])
     try:
         return Ville.objects.get(lat=data['latLng']['lat'], lng=data['latLng']['lng'])
-    except Ville.DoesNotExist, e:
+    except (Ville.DoesNotExist, e):
         pass
     obj = Ville(
         lat      = data['latLng']['lat'],
@@ -107,7 +177,8 @@ class Equipe(models.Model):
     gerant_email       = models.EmailField(_(u'e-mail'), max_length=200)
     password           = models.CharField(_(u'Mot de passe'), max_length=200, blank=True)
     gerant_telephone   = models.CharField(_(u'Téléphone'), max_length=200, blank=True)
-    categorie          = models.CharField(_(u'Catégorie'), max_length=10)
+    categorie          = models.ForeignKey(Categorie)
+    course             = models.ForeignKey(Course)
     nombre             = models.IntegerField(_(u"Nombre d'équipiers"))
     paiement_info      = models.CharField(_(u'Détails'), max_length=200, blank=True)
     prix               = models.DecimalField(_(u'Prix'), max_digits=5, decimal_places=2)
@@ -117,6 +188,7 @@ class Equipe(models.Model):
     commentaires       = models.TextField(_(u'Commentaires'), blank=True)
     gerant_ville2      = models.ForeignKey(Ville, null=True)
     numero             = models.IntegerField(_(u'Numéro'))
+    connu              = models.CharField(_('Comment avez vous connu la course ?'), max_length=200, choices=CONNU_CHOICES)
 
     def __unicode__(self):
         return u'%s - %s - %s' % (self.id, self.categorie, self.nom)
@@ -130,35 +202,12 @@ class Equipe(models.Model):
     def autorisation_manquantes(self):
         return [equipier for equipier in self.equipier_set.all() if equipier.age() < 18 and not equipier.autorisation_valide and not equipier.autorisation ]
 
-    def documents_manquants2(self):
-        return (len(self.licence_manquantes()) + len(self.certificat_manquantes()) + len(self.autorisation_manquantes())) or ''
-    documents_manquants2.short_description = u'✉'
-
     def verifier(self):
         return len([equipier for equipier in self.equipier_set.all() 
                 if (equipier.piece_jointe and equipier.piece_jointe_valide == None) or
                    (equipier.autorisation and equipier.autorisation_valide == None)]) > 0
-    def verifier2(self):
-        return self.verifier() and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u''
-    verifier2.allow_tags = True
-    verifier2.short_description = 'V'
-
     def paiement_complet(self):
         return self.paiement >= self.prix
-    def paiement_complet2(self):
-        return self.paiement >= self.prix and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
-    paiement_complet2.allow_tags = True
-    paiement_complet2.short_description = '€'
-    
-    def nombre2(self):
-        return self.nombre
-    nombre2.short_description = u'☺'
-
-    def dossier_complet2(self):
-        return self.dossier_complet and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
-    dossier_complet2.allow_tags = True
-    dossier_complet2.short_description = mark_safe(u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""")
-
     def dossier_complet_auto(self):
         if len([equipier for equipier in self.equipier_set.all()
                     if (not equipier.piece_jointe_valide) or
@@ -169,17 +218,6 @@ class Equipe(models.Model):
                     (equipier.age() < 18 and equipier.autorisation_valide == False)]) > 0:
             return False
         return None
-    def dossier_complet_auto2(self):
-        auto = self.dossier_complet_auto()
-        if auto:
-            return u"""<img alt="None" src="/static/admin/img/icon-yes.gif">"""
-        if auto == False:
-            return u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
-        return u""
-    dossier_complet_auto2.allow_tags = True
-    dossier_complet_auto2.short_description = mark_safe(u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""")
-
-
 
     def frais_paypal(self):
         return ( self.prix + Decimal('0.25') ) / ( Decimal('1.000') - Decimal('0.034') ) - self.prix
@@ -194,13 +232,13 @@ class Equipe(models.Model):
                 ctx = { "instance": self, }
                 subject = '[6h de Paris 2013] Paiement reçu'
                 message = render_to_string( 'mail_paiement.html', ctx)
-                msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ self.gerant_email ])
+                msg = EmailMessage(subject, message, self.course.email_contact, [ self.gerant_email ])
                 msg.content_subtype = "html"
                 msg.send()
 
                 subject = '[6h de Paris 2013] Paiement reçu %s' % (self.id, )
                 message = render_to_string( 'mail_paiement_admin.html', ctx)
-                msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ 'inscriptions@6hdeparis.fr' ])
+                msg = EmailMessage(subject, message, self.course.email_contact, [ self.course.email_contact ])
                 msg.content_subtype = "html"
                 msg.send()
         else:
@@ -212,23 +250,14 @@ class Equipe(models.Model):
             self.gerant_ville2 = lookup_ville(self.gerant_ville, self.gerant_code_postal, self.gerant_pays)
             super(Equipe, self).save()
 
-    def send_mail_relance(self, template='mail_relance.html', mail=None):
+    def send_mail(self, template, mail=None):
         #if self.paiement_complet and self.dossier_complet_auto:
         #    return
+        mail = Template_mail.objects.get(id=template)
         ctx = { "instance": self, }
-        subject = '[6h de Paris 2013] Votre inscription %d / Your registration %d' % (self.id, self.id)
-        message = render_to_string(template, ctx)
-        msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ mail or self.gerant_email ])
-        msg.content_subtype = "html"
-        msg.send()
-
-    def send_mail_erreur(self, message='', mail=None):
-        #if self.paiement_complet and self.dossier_complet_auto:
-        #    return
-        ctx = { "instance": self, 'message': message }
-        subject = '[6h de Paris 2013] Votre inscription / Your registration'
-        message = render_to_string( 'mail_erreur.html', ctx)
-        msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ mail or self.gerant_email ])
+        subject = Template(mail.sujet).render(ctx)
+        message = Template(mail.message).render(ctx)
+        msg = EmailMessage(subject, message, self.course.email_contact, [ mail or self.gerant_email ])
         msg.content_subtype = "html"
         msg.send()
 
@@ -275,8 +304,10 @@ class Equipier(models.Model):
     parent            = models.CharField(_(u'Lien de parenté'), max_length=200, blank=True)
     piece_jointe2       = models.FileField(_(u'Justificatif entreprise / etudiant'), upload_to='certificats', blank=True)
     piece_jointe2_valide  = models.NullBooleanField(_(u'Justificatif valide'))
-    ville2            = models.ForeignKey(Ville, null=True)
+    ville_normalisee  = models.ForeignKey(Ville, null=True)
     code_eoskates     = models.CharField(_(u'Code EOSkates'), max_length=20, blank=True)
+    transpondeur      = models.CharField(_(u'Transpondeur'), max_length=20, blank=True)
+    taille_tshirt     = models.CharField(_(u'Taille T-shirt'), max_length=3, choices=TAILLES_CHOICES)
     
     def age(self):
         today = date(YEAR, MONTH, DAY)
@@ -291,51 +322,31 @@ class Equipier(models.Model):
 
     def save(self, *args, **kwargs):
         super(Equipier, self).save(*args, **kwargs)
-        if not self.ville2:
-            self.ville2 = lookup_ville(self.ville, self.code_postal, self.pays)
+        if not self.ville_normalisee:
+            self.ville_normalisee = lookup_ville(self.ville, self.code_postal, self.pays)
             super(Equipier, self).save()
 
     def dossard(self):
-        #if self.equipe.categorie.startswith('ID'):
-        #    return self.equipe.numero
         return self.equipe.numero * 10 + self.numero
 
     def send_mail(self, subject='', template=None, mail=None):
-        #if self.paiement_complet and self.dossier_complet_auto:
-        #    return
         ctx = { "equipier": self, }
         subject = subject
         message = render_to_string(template, ctx)
-        msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ mail or self.email ])
+        msg = EmailMessage(subject, message, self.equipe.course.email_contact, [ mail or self.email ])
         msg.content_subtype = "html"
         msg.send()
 
-def send_mail(subject='', template=None, mail=None):
-    #if self.paiement_complet and self.dossier_complet_auto:
-    #    return
-    ctx = { }
-    subject = subject
-    message = render_to_string(template, ctx)
-    msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ mail ])
-    msg.content_subtype = "html"
-    msg.send()
 
-def renumerote():
-    l = []
-    for e in Equipe.objects.all():
-        e.numero = 0
-        if e.nom.startswith('6h de Paris'):
-            e.nom = ''
-            l.append(e)
-        e.save()
-    for e in Equipe.objects.extra(select={
-            'club_upper': 'UPPER(club)',
-            'nom_upper': 'UPPER(nom)',
-            'c': "CASE categorie WHEN 'IDH' THEN 1 WHEN 'IDF' THEN 1 WHEN 'DUX' THEN 2 WHEN 'DUF' THEN 2 ELSE 3 END"
-        }, order_by=['c', 'club_upper', 'nom_upper', 'id']):
-        e.numero = e.getNumero()
-        e.save()
-    for i in range(len(l)):
-        l[i].nom = '6h de Paris %s' % i
-        l[i].save()
+class UserProfile(models.Model):
+    user = models.ForeignKey(User, unique=True)
+    course = models.ManyToManyField(Course, related_name='+')
+    role = models.CharField(_("Role"), max_length=20, choices=ROLE_CHOICES)
+
+User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
+
+class TemplateMail(models.Model):
+    course = models.ForeignKey(Course)
+    sujet = models.CharField(_('Sujet'), max_length=200)
+    message = models.TextField(_('Message'))
 

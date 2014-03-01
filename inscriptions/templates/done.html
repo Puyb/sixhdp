@@ -5,7 +5,7 @@
 <h1>{% trans 'Votre inscription est enregistrée' %}</h1>
 <table>
     <tr><th>{% trans 'Equipe : ' %}</th><td>{{ instance.nom }}</td></tr>
-    <tr><th>{% trans "Numéro d'inscription :" %}</th><td>{{ instance.id }}</td></tr>
+    <tr><th>{% trans "Numéro d'inscription :" %}</th><td>{{ instance.numero }}</td></tr>
 </table>
 <br />
 {% if create %}
@@ -43,7 +43,7 @@
 
 {% blocktrans with frais=instance.frais_paypal|floatformat:2 %}Pour tout paiement par internet, {{ frais }} € de frais seront ajoutés.{% endblocktrans %}<br />
 <br />
-{% blocktrans with prix=instance.prix %}Ou envoyer un chèque de {{ prix }} € à l'ordre du "Paris Université Club".{% endblocktrans %}<br />
+{% blocktrans with prix=instance.prix and ordre=COURSE.ordre %}Ou envoyer un chèque de {{ prix }} € à l'ordre de "{{ ordre }}".{% endblocktrans %}<br />
 {% else %}
 {% blocktrans with prix=instance.paiement %}Votre paiement de {{ prix }} € à bien été reçu.{% endblocktrans %}
 {% endif %}
@@ -93,11 +93,9 @@
 <br />
 {% if not instance.paiement or instance.licence_manquantes or instance.certificat_manquantes or instance.autorisation_manquantes %}
 {% trans 'Vous pouvez envoyer le paiement et les justificatifs à' %} <br />
-<pre>{% blocktrans %}PUC - 6h Roller de Paris
-17 avenue Pierre de Coubertin
-75013 Paris{% endblocktrans %}</pre>
+<pre>{{ COURSE.adresse }}</pre>
 <br />
-{% blocktrans with id=instance.id %}En précisant le nom de votre équipe et le numéro d'inscription <b>{{ id }}</b>.{% endblocktrans %}
+{% blocktrans with numero=instance.numero %}En précisant le nom de votre équipe et le numéro d'inscription <b>{{ numero }}</b>.{% endblocktrans %}
 {% endif %}
 
 {% endblock %}
