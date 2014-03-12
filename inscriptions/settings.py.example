@@ -1,16 +1,4 @@
-YEAR = 2013
-MONTH = 8
-DAY = 4
-TITLE = '6h de Paris'
-MIN_AGE = 12
-
-MAX_EQUIPIER = 650
-CLOSE_YEAR = 2013
-CLOSE_MONTH = 7
-CLOSE_DAY = 22
-
 PAYPAL_URL = 'https://www.paypal.com/cgi-bin/webscr'
 # PAYPAL_URL = 'https://www.sandbox.paypal.com/cgi-bin/webscr'
-PAYPAL_BUSINESS = ''
 
 MAPQUEST_API_KEY = ''

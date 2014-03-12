@@ -26,7 +26,7 @@
         <input type="hidden" name="cmd"           value="_cart" />
         <input type="hidden" name="upload"        value="1" />
         <input type="hidden" name="no_shipping"   value="1" />
-        <input type="hidden" name="item_name_1"   value="6H de Paris - {{ instance.categorie }}" />
+        <input type="hidden" name="item_name_1"   value="{{ COURSE.uid }} - {{ instance.categorie.code }}" />
         <input type="hidden" name="invoice"       value="{{ instance.id }}{{ hour }}" />
         <input type="hidden" name="amount_1"      value="{{ instance.prix_paypal|stringformat:".2f" }}" />
         <input type="hidden" name="quantity_1"    value="1" />
@@ -43,7 +43,7 @@
 
 {% blocktrans with frais=instance.frais_paypal|floatformat:2 %}Pour tout paiement par internet, {{ frais }} € de frais seront ajoutés.{% endblocktrans %}<br />
 <br />
-{% blocktrans with prix=instance.prix and ordre=COURSE.ordre %}Ou envoyer un chèque de {{ prix }} € à l'ordre de "{{ ordre }}".{% endblocktrans %}<br />
+{% blocktrans with prix=instance.prix ordre=COURSE.ordre %}Ou envoyer un chèque de {{ prix }} € à l'ordre de "{{ ordre }}".{% endblocktrans %}<br />
 {% else %}
 {% blocktrans with prix=instance.paiement %}Votre paiement de {{ prix }} € à bien été reçu.{% endblocktrans %}
 {% endif %}

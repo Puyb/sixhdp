@@ -3,26 +3,16 @@
 {% block content %}
 {% get_current_language as LANGUAGE_CODE %}
 {% get_available_languages as LANGUAGES %}
-{% if create %}<h1>{% trans 'Inscription' %} - {{ TITLE }} {{ YEAR }}</h1>{% endif %}
-{% if update %}<h1>{% trans 'Modification de votre inscription' %} - {{ TITLE }} {{ YEAR }}</h1>{% endif %}
+{% if create %}<h1>{% trans 'Inscription' %} - {{ TITLE }}</h1>{% endif %}
+{% if update %}<h1>{% trans 'Modification de votre inscription' %} - {{ TITLE }}</h1>{% endif %}
 <script src="{{ STATIC_URL }}prototype.js"></script>
 <script>
-(function() {
-    if(![].map)
-        Array.prototype.map = function(fn) {
-            var r = [];
-            for(var i = 0; i < this.length; i++)
-                r.push(fn(this[i], i));
-            return r;
-        };
-    var max_solo = {{ COURSE.limite_solo }};
-
-    var actual_part = 0;
-    var categories = [
-    {% for cat in COURSE.categories %}
+    var CATEGORIES = [
+    {% for cat in COURSE.categories.all %}
         {
-            code: "{{ cat.code|javascript }}",
-            label: "{{ cat.nom|javascript }}",
+            id:    "{{ cat.id }}",
+            code:  "{{ cat.code|escapejs }}",
+            label: "{{ cat.nom|escapejs }}",
             prix: {% if instance %} 
                     new Date("{{ COURSE.date_augmentation|date:'%c' }}") <= new Date("{{ instance.date|date:'%c' }}") 
                   {% else %}
@@ -32,314 +22,40 @@
             max_equipiers: {{ cat.max_equipiers }},
             min_age: {{ cat.min_age }},
             sexe: '{{ cat.sexe }}',
-            valid: {{ cat.validation }}
-        }{% if forloop.last %},{% endif %}
+            valid: {{ cat.validation|safe }},
+            numero_debut: {{ cat.numero_debut }},
+            numero_fin: {{ cat.numero_fin }}
+        }{% if not forloop.last %},{% endif %}
     {% endfor %}];
-    {% if instance.categorie != 'IDH' and instance.categorie != 'IDF' %}
-    if({{ solo }} > max_solo) // Limitation des solos à 30
-        categories = categories.slice(2);
-    {% endif %}
-
-    function age(a) {
-        return function(eq) {
-            var b = {{ YEAR }} - parseFloat(eq.date_de_naissance_year);
-            if(b != a) return b > a;
-            if(parseFloat(eq.date_de_naissance_month) != {{ MONTH }})
-                return parseFloat(eq.date_de_naissance_month) < {{ MONTH }};
-            return parseFloat(eq.date_de_naissance_day) <= {{ DAY }}
-        };
-    }
-
-    function serialize() {
-        $$('input, select').each(function(e) {
-            e.disabled = false;
-        });
-        var data = Form.serialize(document.body, true);
-        {% if not user.is_staff %}
-        if(new Date() >= new Date({{ CLOSE_YEAR }},{{ CLOSE_MONTH }}-1,{{ CLOSE_DAY }}) || {{ equipier_count }} >= {{ MAX_EQUIPIERS }}) {
-            $$('input, select').each(function(e) {
-                if(e.type != 'file' && e.type != 'button' && e.type != 'submit' && e.type != 'radio' && !/num_licence$/.test(e.name))
-                    e.disabled = true;
-            });
-        }
-        {% endif %}
-        data.equipiers = [{}, {}, {}, {}, {}];
-        data.nombre = parseFloat(data.nombre);
-        for(var k in data)
-            if(/^form-\d-/.test(k) && parseFloat(k.substr(5)) < data.nombre)
-                data.equipiers[parseFloat(k.substr(5))][k.substr(7)] = data[k];
-        data.nombre_h = data.equipiers.filter(function(i) { return i.sexe == 'H'; }).length;
-        data.nombre_f = data.equipiers.filter(function(i) { return i.sexe == 'F'; }).length;
-        return data;
-    }
-
-    Event.observe(window, 'load', function() {
-        $('id_categorie').remove();
-        for(var i = 0; i < 5; i++) {
-            $('id_form-' + i + '-date_de_naissance_day').up().id = 'id_form-' + i + '-date_de_naissance';
-        }
-        //$('id_password').up().insert('<br /><input type="password" id="id_password2" />');
-
-        $$('select[name*=naissance]').invoke('observe', 'change', function(event) {
-            var data = serialize();
-            var n = event.element().name.split('-')[1];
-            if(age(18)(data.equipiers[n])) {
-                $('id_form-' + n + '-autorisation').up('tr').hide();
-                if($('tr-autorisation-warning'))
-                    $('tr-autorisation-warning').remove()
-            } else {
-                var e = $('id_form-' + n + '-autorisation').up('tr').show();
-                if(!$('tr-autorisation-warning'))
-                    e.insert({
-                        after: new Element('tr', { id: 'tr-autorisation-warning' })
-                                .insert(new Element('td', { colspan: 2 })
-                                .update("{% trans "Si vous le pouvez, scannez l'autorisation et ajoutez la en pièce jointe (formats PDF ou JPEG)." %}<br />{% blocktrans %}Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier (<a href=\"http://www.6hdeparis.fr/wp-content/uploads/2013/03/autorisation_parentale.pdf\" target=\"_blank\">modèle</a>).{% endblocktrans %}"))
-                    });
-            }
-        
-        });
-        $$('input[name*=licence]').each(function(e) {
-            var tr = e.up('tr');
-            var id = e.id.split('-').slice(0, 2).join('-');
-            tr.hide()
-                .next().hide();
-            var handler = function() {
-                if($(id + '-justificatif_1').checked) {
-                    tr.show()
-                        .next().show().down('label').update('{% trans 'Licence' %}:');
-                    tr.next(1).show()
-                }
-                if($(id + '-justificatif_2').checked) {
-                    tr.hide()
-                        .next().show().down('label').update('{% trans 'Certificat médical' %}:');
-                    tr.next(1).show()
-                }
-            };
-            $(id + '-justificatif_0').up('li').remove();
-            $(id + '-justificatif_1').observe(Prototype.Browser.IE ? 'click' : 'change', handler);
-            $(id + '-justificatif_2').observe(Prototype.Browser.IE ? 'click' : 'change', handler);
-            handler();
-        })
-        $$('input[name*=parent]').each(function(e) {
-            var tr = e.up('tr').hide();
-            $('justif_FMX').down('table').insert(tr);
-        });
-        $$('input[name*=jointe2]').each(function(e) {
-            var tr = e.up('tr').hide();
-            $('justif_EPX').down('table').insert(tr);
-        });
-        {% if not user.is_staff %}
-        if(new Date() >= new Date({{ CLOSE_YEAR }},{{ CLOSE_MONTH }}-1,{{ CLOSE_DAY }}) || {{ equipier_count }} >= {{ MAX_EQUIPIERS }}) {
-            $$('input, select').each(function(e) {
-                if(e.type != 'file' && e.type != 'button' && e.type != 'submit' && e.type != 'radio' && !/num_licence$/.test(e.name))
-                    e.disabled = true;
-            });
-        }
-        {% endif %}
-
-        var nom_timeout;
-        function check_nom(wait) {
-            new Ajax.Request('{% url inscriptions.check_name %}', {
-                parameters: { nom: $F('id_nom'), id: '0{{ instance.id }}' },
-                asynchronous: !wait,
-                onSuccess: function(r) {
-                    if(r.responseText != '0')
-                        $('nom_erreur').update("{% trans "Ce nom d'équipe est déjà utilisé !" %}");
-                    else
-                        $('nom_erreur').update("");
-
-                }
-            });
-        }
-        $('id_nom')
-            .insert({ after: new Element('div', { id: 'nom_erreur' }) })
-            .observe('keydown', function(event) {
-                if(nom_timeout) clearTimeout(nom_timeout);
-                nom_timeout = setTimeout(check_nom, 500);
-            });
-
-
-
-        $('part0').down('input').focus();
-
-        $('button_prev').observe('click', function(event) {
-            $$('.parts').invoke('hide');
-            actual_part--;
-            $('part' + actual_part).show();
-            $('part' + actual_part).down('input').focus();
-            $('button_next').show();
-            $('button_submit').hide();
-            if(!actual_part) event.element().hide();
-        });
-
-
-        $('button_next').observe('click', function(event) {
-            var data = serialize();
-            // check values
-            var ok = true;
-            var prefix = 'id_';
-            var test_data = data;
-            if(!actual_part) {
-                var tests = {
-                    nom:                function(k) { check_nom(true); return /^.+$/i.test(this.nom) && $('nom_erreur').innerHTML == ''; },
-                    gerant_nom:         /^.+$/i,
-                    gerant_prenom:      /^.+$/i,
-                    gerant_ville:       /^.+$/i,
-                    gerant_code_postal: /^[0-9]{4,6}$/i,
-                    gerant_email:       /^[a-z0-9+\-\._]+@([a-z0-9\-_]+\.)+[a-z]{2,5}$/i,
-                    //password:           {% if create %}/^.{6,}$/i{% else %}/^(|.{6,})$/i{% endif %},
-                    //password2:          function() { return this.password == $F('id_password2'); },
-                    //nombre:             /^[12345]$/i,
-                    {% if instance.categorie != 'IDH' and instance.categorie != 'IDF' %}
-                    nombre:             function(k) { if({{ solo }} > max_solo && this.nombre == 1) { alert("{% trans "Désolé, il n'y a plus de places en catégorie individuel." %}"); return false; } return true; },
-                    {% endif %}
-                    gerant_telephone:   /^\+?[0-9]{10,15}$/i
-
-                };
-            } else {
-                function check_date(k) {
-                    var d = new Date(parseFloat(this[k + '_year']), parseFloat(this[k + '_month']) - 1, parseFloat(this[k + '_day']));
-                    return d.getFullYear()  == parseFloat(this[k + '_year'])  && 
-                           d.getMonth() + 1 == parseFloat(this[k + '_month']) &&
-                           d.getDate()       == parseFloat(this[k + '_day'])   ? d : undefined;
-                }
-
-                var tests = {
-                    nom:                /^.+$/i,
-                    prenom:             /^.+$/i,
-                    //sexe:               /^[HF]$/i,
-                    ville:              /^.+$/i,
-                    code_postal:        /^[0-9]{4,6}$/i,
-                    email:              /^[a-z0-9+\-\._]+@([a-z0-9\-_]+\.)+[a-z]{2,5}$/i,
-                    date_de_naissance:  function(k) { return check_date.call(this, k) && age({{ MIN_AGE }})(this); },
-                    num_licence:        function(k) { return this.justificatif != 'licence' || /^[0-9]{3,9}$/i.test(this[k]); }
-                };
-                prefix = 'id_form-' + (actual_part - 1) + '-';
-                test_data = data.equipiers[actual_part - 1];
-            }
-            for(var k in tests) {
-                if(tests[k].test ? tests[k].test(test_data[k]) : tests[k].call(test_data, k)) {
-                    $(prefix + k).setStyle({ background: 'white' });
-                } else {
-                    ok = false;
-                    $(prefix + k).setStyle({ background: '#ff6666' });
-                }
-            }
-            if(!ok) {
-                return alert('{% trans 'Veuillez corriger les champs en rouge.' %}');
-            }
-
-            // change page
-            $('button_prev').show();
-            $$('.parts').invoke('hide');
-            actual_part++;
-            if(actual_part > parseInt($F('id_nombre'))) {
-                // last page
-                $('partlast').show();
-                try {
-                    $('partlast').down('input').focus();
-                } catch(e) {}
-
-                actual_categories = categories.filter(function(c) {
-                    return c.min_equipier <= data.nombre && data.nombre <= c.max_equipier
-                        && data.equipiers.filter(age(c.min_age)).length === data.nombre
-                        && ((c.sexe == 'M' && data.nombre == data.nombre_h) ||
-                            (c.sexe == 'F' && data.nombre == data.nombre_f) ||
-                            (c.sexe == 'MX' && data.nombre_f >= 1) ||
-                            (c.sexe == 'FX' && data.nombre_h >= 1) ||
-                            (c.sexe == 'X' && data.nombre_f >0 && data.nombre_h > 0))
-                        && c.valid(data);
-                })
-                
-                if(actual_categories.length == 0) {
-                    $('button_prev').click();
-                    return alert("{% trans "Votre équipe n'est éligible dans aucune des catégories proposées pour cette compétition. Veuillez vous référer au réglement de la course disponible sur le site pour voir les critères de chaque catégorie." %}");
-                }
-
-                $('catwrapper').innerHTML = actual_categories.map(function(c) {
-                    return '<input type="radio" value="#{code}" name="categorie" id="id_categorie-#{code}"><label for="id_categorie-#{code}">#{label} - #{prix} €</label><br />'.interpolate(c);
-                }).join('');
-                {% if not user.is_staff %}
-                if(new Date() >= new Date({{ CLOSE_YEAR }},{{ CLOSE_MONTH }}-1,{{ CLOSE_DAY }}) || {{ equipier_count }} >= {{ MAX_EQUIPIERS }}) {
-                    $$('#catwrapper input').each(function(e) {
-                        e.disabled = true;
-                    });
-                }
-                {% endif %}
-                $$('input[name=categorie]').invoke('observe', 'change', function(event) {
-                    var categorie = $$('input[name=categorie]').filter(function(e) { return e.checked; })[0].value;
-                    var d = categories.filter(function(c) { return c.code == categorie; })[0];
-                    $('id_prix').value = d.prix;
-                    $$('.justif_supp').invoke('hide');
-                    if(d.show)
-                        $('justif_' + d.code).show();
-                });
-
-                for(var i = 1; i < actual_part; i++) {
-                    var n = $F('id_form-' + (i - 1) + '-prenom') + ' ' + $F('id_form-' + (i - 1) + '-nom');
-                    $$('#justif_FMX', '#justif_EPX').each(function(e) {
-                        var tr = e.down('tr', i - 1);
-                        tr.show();
-                        tr.down().update(n);
-                    });
-                }
-
-                {% if update %}
-                if(!$('id_categorie-{{ instance.categorie }}'))
-                    alert('{% trans "Vos modifications impliquent un changement de catégorie. Veuillez sélectionner la nouvelle catégorie." %}');
-                else
-                    $('id_categorie-{{ instance.categorie }}').checked = true;
-                {% else %}
-                $$('input[name=categorie]')[0].checked = true;
-                $('id_prix').value = actual_categories[0].prix;
-                {% endif %}
-
-                $('button_next').hide();
-                $('id_form-TOTAL_FORMS').value = actual_part - 1;
-                $('button_submit').show();
-            } else {
-                $('part' + actual_part).show();
-                $('part' + actual_part).down('input').focus();
-                if(age(18)(data.equipiers[actual_part - 1]))
-                    $('id_form-' + (actual_part - 1) + '-autorisation').up('tr').hide();
-            }
-        });
-
-
-
-        $('button_submit').observe('mousedown', function(event) {
-            $R(actual_part, 5).each(function(i) { $('part' + i).remove(); });
-            var categorie = $$('input[name=categorie]').filter(function(e) { return e.checked; })[0].value;
-            $('id_prix').value = categories.filter(function(c) { return c.code == categorie; })[0].prix;
-            if(!categorie) {
-                event.stop();
-                alert("{% trans 'Vous devez choisir une catégorie' %}");
-            }
-            if(!$('id_conditions').checked) {
-                event.stop();
-                alert("{% trans 'Vous devez accépter le règlement de la compétition' %}");
-            }
-            $$('input, select').each(function(e) {
-                e.disabled = false;
-            });
-        });
+    var nombres_par_tranche = { {% for k, v in nombres_par_tranche.items %}"{{ k }}": {{ v }}{% if not forloop.last %},{% endif %}{% endfor %} };
+    CATEGORIES = CATEGORIES.filter(function(categorie) {
+        return nombres_par_tranche[categorie.numero_debut + '-' + categorie.numero_fin] < categorie.numero_fin - categorie.numero_debut + 1;
     });
-
-    {% if not update %}
-    {% if not user.is_staff %}
-    if(new Date() >= new Date({{ CLOSE_YEAR }},{{ CLOSE_MONTH }}-1,{{ CLOSE_DAY }})) {
-        alert("Désolé, les inscriptions sont fermées. Il n'est plus possible de s'incrire à la course");
-        location.href = "http://www.6hdeparis.fr/";
-    } else if({{ equipier_count }} >= {{ MAX_EQUIPIERS }}) {
-        alert("Désolé, la course est complete, il n'y a plus de place disponible.");
-        location.href = "http://www.6hdeparis.fr/";
-    }
+    var COURSE = {
+        YEAR: {{ YEAR }},
+        MONTH: {{ MONTH }},
+        DAY: {{ DAY }},
+        CLOSE_DATE: new Date({{ CLOSE_YEAR }},{{ CLOSE_MONTH }}-1,{{ CLOSE_DAY }}),
+        MIN_AGE: {{ MIN_AGE }},
+        EQUIPIERS_COUNT: {{ equipiers_count }},
+        MAX_EQUIPIERS: {{ MAX_EQUIPIERS }},
+        URL: "{{ COURSE.url|escapejs }}"
+    };
+    var INSTANCE = {% if instance %}{}{% else %}{
+        ID: 0{{ instance.id }},
+        CATEGORIE: 0{{ instance.categorie_id }},
+        CATEGORIE_CODE: '{{ instance.categorie.code }}'
+    }{% endif %};
+    var CHECK_URL = '{% url inscriptions.check_name course_uid=COURSE.uid %}';
+    var UPDATE = {{ update|yesno:"true,false" }};
+    var STAFF = false;
+    {% if user.is_staff %}
+    UPDATE = false;
+    STAFF = true;
     {% endif %}
-    {% endif %}
-
-
-})()
+    var I18N = {};
 </script>
+<script src="{{ STATIC_URL }}form.js"></script>
 <form method="post" enctype="multipart/form-data" onsubmit="$('button_submit').style.display=='none'">
     <div id="errors">
         {% if equipe_form.errors %}

@@ -4,13 +4,16 @@ from django_countries import CountryField
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
-import os, re, urllib, urlparse, simplejson
+import os, re, urllib, simplejson
 from django.db import models
 from settings import *
 from datetime import date
 from decimal import Decimal
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
+from django.db.models import Min
+from utils import iriToUri, MailThread
+import traceback
 
 
 SEXE_CHOICES = (
@@ -21,7 +24,7 @@ SEXE_CHOICES = (
 MIXITE_CHOICES = (
     ('H', _(u'Homme')),
     ('F', _(u'Femme')),
-    ('MX', _(u'Homme ou Mixte')),
+    ('HX', _(u'Homme ou Mixte')),
     ('FX', _(u'Femme ou Mixte')),
     ('X', _(u'Mixte')),
 )
@@ -57,6 +60,13 @@ TAILLES_CHOICES = (
     ('XXL', _('XXL')),
 )
 
+DESTINATAIRE_CHOICES = (
+    ('Equipe', _(u"Gerant d'équipe")),
+    ('Equipier', _(u'Equipier')),
+    ('Organisateur', _(u'Organisateur')),
+    ('Tous', _(u'Tous')),
+)
+
 #class Chalenge(model.Model):
 #    nom = models.CharField(_('Nom'), max=200)
 
@@ -86,6 +96,10 @@ class Course(models.Model):
     def __unicode__(self):
         return '%s (%s)' % (self.nom, self.date)
 
+    def send_mail(self, nom, instance):
+        mail = MailTemplate.objects.get(course=self, nom=nom)
+        mail.send(instance)
+
 class Categorie(models.Model):
     course          = models.ForeignKey(Course, related_name='categories')
     nom             = models.CharField(_(u'Nom'), max_length=200)
@@ -97,10 +111,11 @@ class Categorie(models.Model):
     min_age         = models.IntegerField(_(u'Age minimum'), default=12)
     sexe            = models.CharField(_(u'Sexe'), max_length=2, choices=MIXITE_CHOICES)
     validation      = models.TextField(_(u'Validation function (javascript)'))
-    numero_dossard  = models.IntegerField(_(u'Numero de dossard (début)'), default=0)
+    numero_debut    = models.IntegerField(_(u'Numero de dossard (début)'), default=0)
+    numero_fin      = models.IntegerField(_(u'Numero de dossard (fin)'), default=0)
 
     def __unicode__(self):
-        return '%s (%s)' % (self.nom, self.code)
+        return self.code
 
 class Ville(models.Model):
     lat      = models.DecimalField(max_digits=10, decimal_places=7)
@@ -115,18 +130,8 @@ def lookup_ville(nom, cp, pays):
     nom = re.sub('[- ,/]+', ' ', nom)
     try:
         return Ville.objects.get(nom=nom)
-    except (Ville.DoesNotExist, e):
+    except Ville.DoesNotExist, e:
         pass
-
-    def urlEncodeNonAscii(b):
-        return re.sub('[\x80-\xFF]', lambda c: '%%%02x' % ord(c.group(0)), b)
-
-    def iriToUri(iri):
-        parts = urlparse.urlparse(iri)
-        return urlparse.urlunparse(
-            part.encode('idna') if parti==1 else urlEncodeNonAscii(part.encode('utf-8'))
-            for parti, part in enumerate(parts)
-        )
 
     f = urllib.urlopen(iriToUri('http://open.mapquestapi.com/geocoding/v1/address?key=%s&location=%s' % (MAPQUEST_API_KEY, nom + ' ' + cp + ', ' + str(pays))))
     data = simplejson.load(f)
@@ -151,7 +156,7 @@ def lookup_ville(nom, cp, pays):
     data['latLng']['lng'] = str(data['latLng']['lng'])
     try:
         return Ville.objects.get(lat=data['latLng']['lat'], lng=data['latLng']['lng'])
-    except (Ville.DoesNotExist, e):
+    except Ville.DoesNotExist, e:
         pass
     obj = Ville(
         lat      = data['latLng']['lat'],
@@ -189,6 +194,9 @@ class Equipe(models.Model):
     gerant_ville2      = models.ForeignKey(Ville, null=True)
     numero             = models.IntegerField(_(u'Numéro'))
     connu              = models.CharField(_('Comment avez vous connu la course ?'), max_length=200, choices=CONNU_CHOICES)
+
+    class Meta:
+        unique_together = ( ('course', 'numero'), )
 
     def __unicode__(self):
         return u'%s - %s - %s' % (self.id, self.categorie, self.nom)
@@ -229,18 +237,14 @@ class Equipe(models.Model):
         if self.id:
             paiement = Equipe.objects.get(id=self.id).paiement
             if paiement != self.paiement:
-                ctx = { "instance": self, }
-                subject = '[6h de Paris 2013] Paiement reçu'
-                message = render_to_string( 'mail_paiement.html', ctx)
-                msg = EmailMessage(subject, message, self.course.email_contact, [ self.gerant_email ])
-                msg.content_subtype = "html"
-                msg.send()
-
-                subject = '[6h de Paris 2013] Paiement reçu %s' % (self.id, )
-                message = render_to_string( 'mail_paiement_admin.html', ctx)
-                msg = EmailMessage(subject, message, self.course.email_contact, [ self.course.email_contact ])
-                msg.content_subtype = "html"
-                msg.send()
+                try:
+                    self.send_mail('paiement')
+                except e:
+                    traceback.print_exc(e)
+                try:
+                    self.send_mail('paiement_admin')
+                except e:
+                    traceback.print_exc(e)
         else:
             if not self.numero:
                 self.numero = self.getNumero()
@@ -250,37 +254,25 @@ class Equipe(models.Model):
             self.gerant_ville2 = lookup_ville(self.gerant_ville, self.gerant_code_postal, self.gerant_pays)
             super(Equipe, self).save()
 
-    def send_mail(self, template, mail=None):
-        #if self.paiement_complet and self.dossier_complet_auto:
-        #    return
-        mail = Template_mail.objects.get(id=template)
-        ctx = { "instance": self, }
-        subject = Template(mail.sujet).render(ctx)
-        message = Template(mail.message).render(ctx)
-        msg = EmailMessage(subject, message, self.course.email_contact, [ mail or self.gerant_email ])
-        msg.content_subtype = "html"
-        msg.send()
+    def send_mail(self, nom):
+        self.course.send_mail(nom, self)
 
     def getNumero(self):
         if self.numero:
             return self.numero
-        if self.categorie.startswith('ID'):
-            m = Equipe.objects.filter(categorie__startswith='ID').aggregate(models.Max('numero'))['numero__max']
-            if not m:
-                m = 200
-        elif self.categorie.startswith('DU'):
-            m = Equipe.objects.filter(categorie__startswith='DU').aggregate(models.Max('numero'))['numero__max']
-            if not m:
-                m = 300
-        elif self.categorie.startswith('HND'):
-            m = Equipe.objects.filter(categorie__startswith='HND').aggregate(models.Max('numero'))['numero__max']
-            if not m:
-                m = 400
+        start = self.categorie.numero_debut
+        end = self.categorie.numero_fin
+
+        res = Equipe.objects.raw("""SELECT e1.id as id, e1.numero as numero FROM inscriptions_equipe e1 
+                LEFT JOIN inscriptions_equipe e2 ON e1.numero=e2.numero-1 AND e1.course_id=e2.course_id
+                WHERE e1.course_id=%s AND e1.numero>=%s AND e1.numero<=%s AND e2.numero IS NULL LIMIT 1""", 
+                [self.course.id, start, end])
+
+        if len(list(res)) == 0 or res[0].numero == None:
+            numero = start
         else:
-            m = Equipe.objects.exclude(categorie__startswith='ID').exclude(categorie__startswith='DU').exclude(categorie__startswith='HND').aggregate(models.Max('numero'))['numero__max']
-            if not m:
-                m = 0
-        return m + 1
+            numero = res[0].numero + 1
+        return numero
 
 class Equipier(models.Model):
     numero            = models.IntegerField(_(u'Numéro'))
@@ -304,13 +296,13 @@ class Equipier(models.Model):
     parent            = models.CharField(_(u'Lien de parenté'), max_length=200, blank=True)
     piece_jointe2       = models.FileField(_(u'Justificatif entreprise / etudiant'), upload_to='certificats', blank=True)
     piece_jointe2_valide  = models.NullBooleanField(_(u'Justificatif valide'))
-    ville_normalisee  = models.ForeignKey(Ville, null=True)
+    ville2            = models.ForeignKey(Ville, null=True)
     code_eoskates     = models.CharField(_(u'Code EOSkates'), max_length=20, blank=True)
     transpondeur      = models.CharField(_(u'Transpondeur'), max_length=20, blank=True)
-    taille_tshirt     = models.CharField(_(u'Taille T-shirt'), max_length=3, choices=TAILLES_CHOICES)
+    taille_tshirt     = models.CharField(_(u'Taille T-shirt'), max_length=3, choices=TAILLES_CHOICES, blank=True)
     
     def age(self):
-        today = date(YEAR, MONTH, DAY)
+        today = self.equipe.course.date
         try: 
             birthday = self.date_de_naissance.replace(year=today.year)
         except ValueError: # raised when birth date is February 29 and the current year is not a leap year
@@ -322,20 +314,15 @@ class Equipier(models.Model):
 
     def save(self, *args, **kwargs):
         super(Equipier, self).save(*args, **kwargs)
-        if not self.ville_normalisee:
-            self.ville_normalisee = lookup_ville(self.ville, self.code_postal, self.pays)
+        if not self.ville2:
+            self.ville2 = lookup_ville(self.ville, self.code_postal, self.pays)
             super(Equipier, self).save()
 
     def dossard(self):
         return self.equipe.numero * 10 + self.numero
 
-    def send_mail(self, subject='', template=None, mail=None):
-        ctx = { "equipier": self, }
-        subject = subject
-        message = render_to_string(template, ctx)
-        msg = EmailMessage(subject, message, self.equipe.course.email_contact, [ mail or self.email ])
-        msg.content_subtype = "html"
-        msg.send()
+    def send_mail(self, nom):
+        self.course.send_mail(nom, self)
 
 
 class UserProfile(models.Model):
@@ -346,7 +333,34 @@ class UserProfile(models.Model):
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 
 class TemplateMail(models.Model):
+    destinataire = models.CharField(_(''), max_length=20, choices=DESTINATAIRE_CHOICES)
+    nom = models.CharField(_('Nom'), max_length=200)
     course = models.ForeignKey(Course)
     sujet = models.CharField(_('Sujet'), max_length=200)
     message = models.TextField(_('Message'))
+    bcc = models.TextField(_('Copie cachée à'), max_length=200, blank=True)
+    class Meta:
+        unique_together= ( ('course', 'nom'), )
+
+    def send(self, instances):
+        messages = []
+        for instance in instance:
+            ctx = { "instance": instance, }
+            subject = Template(self.sujet).render(ctx)
+            message = Template(self.message).render(ctx)
+            
+            dest = self.course.email_contact
+            if instance is Equipe:
+                dest = equipe.gerant_mail
+            if instance is Equipier:
+                dest = equipe.mail
+            
+            bcc = []
+            if message.bcc:
+                bcc = re.split('[,; ]+', message.bcc)
+            
+            message = EmailMessage(subject, message, self.course.email_contact, [ dest ], bcc)
+            message.content_subtype = "html"
+            messages.append(message)
+        MailThread(messages).start()
 

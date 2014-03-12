@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
-from models import Equipe, Equipier, Ville, SEXE_CHOICES, JUSTIFICATIF_CHOICES
+from models import Equipe, Equipier, Categorie, Ville, Course, SEXE_CHOICES, JUSTIFICATIF_CHOICES
 from decorators import open_closed
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template.loader import render_to_string
@@ -12,23 +12,20 @@ from django.forms.extras.widgets import SelectDateWidget
 from django.forms.formsets import formset_factory
 from django.forms.models import BaseModelFormSet
 from django.utils.translation import ugettext as _
-from django.core.mail import EmailMessage
 from django.utils.http import urlencode
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Count
+from django.db.models import Count, Sum
 import urllib2
 import random
 from settings import *
-from datetime import datetime
+from datetime import datetime, date
 from django.utils import timezone
-from threading import Thread
 
 class EquipeForm(ModelForm):
     class Meta:
         model = Equipe
-        exclude = ('paiement', 'dossier_complet', 'password', 'date', 'commentaires', 'paiement_info', 'gerant_ville2', 'numero')
+        exclude = ('paiement', 'dossier_complet', 'password', 'date', 'commentaires', 'paiement_info', 'gerant_ville2', 'numero', 'course')
         widgets = {
-            #'password': PasswordInput(),
             'categorie': HiddenInput(),
             'prix': HiddenInput(),
             'nombre': Select(choices=tuple([(i, i) for i in range(1, 6)])),
@@ -47,22 +44,14 @@ class EquipierForm(ModelForm):
 EquipierFormset = formset_factory(EquipierForm, formset=BaseModelFormSet, extra=5)
 EquipierFormset.model = Equipier
 
-class mailThread(Thread):
-    def __init__ (self,msg):
-        Thread.__init__(self)
-        self.msg = msg
-
-    def run(self):  
-        self.msg.send()
-
 @open_closed
-def form(request, course_uid, id=None, code=None):
+def form(request, course_uid, numero=None, code=None):
     course = get_object_or_404(Course, uid=request.path.split('/')[1])
     instance = None
     old_password = None
-    equipier_count = Equipier.objects.count()
-    if id:
-        instance = get_object_or_404(Equipe, id=id)
+    equipiers_count = Equipier.objects.filter(equipe__course=course).count()
+    if numero:
+        instance = get_object_or_404(Equipe, numero=numero)
         if instance.course != course:
             raise Http404()
         old_password = instance.password
@@ -78,7 +67,7 @@ def form(request, course_uid, id=None, code=None):
         if instance:
             equipier_formset = EquipierFormset(request.POST, request.FILES, queryset=instance.equipier_set.all())
         else:
-            if datetime.now() >= datetime(CLOSE_YEAR, CLOSE_MONTH, CLOSE_DAY) or equipier_count >= MAX_EQUIPIERS:
+            if date.today() >= course.date_fermeture or equipiers_count >= course.limite_participants:
                 if not request.user.is_staff:
                     return redirect('/')
             equipier_formset = EquipierFormset(request.POST, request.FILES)
@@ -106,35 +95,30 @@ def form(request, course_uid, id=None, code=None):
                 "instance": new_instance,
                 "url": request.build_absolute_uri(reverse(
                     'inscriptions.edit', kwargs={
-                        'id': new_instance.id,
+                        'course_uid': course.uid,
+                        'numero': new_instance.numero,
                         'code': new_instance.password
                     }
                 )),
                 "url2": request.build_absolute_uri(reverse(
                     'inscriptions.done', kwargs={
-                        'id': new_instance.id,
+                        'course_uid': course.uid,
+                        'numero': new_instance.numero,
                     }
-                )),
-                'url_admin': request.build_absolute_uri(reverse( 
-                    'admin:inscriptions_equipe_change', 
-                    args=[new_instance.id]
                 )),
                 "equipe_form": equipe_form,
                 "equipier_formset": equipier_formset,
             })
             if not instance:
-                subject = '[6h de Paris 2013] Inscription'
-                message = render_to_string( 'mail_inscription.html', ctx)
-                msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ new_instance.gerant_email ])
-                msg.content_subtype = "html"
-                mailThread(msg).start()
-
-                subject = '[6h de Paris 2013] Inscription %s' % (new_instance.id, )
-                message = render_to_string( 'mail_inscription_admin.html', ctx)
-                msg = EmailMessage(subject, message, 'organisation@6hdeparis.fr', [ 'inscriptions@6hdeparis.fr' ])
-                msg.content_subtype = "html"
-                mailThread(msg).start()
-            return redirect('inscriptions.done', id=new_instance.id)
+                try:
+                    course.send_mail('inscription', instance)
+                except e:
+                    traceback.print_exc(e)
+                try:
+                    course.send_mail('inscription_admin', instance)
+                except e:
+                    traceback.print_exc(e)
+            return redirect('inscriptions.done', course_uid=course.uid, numero=new_instance.numero)
     else:
         equipe_form = EquipeForm(instance=instance)
         if instance:
@@ -143,34 +127,40 @@ def form(request, course_uid, id=None, code=None):
             equipier_formset = EquipierFormset(queryset=Equipier.objects.none())
     date_prix2 = timezone.make_aware(datetime(2013, 6, 17), timezone.get_default_timezone())
     if instance:
-        return done(request, course_uid, instance.id)
+        return done(request, course_uid, instance.numero)
 
+    nombres_par_tranche = {}
+    for categorie in Categorie.objects.filter(course=course):
+        key = '%d-%d' % (categorie.numero_debut, categorie.numero_fin)
+        if not nombres_par_tranche.has_key(key):
+            nombres_par_tranche[key] = Equipe.objects.filter(course=course, numero__gte=categorie.numero_debut, numero__lte=categorie.numero_fin).count()
+    
     return render_to_response("form.html", RequestContext(request, {
         "equipe_form": equipe_form,
         "equipier_formset": equipier_formset,
         "instance": instance,
         "create": not instance,
         "update": not not instance,
-        "solo": Equipe.objects.filter(categorie__startswith='ID').count(),
-        "max_solo": datetime(2013, 6, 8) <= datetime.now() and 49 or 30,
-        "equipier_count": equipier_count,
+        "nombres_par_tranche": nombres_par_tranche,
+        "equipiers_count": equipiers_count,
     }))
 
 @open_closed
-def done(request, course_uid, id):
+def done(request, course_uid, numero):
     course = get_object_or_404(Course, uid=request.path.split('/')[1])
-    instance = get_object_or_404(Equipe, id=id)
+    instance = get_object_or_404(Equipe, course=course, numero=numero)
     if instance.course != course:
         raise Http404()
     ctx = RequestContext(request, {
         "instance": instance,
         "url": request.build_absolute_uri(reverse(
             'inscriptions.edit', kwargs={
-                'id': instance.id,
+                'course_uid': course.uid,
+                'numero': instance.numero,
                 'code': instance.password
             }
         )),
-        "paypal_ipn_url": request.build_absolute_uri(reverse('inscriptions.ipn')),
+        "paypal_ipn_url": request.build_absolute_uri(reverse('inscriptions.ipn', kwargs={'course_uid': course.uid })),
         "hour": datetime.now().strftime('%H%M'),
     })
     return render_to_response('done.html', ctx)
@@ -181,7 +171,6 @@ def ipn(request, course_uid):
     Cornfirms that payment has been completed and marks invoice as paid.
     Adapted from IPN cgi script provided at http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/456361"""
 
-    print >>sys.stderr, 1
     try:
         if not confirm_ipn_data(request.body, PAYPAL_URL):
             return HttpResponse()
@@ -203,19 +192,15 @@ def ipn(request, course_uid):
 
 def confirm_ipn_data(data, PP_URL):
     # data is the form data that was submitted to the IPN URL.
-    print >>sys.stderr, 2
     #PP_URL = 'https://www.paypal.com/cgi-bin/webscr'
 
-    print >>sys.stderr, 3, PP_URL
     params = data + '&' + urlencode({ 'cmd': "_notify-validate" })
 
-    print >>sys.stderr, 4, params
     req = urllib2.Request(PP_URL)
     req.add_header("Content-type", "application/x-www-form-urlencoded")
     fo = urllib2.urlopen(req, params)
 
     ret = fo.read()
-    print >>sys.stderr, 5, ret
     if ret == "VERIFIED":
         print >>sys.stderr, "PayPal IPN data verification was successful."
     else:
@@ -226,12 +211,38 @@ def confirm_ipn_data(data, PP_URL):
 
 @csrf_exempt
 def check_name(request, course_uid):
-    return HttpResponse(Equipe.objects.filter(nom__iexact=request.POST['nom']).exclude(id=request.POST['id']).count(), content_type="text/plain")
+    return HttpResponse(
+            Equipe.objects
+                .filter(course__uid=course_uid, nom__iexact=request.POST['nom'])
+                .exclude(id=request.POST['id'])
+                .count(),
+            content_type="text/plain")
 
 def list(request, course_uid):
+    stats = Equipe.objects.filter(course__uid=course_uid).aggregate(
+        count     = Count('id'),
+        prix      = Sum('prix'), 
+        nbpaye    = Count('prix'), 
+        paie      = Sum('paiement'), 
+        club      = Count('club', distinct=True),
+        villes    = Count('gerant_ville2__nom', distinct=True),
+        pays      = Count('gerant_ville2__pays', distinct=True),
+        equipiers = Count('equipier'),
+
+    )
+    equipes = Equipe.objects.filter(course__uid=course_uid)
     return render_to_response('list.html', RequestContext(request, {
-       'object_list': Equipe.objects.filter(course__uid=course_uid),
-       'villes': Ville.objects.filter(equipier_set__equipe__course__uid=course_uid).order_by('nom').annotate(equipiers=Count('equipier')),
-       'equipiers': Equipier.objects.filter(equipe__course__uid=course_uid),
+        'stats': stats,
+        'equipes': equipes
+    }))
+
+def stats(request, course_uid):
+    equipes = Equipe.objects.filter(course__uid=course_uid)
+    equipiers = Equipier.objects.filter(equipe__in=equipes),
+    villes = Ville.objects.filter(equipier__equipe__in=equipes).order_by('nom').annotate(equipiers=Count('equipier')),
+    return render_to_response('stats.html', RequestContext(request, {
+        'equipes': Equipe.objects.filter(course__uid=course_uid),
+        'equipers': equipiers,
+        'villes': villes,
     }))
 

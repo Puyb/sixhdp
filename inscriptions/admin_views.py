@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 from models import Equipe, Equipier, TemplateMail
-from django.shortcuts import render_to_response, get_object_or_404, redirect
-from django.template.loader import render_to_string
+from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, Http404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
-from django.core.mail import EmailMessage
 from django.utils.http import urlencode
 from django.db.models import Count
 import urllib2
@@ -16,30 +14,6 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import csv, cStringIO
-
-@login_required
-def send_mail(request, course_uid, id, template):
-    course = get_object_or_404(Course, uid=course_uid)
-    instance = get_object_or_404(Equipe, id=id, course=course)
-
-    if request.method == 'POST':
-        msg = EmailMessage(request.POST['subject'], request.POST['message'], request.POST['sender'], [ request.POST['mail'] ])
-        msg.content_subtype = "html"
-        msg.send()
-        messages.add_message(request, messages.INFO, u'Message envoyé à %s' % (request.POST['mail'], ))
-        return redirect('/admin/inscriptions/equipe/%s/' % (instance.id, ))
-
-
-    mail = get_object_or_404(TemplateMail, id=template, course__uid=course_uid)
-    sujet = render_to_string(mail.sujet, { "instance": instance, })
-    message = render_to_string(mail.message, { "instance": instance, })
-
-    return render_to_response('send_mail.html', RequestContext(request, {
-        'message': message,
-        'sender': course.email_contact,
-        'mail': instance.gerant_email,
-        'subject': sujet,
-    }))
 
 @login_required
 def dossards(request, course_uid):
