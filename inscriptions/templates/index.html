@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+{% for course in prochaines_courses %}
+{% if forloop.first %}<h1>{% trans "Prochaines courses" %}</h1>
+<ul>{% endif %}
+    <li>
+        <a href="{{ course.url }}">{{ course.nom }}</a> {% blocktrans with date=course.date ville=course.ville %}le {{date }} à {{ ville }}{% endblocktrans %}<br />
+        {% if course.ouverte %}
+            <a href="{% url inscriptions.create course_uid=course.uid %}">{% trans "Inscription" %}</a><br />
+            {% blocktrans with fermeture=course.date_fermeture %}Fermeture des inscriptions le {{ fermeture }}{% endblocktrans %}<br />
+            <a href="{% url inscriptions.list course_uid=course.uid %}">{% trans "Liste des inscrits" %}</a><br />
+            <a href="{% url inscriptions.stats course_uid=course.uid %}">{% trans "Statistiques" %}</a><br />
+        {% else %}
+            {% blocktrans with ouverture=course.date_ouverture %}Ouverture des inscriptions le {{ ouverture }}{% endblocktrans %}<br />
+        {% endif %}
+    </li>
+{% if forloop.last %}</ul>{% endif %}
+{% endfor %}
+
+{% for course in anciennes_courses %}
+{% if forloop.first %}<h1>{% trans "Anciennes courses" %}</h1>
+<ul>{% endif %}
+    <li>
+        <a href="{{ course.url }}">{{ course.nom }}</a> {% blocktrans with date=course.date ville=course.ville %}le {{date }} à {{ ville }}{% endblocktrans %}<br />
+        <a href="{% url inscriptions.list course_uid=course.uid %}">{% trans "Liste des inscrits" %}</a><br />
+        <a href="{% url inscriptions.stats course_uid=course.uid %}">{% trans "Statistiques" %}</a><br />
+        {% trans "Résultats" %}
+    </li>
+{% if forloop.last %}</ul>{% endif %}
+{% endfor %}
+            
+{% endblock %}
