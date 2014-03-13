@@ -97,7 +97,7 @@ class Course(models.Model):
         return '%s (%s)' % (self.nom, self.date)
 
     def send_mail(self, nom, instance):
-        mail = MailTemplate.objects.get(course=self, nom=nom)
+        mail = TemplateMail.objects.get(course=self, nom=nom)
         mail.send(instance)
 
 class Categorie(models.Model):
