@@ -244,3 +244,10 @@ def stats(request, course_uid):
         'villes': villes,
     }))
 
+def index(request):
+    return render_to_response('index.html', RequestContext(request, {
+        'prochaines_courses': Course.objects.filter(date__gt=date.today()).order_by('date'),
+        'anciennes_courses': Course.objects.filter(date__lte=date.today()).order_by('date'),
+    }))
+
+

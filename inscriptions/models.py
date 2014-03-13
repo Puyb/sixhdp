@@ -88,6 +88,14 @@ class Course(models.Model):
     url_reglement       = models.URLField(_(u'URL Réglement'))
     email_contact       = models.EmailField(_(u'Email contact'))
 
+    @property
+    def ouverte(self):
+        return self.date_ouverture <= date.today()
+
+    @property
+    def fermee(self):
+        return self.date_fermeture < date.today()
+
     def save(self, *args, **kwargs):
         if not self.uid:
             self.uid = self.nom.lower().replace(' ', '_')
