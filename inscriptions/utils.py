@@ -14,7 +14,7 @@ def iriToUri(iri):
     )
 
 class MailThread(Thread):
-    def __init__ (self,msg):
+    def __init__ (self, messages):
         Thread.__init__(self)
         self.messages = messages
 

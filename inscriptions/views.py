@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys
+import sys, urllib2, random, traceback
 from models import Equipe, Equipier, Categorie, Ville, Course, SEXE_CHOICES, JUSTIFICATIF_CHOICES
 from decorators import open_closed
 from django.shortcuts import render_to_response, get_object_or_404, redirect
@@ -15,8 +15,6 @@ from django.utils.translation import ugettext as _
 from django.utils.http import urlencode
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count, Sum
-import urllib2
-import random
 from settings import *
 from datetime import datetime, date
 from django.utils import timezone
@@ -111,12 +109,12 @@ def form(request, course_uid, numero=None, code=None):
             })
             if not instance:
                 try:
-                    course.send_mail('inscription', instance)
-                except e:
+                    course.send_mail('inscription', [ new_instance ])
+                except Exception, e:
                     traceback.print_exc(e)
                 try:
-                    course.send_mail('inscription_admin', instance)
-                except e:
+                    course.send_mail('inscription_admin', [ new_instance ])
+                except Exception, e:
                     traceback.print_exc(e)
             return redirect('inscriptions.done', course_uid=course.uid, numero=new_instance.numero)
     else:

@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_countries import CountryField
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.template import Template, Context
 from django.core.mail import EmailMessage
 import os, re, urllib, simplejson
 from django.db import models
@@ -104,9 +105,9 @@ class Course(models.Model):
     def __unicode__(self):
         return '%s (%s)' % (self.nom, self.date)
 
-    def send_mail(self, nom, instance):
-        mail = MailTemplate.objects.get(course=self, nom=nom)
-        mail.send(instance)
+    def send_mail(self, nom, instances):
+        mail = TemplateMail.objects.get(course=self, nom=nom)
+        mail.send(instances)
 
 class Categorie(models.Model):
     course          = models.ForeignKey(Course, related_name='categories')
@@ -263,7 +264,7 @@ class Equipe(models.Model):
             super(Equipe, self).save()
 
     def send_mail(self, nom):
-        self.course.send_mail(nom, self)
+        self.course.send_mail(nom, [self])
 
     def getNumero(self):
         if self.numero:
@@ -330,7 +331,7 @@ class Equipier(models.Model):
         return self.equipe.numero * 10 + self.numero
 
     def send_mail(self, nom):
-        self.course.send_mail(nom, self)
+        self.course.send_mail(nom, [self])
 
 
 class UserProfile(models.Model):
@@ -352,11 +353,11 @@ class TemplateMail(models.Model):
 
     def send(self, instances):
         messages = []
-        for instance in instance:
-            ctx = { "instance": instance, }
-            subject = Template(self.sujet).render(ctx)
-            message = Template(self.message).render(ctx)
-            
+        for instance in instances:
+            context = Context({ "instance": instance, })
+            subject = Template(self.sujet).render(context)
+            message = Template(self.message).render(context)
+
             dest = self.course.email_contact
             if instance is Equipe:
                 dest = equipe.gerant_mail
@@ -364,8 +365,8 @@ class TemplateMail(models.Model):
                 dest = equipe.mail
             
             bcc = []
-            if message.bcc:
-                bcc = re.split('[,; ]+', message.bcc)
+            if self.bcc:
+                bcc = re.split('[,; ]+', self.bcc)
             
             message = EmailMessage(subject, message, self.course.email_contact, [ dest ], bcc)
             message.content_subtype = "html"
