@@ -94,7 +94,7 @@ class EquipeAdmin(admin.ModelAdmin):
         return qs
     class Media:
         css = {"all": ("admin.css",)}
-        js  = ('admin/equipe.js', )
+        js = ('custom_admin/equipe.js', )
     readonly_fields = [ 'id', 'nom', 'club', 'gerant_nom', 'gerant_prenom', 'gerant_adresse1', 'gerant_adress2', 'gerant_ville', 'gerant_code_postal', 'gerant_pays', 'gerant_email', 'gerant_telephone', 'categorie', 'nombre', 'prix', 'date', 'password']
     list_display = ['numero', 'categorie', 'nom', 'club', 'gerant_email', 'date', 'nombre2', 'paiement_complet2', 'documents_manquants2', 'verifier2', 'dossier_complet_auto2']
     list_display_links = ['numero', 'categorie', 'nom', 'club', ]
@@ -204,7 +204,7 @@ site.register(MaCourse, CourseAdmin)
 
 class CategorieAdmin(admin.ModelAdmin):
     class Media:
-        js  = ('admin/categorie.js', )
+        js = ('custom_admin/categorie.js', )
     def queryset(self, request):
         qs = super(CategorieAdmin, self).queryset(request)
         course_uid = request.COOKIES['course_uid']
@@ -216,7 +216,7 @@ site.register(Categorie, CategorieAdmin)
 
 class TemplateMailAdmin(admin.ModelAdmin):
     class Media:
-        js  = ('http://tinymce.cachefly.net/4.0/tinymce.min.js', 'admin/templatemail.js', )
+        js  = ('http://tinymce.cachefly.net/4.0/tinymce.min.js', 'custom_admin/templatemail.js', )
     def queryset(self, request):
         qs = super(TemplateMailAdmin, self).queryset(request)
         course_uid = request.COOKIES['course_uid']

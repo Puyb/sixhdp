@@ -19,7 +19,7 @@ django.jQuery(function() {
 
     $('.field-age>p').each(function() {
         if(parseFloat(this.textContent) >= 18) {
-            this.up('.form-row').next().hide();
+            $(this).parents('.form-row').next().hide();
         }
     
     });
