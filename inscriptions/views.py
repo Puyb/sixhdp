@@ -109,11 +109,11 @@ def form(request, course_uid, numero=None, code=None):
             })
             if not instance:
                 try:
-                    course.send_mail('inscription', instance)
+                    course.send_mail('inscription', [ new_instance ])
                 except Exception, e:
                     traceback.print_exc(e)
                 try:
-                    course.send_mail('inscription_admin', instance)
+                    course.send_mail('inscription_admin', [ new_instance ])
                 except Exception, e:
                     traceback.print_exc(e)
             return redirect('inscriptions.done', course_uid=course.uid, numero=new_instance.numero)

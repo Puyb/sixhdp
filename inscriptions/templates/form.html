@@ -38,7 +38,7 @@
         CLOSE_DATE: new Date({{ CLOSE_YEAR }},{{ CLOSE_MONTH }}-1,{{ CLOSE_DAY }}),
         MIN_AGE: {{ MIN_AGE }},
         EQUIPIERS_COUNT: {{ equipiers_count }},
-        MAX_EQUIPIERS: {{ MAX_EQUIPIERS }},
+        MAX_EQUIPIERS: {{ COURSE.limite_participants }},
         URL: "{{ COURSE.url|escapejs }}"
     };
     var INSTANCE = {% if instance %}{}{% else %}{
