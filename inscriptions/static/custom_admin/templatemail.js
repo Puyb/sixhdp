@@ -6,6 +6,6 @@ django.jQuery(function() {
         $(this)
             .val(res[1])
             .parents('.form-row').hide();
-        tinymce.init({selector:'textarea'});
+        tinymce.init({selector:'#id_message'});
     });
 });

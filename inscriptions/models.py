@@ -342,12 +342,12 @@ class UserProfile(models.Model):
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 
 class TemplateMail(models.Model):
-    destinataire = models.CharField(_(''), max_length=20, choices=DESTINATAIRE_CHOICES)
-    nom = models.CharField(_('Nom'), max_length=200)
     course = models.ForeignKey(Course)
+    nom = models.CharField(_('Nom'), max_length=200)
+    destinataire = models.CharField(_('Destinataire'), max_length=20, choices=DESTINATAIRE_CHOICES)
+    bcc = models.CharField(_(u'Copie cachée à'), max_length=1000, blank=True)
     sujet = models.CharField(_('Sujet'), max_length=200)
     message = models.TextField(_('Message'))
-    bcc = models.TextField(_('Copie cachée à'), max_length=200, blank=True)
     class Meta:
         unique_together= ( ('course', 'nom'), )
 
