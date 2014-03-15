@@ -359,10 +359,10 @@ class TemplateMail(models.Model):
             message = Template(self.message).render(context)
 
             dest = self.course.email_contact
-            if instance is Equipe:
-                dest = equipe.gerant_mail
-            if instance is Equipier:
-                dest = equipe.mail
+            if isinstance(instance, Equipe):
+                dest = instance.gerant_email
+            if isinstance(instance, Equipier):
+                dest = instance.email
             
             bcc = []
             if self.bcc:

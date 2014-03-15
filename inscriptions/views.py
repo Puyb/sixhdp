@@ -141,6 +141,7 @@ def form(request, course_uid, numero=None, code=None):
         "update": not not instance,
         "nombres_par_tranche": nombres_par_tranche,
         "equipiers_count": equipiers_count,
+        "course": course,
     }))
 
 @open_closed

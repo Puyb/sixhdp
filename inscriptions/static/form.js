@@ -56,6 +56,29 @@ function serialize() {
     return data;
 }
 
+function disable_form_if_needed() {
+    if(new Date() >= COURSE.CLOSE_DATE || COURSE.EQUIPIERS_COUNT >= COURSE.MAX_EQUIPIERS && !STAFF) {
+        $$('input, select').each(function(e) {
+            if(e.type !== 'file' && e.type !== 'button' && e.type !== 'submit' && e.type !== 'radio' && !/num_licence$/.test(e.name))
+                e.disabled = true;
+        });
+    }
+}
+
+function check_nom(wait) {
+    new Ajax.Request(CHECK_URL, {
+        parameters: { nom: $F('id_nom'), id: INSTANCE.ID },
+        asynchronous: !wait,
+        onSuccess: function(r) {
+            if(r.responseText !== '0')
+                $('nom_erreur').update(_("Ce nom d'équipe est déjà utilisé !"));
+            else
+                $('nom_erreur').update("");
+
+        }
+    });
+}
+
 function check_step(data) {
     // check values
     var ok = true;
@@ -88,6 +111,7 @@ function check_step(data) {
         tests = {
             nom:                /^.+$/i,
             prenom:             /^.+$/i,
+            sexe:               /^[HF]$/,
             ville:              /^.+$/i,
             code_postal:        /^[0-9]{4,6}$/i,
             email:              /^[a-z0-9+\-\._]+@([a-z0-9\-_]+\.)+[a-z]{2,5}$/i,
@@ -126,7 +150,8 @@ function setup_categories(data) {
     
     if(actual_categories.length === 0) {
         $('button_prev').click();
-        return alert(_("Votre équipe n'est éligible dans aucune des catégories proposées pour cette compétition. Veuillez vous référer au réglement de la course disponible sur le site pour voir les critères de chaque catégorie."));
+        alert(_("Votre équipe n'est éligible dans aucune des catégories proposées pour cette compétition. Veuillez vous référer au réglement de la course disponible sur le site pour voir les critères de chaque catégorie."));
+        return false;
     }
 
     // generate html
@@ -156,6 +181,8 @@ function setup_categories(data) {
         $$('input[name=categorie]')[0].checked = true;
         $('id_prix').value = actual_categories[0].prix;
     }
+
+    return true;
 }
 
 function setup_extra_justif() {
@@ -167,29 +194,6 @@ function setup_extra_justif() {
             tr.down().update(n);
         });
     }
-}
-
-function disable_form_if_needed() {
-    if(new Date() >= COURSE.CLOSE_DATE || COURSE.EQUIPIERS_COUNT >= COURSE.MAX_EQUIPIERS && !STAFF) {
-        $$('input, select').each(function(e) {
-            if(e.type !== 'file' && e.type !== 'button' && e.type !== 'submit' && e.type !== 'radio' && !/num_licence$/.test(e.name))
-                e.disabled = true;
-        });
-    }
-}
-
-function check_nom(wait) {
-    new Ajax.Request(CHECK_URL, {
-        parameters: { nom: $F('id_nom'), id: INSTANCE.ID },
-        asynchronous: !wait,
-        onSuccess: function(r) {
-            if(r.responseText !== '0')
-                $('nom_erreur').update(_("Ce nom d'équipe est déjà utilisé !"));
-            else
-                $('nom_erreur').update("");
-
-        }
-    });
 }
 
 Event.observe(window, 'load', function() {
@@ -237,6 +241,7 @@ Event.observe(window, 'load', function() {
         $(id + '-justificatif_0').up('li').remove();
         $(id + '-justificatif_1').observe(Prototype.Browser.IE ? 'click' : 'change', handler);
         $(id + '-justificatif_2').observe(Prototype.Browser.IE ? 'click' : 'change', handler);
+        $(id + '-justificatif_1').up('tr').next(1).insert({after: e.up('table').down('tr:last') });
         handler();
     });
     $$('input[name*=parent]').each(function(e) {
@@ -290,18 +295,27 @@ Event.observe(window, 'load', function() {
                 $('partlast').down('input').focus();
             } catch(e) {}
 
-            setup_categories(data);
+            if(setup_categories(data)) {
 
-            setup_extra_justif();
+                setup_extra_justif();
 
-            $('button_next').hide();
-            $('id_form-TOTAL_FORMS').value = actual_part - 1;
-            $('button_submit').show();
+                $('button_next').hide();
+                $('id_form-TOTAL_FORMS').value = actual_part - 1;
+                $('button_submit').show();
+            }
         } else {
             $('part' + actual_part).show();
             $('part' + actual_part).down('input').focus();
             if(age(18)(data.equipiers[actual_part - 1]))
                 $('id_form-' + (actual_part - 1) + '-autorisation').up('tr').hide();
+            if(actual_part === 1) {
+                $$('[name*=gerant_]').each(function(element) {
+                    var element2 = $('id_form-0-' + element.name.substr('gerant_'.length));
+                    if(element2) {
+                        element2.setValue(element.getValue());
+                    }
+                });
+            }
         }
     });
 

@@ -87,11 +87,11 @@
     {% for equipier_form in equipier_formset %}
     <div id="part{{ forloop.counter }}" style="display: none;" class="parts">
         <h2>Equipier {{ forloop.counter }}</h2>
-        <table>
+        <table class="equipier_table">
             {{ equipier_form.as_table }}
             <tr style="display: none"><td colspan="2">{% blocktrans %}Si vous le pouvez, scannez le certificat ou la licence et ajoutez le en pièce jointe (formats PDF ou JPEG, <a href="http://www.6hdeparis.fr/wp-content/uploads/2013/03/certificat_medical.pdf" target="_blank">modèle de certificat</a>).{% endblocktrans %}<br />{% trans "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier." %}</td></tr>
         </table><br />
-        {% blocktrans with MIN_AGE=MIN_AGE DAY=DAY MONTH=MONTH YEAR=YEAR %}Chaque équipier doit avoir plus de {{ COURSE.min_age }} ans au {{ COURSE.date }}.{% endblocktrans %}<br />
+        {% blocktrans with min_age=COURSE.min_age date=COURSE.date %}Chaque équipier doit avoir plus de {{ min_age }} ans au {{ date }}.{% endblocktrans %}<br />
         {% trans "Chaque équipier doit avoir un certificat médical d'un an ou une licence FFRS en cours de validité pour participer." %}<br />
     </div>
     {% endfor %}
