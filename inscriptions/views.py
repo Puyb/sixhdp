@@ -236,13 +236,14 @@ def list(request, course_uid):
     }))
 
 def stats(request, course_uid):
-    equipes = Equipe.objects.filter(course__uid=course_uid)
-    equipiers = Equipier.objects.filter(equipe__in=equipes),
-    villes = Ville.objects.filter(equipier__equipe__in=equipes).order_by('nom').annotate(equipiers=Count('equipier')),
+    course = get_object_or_404(Course, uid=request.path.split('/')[1])
+    stats = course.stats()
+    from django.db import connection
+    import json
+
     return render_to_response('stats.html', RequestContext(request, {
-        'equipes': Equipe.objects.filter(course__uid=course_uid),
-        'equipers': equipiers,
-        'villes': villes,
+        'json': json.dumps(stats),
+        'queries': connection.queries
     }))
 
 def index(request):

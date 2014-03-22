@@ -12,7 +12,7 @@ from datetime import date
 from decimal import Decimal
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
-from django.db.models import Min
+from django.db.models import Min, Max, Count, Avg
 from utils import iriToUri, MailThread
 import traceback
 
@@ -108,6 +108,87 @@ class Course(models.Model):
     def send_mail(self, nom, instances):
         mail = TemplateMail.objects.get(course=self, nom=nom)
         mail.send(instances)
+
+    def stats(self):
+        model_stats = {
+            "equipes": 0,
+            "equipiers": 0,
+            "hommes": 0,
+            "femmes": 0,
+            "paiement": 0,
+            "prix": 0,
+            "nbcertifenattente": 0,
+            "pc": 0,
+            "pi": 0,
+            "pe": 0,
+            "pv": 0,
+            "ipc": 0,
+            "ipi": 0,
+            "ipe": 0,
+            "ipv": 0,
+        }
+        result = {
+            "categories": {},
+            "jours": {},
+            "villes": {},
+            "regions": {},
+            "pays": {},
+            "course": {},
+        }
+
+        equipes = (Equipe.objects.filter(course=self)
+            .annotate(equipiers_count=Count('equipier'))
+            .select_related('categorie', 'gerant_ville2')
+            .prefetch_related('equipier_set')
+        )
+        for equipe in equipes:
+        #for equipe in Equipe.objects.raw("""
+        #        SELECT inscriptions_equipe.*, count(e1.id) as equipiers_count, count(e2.id) as hommes_count, count(e3.id) as femmes_count
+        #            FROM inscriptions_equipe
+        #            LEFT JOIN inscriptions_equipier e1 ON inscriptions_equipe.id = e1.equipe_id
+        #            LEFT JOIN inscriptions_equipier e2 ON inscriptions_equipe.id = e2.equipe_id AND e2.sexe = 'H'
+        #            LEFT JOIN inscriptions_equipier e3 ON inscriptions_equipe.id = e3.equipe_id AND e3.sexe = 'F'
+        #            WHERE course_id=%s GROUP BY inscriptions_equipe.id""", [ self.id ]).prefetch_selected('equipiers'):
+            stats = model_stats.copy()
+            keys = {
+                "categories": equipe.categorie_id and equipe.categorie.code or '',
+                "jours": (equipe.date.date() - self.date_ouverture).days,
+                "villes":  equipe.gerant_ville2_id and (equipe.gerant_ville2.pays == 'France' and equipe.gerant_ville2.nom    or equipe.gerant_ville2.pays) or '',
+                "regions": equipe.gerant_ville2_id and (equipe.gerant_ville2.pays == 'France' and equipe.gerant_ville2.region or equipe.gerant_ville2.pays) or '',
+                "pays":    equipe.gerant_ville2_id and equipe.gerant_ville2.pays or '',
+            }
+                    
+            stats['equipes'] = 1
+            stats['equipiers'] = equipe.equipiers_count
+            #stats['hommes'] = equipe.hommes_count
+            #stats['femmes'] = equipe.femmes_count
+            token = ''
+            if not equipe.paiement_complet():
+                token += 'i'
+            token += 'p';
+            if equipe.verifier():
+                token += 'v'
+            else:
+                if equipe.dossier_complet_auto() == True:
+                    token += 'c'
+                elif equipe.dossier_complet_auto() == False:
+                    token += "e"
+                else:
+                    token += "i"
+            stats[token] = 1
+
+            stats['paiement'] = float(equipe.paiement or 0)
+            stats['prix'] = float(equipe.prix)
+            #stats['nbcertifenattente'] = len(equipe.licence_manquantes()) + len(equipe.certificat_manquantes()) + len(equipe.autorisation_manquantes())
+
+
+            for key, index in keys.items():
+                if index not in result[key]:
+                    result[key][index] = model_stats.copy();
+                for stat, value in stats.items():
+                    result[key][index][stat] += value
+
+        return result
 
 class Categorie(models.Model):
     course          = models.ForeignKey(Course, related_name='categories')
@@ -220,9 +301,7 @@ class Equipe(models.Model):
         return [equipier for equipier in self.equipier_set.all() if equipier.age() < 18 and not equipier.autorisation_valide and not equipier.autorisation ]
 
     def verifier(self):
-        return len([equipier for equipier in self.equipier_set.all() 
-                if (equipier.piece_jointe and equipier.piece_jointe_valide == None) or
-                   (equipier.autorisation and equipier.autorisation_valide == None)]) > 0
+        return len([equipier for equipier in self.equipier_set.all() if equipier.verifer]) > 0
     def paiement_complet(self):
         return self.paiement >= self.prix
     def dossier_complet_auto(self):
@@ -283,6 +362,12 @@ class Equipe(models.Model):
             numero = res[0].numero + 1
         return numero
 
+class EquipierManager(models.Manager):
+    def get_query_set(self):
+        return super(EquipierManager, self).get_query_set().extra(select={
+            "verifier": "((piece_jointe AND piece_jointe_valide IS NULL) OR (autorisation AND autorisation_valide IS NULL))",
+        })
+
 class Equipier(models.Model):
     numero            = models.IntegerField(_(u'Numéro'))
     equipe            = models.ForeignKey(Equipe)
@@ -333,6 +418,7 @@ class Equipier(models.Model):
     def send_mail(self, nom):
         self.course.send_mail(nom, [self])
 
+    objects = EquipierManager()
 
 class UserProfile(models.Model):
     user = models.ForeignKey(User, unique=True)
@@ -372,4 +458,3 @@ class TemplateMail(models.Model):
             message.content_subtype = "html"
             messages.append(message)
         MailThread(messages).start()
-
