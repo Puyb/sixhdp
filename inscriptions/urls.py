@@ -6,6 +6,7 @@ from models import Equipe
 import admin
 
 urlpatterns = patterns('',
+    (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', { 'packages': ('inscriptions',), 'domain': 'djangojs' }),
     url(r'^admin/', include(admin.main_site.urls)),
     url(r'^i18n/', include('django.conf.urls.i18n')),
     (r'^(?P<course_uid>[^/]+)/admin/$', admin.course_setter, {}, 'admin_course_setter'),
@@ -29,3 +30,4 @@ urlpatterns = patterns('',
     (r'^(?P<course_uid>[^/]+)/listing_dossards/$', 'listing_dossards', {}, 'inscriptions.listing_dossards'),
     (r'^(?P<course_uid>[^/]+)/listing/$', 'listing', {}, 'inscriptions.listing'),
 )
+

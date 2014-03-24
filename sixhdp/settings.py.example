@@ -178,4 +178,6 @@ LANGUAGES = (
     ('en', u'English'),
 )
 
-AUTH_PROFILE_MODULE = "inscription.UserProfile"
+AUTH_PROFILE_MODULE = "inscriptions.UserProfile"
+
+LOCALE_PATHS = (os.path.join(DIRNAME, 'inscription/static/form.js'), )

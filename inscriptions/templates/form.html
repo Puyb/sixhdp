@@ -5,6 +5,7 @@
 {% get_available_languages as LANGUAGES %}
 {% if create %}<h1>{% trans 'Inscription' %} - {{ TITLE }}</h1>{% endif %}
 {% if update %}<h1>{% trans 'Modification de votre inscription' %} - {{ TITLE }}</h1>{% endif %}
+<script type="text/javascript" src="{% url django.views.i18n.javascript_catalog %}"></script>
 <script src="{{ STATIC_URL }}prototype.js"></script>
 <script>
     var CATEGORIES = [
