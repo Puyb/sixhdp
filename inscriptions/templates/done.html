@@ -13,8 +13,6 @@
 {% endif %}
 <br />
 <br />
-<br />
-<br />
 {% if not instance.paiement_complet %}
 {% trans 'Pour régler votre inscription vous pouvez payer par internet :' %}
 
@@ -44,6 +42,7 @@
 {% blocktrans with frais=instance.frais_paypal|floatformat:2 %}Pour tout paiement par internet, {{ frais }} € de frais seront ajoutés.{% endblocktrans %}<br />
 <br />
 {% blocktrans with prix=instance.prix ordre=COURSE.ordre %}Ou envoyer un chèque de {{ prix }} € à l'ordre de "{{ ordre }}".{% endblocktrans %}<br />
+{% blocktrans with date=instance.date_annulation %}Envoyez votre paiement avant le {{ date }}. Si nous n'avons pas reçu votre paiement à cette date, votre inscription sera annulée.{% endblocktrans %}
 {% else %}
 {% blocktrans with prix=instance.paiement %}Votre paiement de {{ prix }} € à bien été reçu.{% endblocktrans %}
 {% endif %}

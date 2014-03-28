@@ -8,7 +8,7 @@ from django.core.mail import EmailMessage
 import os, re, urllib, simplejson
 from django.db import models
 from settings import *
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
@@ -282,6 +282,10 @@ class Equipe(models.Model):
         else:
             numero = res[0].numero + 1
         return numero
+
+    @property
+    def date_annulation(self):
+        return self.date + timedelta(days=31)
 
 class Equipier(models.Model):
     numero            = models.IntegerField(_(u'Numéro'))
