@@ -132,7 +132,6 @@ class Ville(models.Model):
     nom      = models.CharField(max_length=200)
     region   = models.CharField(max_length=200)
     pays     = models.CharField(max_length=200)
-    response = models.CharField(max_length=65535)
 
 def lookup_ville(nom, cp, pays):
     nom = nom.lower()
@@ -172,8 +171,7 @@ def lookup_ville(nom, cp, pays):
         lng      = data['latLng']['lng'],
         nom      = data['adminArea5'],
         region   = data['adminArea3'],
-        pays     = data['adminArea1'],
-        response = simplejson.dumps(data)
+        pays     = data['adminArea1']
     )
     obj.save()
     return obj
