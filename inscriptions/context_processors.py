@@ -2,7 +2,7 @@ from settings import *
 from models import Course
 from django.db.models import Min, Max
 
-def settings(request):
+def course(request):
     course = (Course.objects
         .prefetch_related('categories')
         .annotate(min_age=Min('categories__min_age'), max_equipiers=Max('categories__max_equipiers'))
@@ -21,5 +21,10 @@ def settings(request):
         'CLOSE_MONTH':     course[0].date_fermeture.month,
         'CLOSE_DAY':       course[0].date_fermeture.day,
         'PAYPAL_BUSINESS': course[0].paypal,
+    }
+
+def settings(request):
+    return {
         'PAYPAL_URL':      PAYPAL_URL,
+        'ROOT_URL':        ROOT_URL,
     }

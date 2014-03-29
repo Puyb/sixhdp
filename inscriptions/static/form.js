@@ -138,9 +138,9 @@ function setup_categories(data) {
             && data.equipiers.filter(age(c.min_age)).length === data.nombre
             && ((c.sexe === 'H' && data.nombre === data.nombre_h) ||
                 (c.sexe === 'F' && data.nombre === data.nombre_f) ||
-                (c.sexe === 'HX' && data.nombre_f >= 1) ||
-                (c.sexe === 'FX' && data.nombre_h >= 1) ||
-                (c.sexe === 'X' && data.nombre_f >0 && data.nombre_h > 0))
+                (c.sexe === 'HX' && data.nombre_h >= 1) ||
+                (c.sexe === 'FX' && data.nombre_f >= 1) ||
+                (c.sexe === 'X'))
             && c.valid(data);
     });
     

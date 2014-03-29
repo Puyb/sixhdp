@@ -89,24 +89,6 @@ def form(request, course_uid, numero=None, code=None):
                 equipier_instance.numero = i + 1
                 equipier_instance.equipe = new_instance
                 equipier_instance.save()
-            ctx = RequestContext(request, {
-                "instance": new_instance,
-                "url": request.build_absolute_uri(reverse(
-                    'inscriptions.edit', kwargs={
-                        'course_uid': course.uid,
-                        'numero': new_instance.numero,
-                        'code': new_instance.password
-                    }
-                )),
-                "url2": request.build_absolute_uri(reverse(
-                    'inscriptions.done', kwargs={
-                        'course_uid': course.uid,
-                        'numero': new_instance.numero,
-                    }
-                )),
-                "equipe_form": equipe_form,
-                "equipier_formset": equipier_formset,
-            })
             if not instance:
                 try:
                     course.send_mail('inscription', [ new_instance ])

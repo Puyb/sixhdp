@@ -1,0 +1,691 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-03-29 23:02+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+
+#: admin_course.py:15
+msgid ""
+"You're not allowed to access this part of the site. Please contact your site "
+"adminstrator."
+msgstr ""
+
+#: models.py:21 models.py:26
+msgid "Homme"
+msgstr ""
+
+#: models.py:22 models.py:27
+msgid "Femme"
+msgstr ""
+
+#: models.py:28
+msgid "Homme ou Mixte"
+msgstr ""
+
+#: models.py:29
+msgid "Femme ou Mixte"
+msgstr ""
+
+#: models.py:30
+msgid "Mixte"
+msgstr ""
+
+#: models.py:34
+msgid "Licence FFRS 2013"
+msgstr ""
+
+#: models.py:35
+msgid "Certificat médical établi après le 4/08/2012"
+msgstr ""
+
+#: models.py:39
+msgid "Administrateur"
+msgstr ""
+
+#: models.py:40 models.py:67
+msgid "Organisateur"
+msgstr ""
+
+#: models.py:41
+msgid "Validateur"
+msgstr ""
+
+#: models.py:45
+msgid "Roller en Ligne"
+msgstr ""
+
+#: models.py:46
+msgid "Facebook"
+msgstr ""
+
+#: models.py:47
+msgid "Presse"
+msgstr ""
+
+#: models.py:48
+msgid "Bouche à oreille"
+msgstr ""
+
+#: models.py:49
+msgid "Fley pendant une course"
+msgstr ""
+
+#: models.py:50
+msgid "Flyer pendant une randonnée"
+msgstr ""
+
+#: models.py:51
+msgid "Affiche"
+msgstr ""
+
+#: models.py:52
+msgid "Information de la Maire de Paris"
+msgstr ""
+
+#: models.py:56
+msgid "XS"
+msgstr ""
+
+#: models.py:57
+msgid "S"
+msgstr ""
+
+#: models.py:58
+msgid "M"
+msgstr ""
+
+#: models.py:59
+msgid "L"
+msgstr ""
+
+#: models.py:60
+msgid "XL"
+msgstr ""
+
+#: models.py:61
+msgid "XXL"
+msgstr ""
+
+#: models.py:65
+msgid "Gerant d'équipe"
+msgstr ""
+
+#: models.py:66
+msgid "Equipier"
+msgstr ""
+
+#: models.py:68
+msgid "Tous"
+msgstr ""
+
+#: models.py:75 models.py:114 models.py:182 models.py:291 models.py:348
+msgid "Nom"
+msgstr ""
+
+#: models.py:76
+msgid "uid"
+msgstr ""
+
+#: models.py:77 models.py:186
+msgid "Ville"
+msgstr ""
+
+#: models.py:79
+msgid "Date"
+msgstr ""
+
+#: models.py:80
+msgid "Date d'ouverture des inscriptionss"
+msgstr ""
+
+#: models.py:81
+msgid "Date d'augmentation dss tarifs"
+msgstr ""
+
+#: models.py:82
+msgid "Date de fermeture des inscriptions"
+msgstr ""
+
+#: models.py:83
+msgid "Limite du nombre de participants"
+msgstr ""
+
+#: models.py:84
+msgid "Limite du nombre de solo"
+msgstr ""
+
+#: models.py:85
+msgid "Adresse paypal"
+msgstr ""
+
+#: models.py:86
+msgid "Ordre des chèques"
+msgstr ""
+
+#: models.py:87 models.py:184 models.py:294 models.py:295
+msgid "Adresse"
+msgstr ""
+
+#: models.py:88
+msgid "URL"
+msgstr ""
+
+#: models.py:89
+msgid "URL Réglement"
+msgstr ""
+
+#: models.py:90
+msgid "Email contact"
+msgstr ""
+
+#: models.py:115
+msgid "Code"
+msgstr ""
+
+#: models.py:116
+msgid "Prix normal"
+msgstr ""
+
+#: models.py:117
+msgid "Prix augmenté"
+msgstr ""
+
+#: models.py:118
+msgid "Nombre minimum d'équipiers"
+msgstr ""
+
+#: models.py:119
+msgid "Nombre maximum d'équipiers"
+msgstr ""
+
+#: models.py:120
+msgid "Age minimum"
+msgstr ""
+
+#: models.py:121 models.py:293
+msgid "Sexe"
+msgstr ""
+
+#: models.py:122
+msgid "Validation function (javascript)"
+msgstr ""
+
+#: models.py:123
+msgid "Numero de dossard (début)"
+msgstr ""
+
+#: models.py:124
+msgid "Numero de dossard (fin)"
+msgstr ""
+
+#: models.py:180
+msgid "Nom d'équipe"
+msgstr ""
+
+#: models.py:181
+msgid "Club"
+msgstr ""
+
+#: models.py:183 models.py:292
+msgid "Prénom"
+msgstr ""
+
+#: models.py:185
+msgid "Adresse 2"
+msgstr ""
+
+#: models.py:187
+msgid "Code postal"
+msgstr ""
+
+#: models.py:188 models.py:298
+msgid "Pays"
+msgstr ""
+
+#: models.py:189 models.py:299
+msgid "e-mail"
+msgstr ""
+
+#: models.py:190
+msgid "Mot de passe"
+msgstr ""
+
+#: models.py:191
+msgid "Téléphone"
+msgstr ""
+
+#: models.py:194
+msgid "Nombre d'équipiers"
+msgstr ""
+
+#: models.py:195
+msgid "Détails"
+msgstr ""
+
+#: models.py:196
+msgid "Prix"
+msgstr ""
+
+#: models.py:197
+msgid "Paiement reçu"
+msgstr ""
+
+#: models.py:198
+msgid "Dossier complet"
+msgstr ""
+
+#: models.py:199
+msgid "Date d'insciption"
+msgstr ""
+
+#: models.py:200
+msgid "Commentaires"
+msgstr ""
+
+#: models.py:202 models.py:289
+msgid "Numéro"
+msgstr ""
+
+#: models.py:203
+msgid "Comment avez vous connu la course ?"
+msgstr ""
+
+#: models.py:300
+msgid "Date de naissance"
+msgstr ""
+
+#: models.py:301
+msgid "Autorisation parentale"
+msgstr ""
+
+#: models.py:302
+msgid "Autorisation parentale valide"
+msgstr ""
+
+#: models.py:303
+msgid "Justificatif"
+msgstr ""
+
+#: models.py:304
+msgid "Numéro de licence"
+msgstr ""
+
+#: models.py:305
+msgid "Certificat ou licence"
+msgstr ""
+
+#: models.py:306
+msgid "Certificat ou licence valide"
+msgstr ""
+
+#: models.py:307
+msgid "Lien de parenté"
+msgstr ""
+
+#: models.py:308
+msgid "Justificatif entreprise / etudiant"
+msgstr ""
+
+#: models.py:309
+msgid "Justificatif valide"
+msgstr ""
+
+#: models.py:311
+msgid "Code EOSkates"
+msgstr ""
+
+#: models.py:312
+msgid "Transpondeur"
+msgstr ""
+
+#: models.py:313
+msgid "Taille T-shirt"
+msgstr ""
+
+#: models.py:342
+msgid "Role"
+msgstr ""
+
+#: models.py:349
+msgid "Destinataire"
+msgstr ""
+
+#: models.py:350
+msgid "Copie cachée à"
+msgstr ""
+
+#: models.py:351
+msgid "Sujet"
+msgstr ""
+
+#: models.py:352
+msgid "Message"
+msgstr ""
+
+#: templates/base.html:69
+msgid "Accueil"
+msgstr ""
+
+#: templates/closed.html:4 templates/not_opened_yet.html:4
+msgid "Le site d'inscription est fermé."
+msgstr ""
+
+#: templates/closed.html:5
+msgid ""
+"S'il vous manque encore des certificats, ammenez les le jour de la course."
+msgstr ""
+
+#: templates/closed.html:6
+msgid ""
+"Si vous n'avez pas encore payé, ammenez votre chèque le jour de la course."
+msgstr ""
+
+#: templates/done.html:5
+msgid "Votre inscription est enregistrée"
+msgstr ""
+
+#: templates/done.html:7
+msgid "Equipe : "
+msgstr ""
+
+#: templates/done.html:8
+msgid "Numéro d'inscription :"
+msgstr ""
+
+#: templates/done.html:12
+msgid "Un email de confirmation vient de vous être envoyé."
+msgstr ""
+
+#: templates/done.html:17
+msgid "Pour régler votre inscription vous pouvez payer par internet :"
+msgstr ""
+
+#: templates/done.html:37
+msgid "Paypal ou Carte bancaire"
+msgstr ""
+
+#: templates/done.html:42
+#, python-format
+msgid "Pour tout paiement par internet, %(frais)s € de frais seront ajoutés."
+msgstr ""
+
+#: templates/done.html:44
+#, python-format
+msgid "Ou envoyer un chèque de %(prix)s € à l'ordre de \"%(ordre)s\"."
+msgstr ""
+
+#: templates/done.html:45
+#, python-format
+msgid ""
+"Envoyez votre paiement avant le %(date)s. Si nous n'avons pas reçu votre "
+"paiement à cette date, votre inscription sera annulée."
+msgstr ""
+
+#: templates/done.html:47
+#, python-format
+msgid "Votre paiement de %(prix)s € à bien été reçu."
+msgstr ""
+
+#: templates/done.html:56
+msgid "Il manque les licences de :"
+msgstr ""
+
+#: templates/done.html:66
+msgid ""
+"Il manque les certificats médicaux de (<a href=\"http://www.6hdeparis.fr/wp-"
+"content/uploads/2013/03/certificat_medical.pdf\" target=\"_blank\">modèle</"
+"a>):"
+msgstr ""
+
+#: templates/done.html:76
+msgid ""
+"Il manque les autorisations parentales (<a href=\"http://www.6hdeparis.fr/wp-"
+"content/uploads/2013/03/autorisation_parentale.pdf\" target=\"_blank"
+"\">modèle</a>) :"
+msgstr ""
+
+#: templates/done.html:86
+msgid ""
+"Catégorie Entreprise / Étudiants : Si ce n'est déjà fait, pensez à envoyer "
+"un certificat signé par l'employeur (un seul pour toute l'équipe, <a href="
+"\"http://www.6hdeparis.fr/wp-content/uploads/2013/03/attestation_entreprise."
+"pdf\" target=\"_blank\">modèle</a>) ou une copie des fiches de paies ou une "
+"copie des cartes étudiants."
+msgstr ""
+
+#: templates/done.html:94
+msgid "Vous pouvez envoyer le paiement et les justificatifs à"
+msgstr ""
+
+#: templates/done.html:97
+#, python-format
+msgid ""
+"En précisant le nom de votre équipe et le numéro d'inscription <b>"
+"%(numero)s</b>."
+msgstr ""
+
+#: templates/form.html:6 templates/index.html:12
+msgid "Inscription"
+msgstr ""
+
+#: templates/form.html:7
+msgid "Modification de votre inscription"
+msgstr ""
+
+#: templates/form.html:63
+msgid "Informations générales"
+msgstr ""
+
+#: templates/form.html:70
+#, python-format
+msgid "Équipier %(n)s"
+msgstr ""
+
+#: templates/form.html:78
+msgid ""
+"Inscrivez votre équipe, votre duo en quelques étapes. Laissez vous guider."
+msgstr ""
+
+#: templates/form.html:80
+msgid ""
+"Vous pouvez envoyez vos justificatifs par internet ou par courrier. Vous "
+"pouvez payer votre inscription par internet ou par chèque. Une fois votre "
+"inscription terminée, vous recevrez un email de confirmation."
+msgstr ""
+
+#: templates/form.html:81
+#, python-format
+msgid ""
+"Mon pouvez modifier votre inscription, ajouter ou enlever des coéquipiers, "
+"envoyer les certificats, changer de catégorie jusqu'au %(date)s inclus."
+msgstr ""
+
+#: templates/form.html:82
+msgid ""
+"Si vous rencontrez des problèmes lors de votre inscription, <a href=\"http://"
+"www.6hdeparis.fr/contact/\">contactez nous</a>"
+msgstr ""
+
+#: templates/form.html:84
+msgid "Information générales"
+msgstr ""
+
+#: templates/form.html:93
+msgid ""
+"Si vous le pouvez, scannez le certificat ou la licence et ajoutez le en "
+"pièce jointe (formats PDF ou JPEG, <a href=\"http://www.6hdeparis.fr/wp-"
+"content/uploads/2013/03/certificat_medical.pdf\" target=\"_blank\">modèle de "
+"certificat</a>)."
+msgstr ""
+
+#: templates/form.html:93
+msgid "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier."
+msgstr ""
+
+#: templates/form.html:95
+#, python-format
+msgid "Chaque équipier doit avoir plus de %(min_age)s ans au %(date)s."
+msgstr ""
+
+#: templates/form.html:96
+msgid ""
+"Chaque équipier doit avoir un certificat médical d'un an ou une licence FFRS "
+"en cours de validité pour participer."
+msgstr ""
+
+#: templates/form.html:105 templates/form.html.py:110
+msgid ""
+"La catégorie que vous avez choisi nécéssite des justificatifs suplémentaires."
+msgstr ""
+
+#: templates/form.html:106
+msgid ""
+"Catégorie Famille : Veuillez le renseigner les liens de parenté pour chaque "
+"équipiers."
+msgstr ""
+
+#: templates/form.html:111
+msgid ""
+"Catégorie Entreprise / Étudiants : Veuillez ajouter un certificat signé par "
+"l'employeur (un seul pour toute l'équipe, <a href=\"http://www.6hdeparis.fr/"
+"wp-content/uploads/2013/03/attestation_entreprise.pdf\" target=\"_blank"
+"\">modèle</a>) ou une copie des fiches de paies ou une copie des cartes "
+"étudiants."
+msgstr ""
+
+#: templates/form.html:115
+#, python-format
+msgid ""
+"J'accepte le <a href=\"%(COURSE.url_reglement)s\" target=\"_blank"
+"\">règlement de la course</a>"
+msgstr ""
+
+#: templates/form.html:121
+msgid "Précédent"
+msgstr ""
+
+#: templates/form.html:122
+msgid "Suivant"
+msgstr ""
+
+#: templates/form.html:123
+msgid "Valider"
+msgstr ""
+
+#: templates/index.html:7
+msgid "Prochaines courses"
+msgstr ""
+
+#: templates/index.html:10 templates/index.html.py:27
+#, python-format
+msgid "le %(date)s à %(ville)s"
+msgstr ""
+
+#: templates/index.html:13
+#, python-format
+msgid "Fermeture des inscriptions le %(fermeture)s"
+msgstr ""
+
+#: templates/index.html:14 templates/index.html.py:28
+msgid "Liste des inscrits"
+msgstr ""
+
+#: templates/index.html:15 templates/index.html.py:29
+msgid "Statistiques"
+msgstr ""
+
+#: templates/index.html:17
+#, python-format
+msgid "Ouverture des inscriptions le %(ouverture)s"
+msgstr ""
+
+#: templates/index.html:24
+msgid "Anciennes courses"
+msgstr ""
+
+#: templates/index.html:30
+msgid "Résultats"
+msgstr ""
+
+#: templates/not_opened_yet.html:5
+#, python-format
+msgid "Ouverture des inscriptions le %(ouverture)s."
+msgstr ""
+
+#: templates/stats.html:221 templates/stats2.html:221
+msgid "Individuel Homme"
+msgstr ""
+
+#: templates/stats.html:222 templates/stats2.html:222
+msgid "Individuel Femme"
+msgstr ""
+
+#: templates/stats.html:223 templates/stats2.html:223
+msgid "Duo Homme ou Mixte"
+msgstr ""
+
+#: templates/stats.html:224 templates/stats2.html:224
+msgid "Duo Femme"
+msgstr ""
+
+#: templates/stats.html:225 templates/stats2.html:225
+msgid "Junior"
+msgstr ""
+
+#: templates/stats.html:226 templates/stats2.html:226
+msgid "Sénior Homme ou Mixte"
+msgstr ""
+
+#: templates/stats.html:227 templates/stats2.html:227
+msgid "Sénior Femme"
+msgstr ""
+
+#: templates/stats.html:228 templates/stats2.html:228
+msgid "Vétéran"
+msgstr ""
+
+#: templates/stats.html:229 templates/stats2.html:229
+msgid "Famille"
+msgstr ""
+
+#: templates/stats.html:230 templates/stats2.html:230
+msgid "Entreprise / Étudiants"
+msgstr ""
+
+#: templates/admin/equipe/send_mail.html:15
+msgid "Expéditeur :"
+msgstr ""
+
+#: templates/admin/equipe/send_mail.html:17
+msgid "Contact"
+msgstr ""
+
+#: templates/admin/equipe/send_mail.html:18
+msgid "Moi"
+msgstr ""
+
+#: templates/admin/equipe/send_mail.html:19
+msgid "À :"
+msgstr ""
+
+#: templates/admin/equipe/send_mail.html:20
+msgid "Sujet :"
+msgstr ""
+
+#: templates/admin/equipe/send_mail.html:22
+msgid "Envoyer"
+msgstr ""

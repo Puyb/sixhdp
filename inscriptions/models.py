@@ -356,7 +356,11 @@ class TemplateMail(models.Model):
     def send(self, instances):
         messages = []
         for instance in instances:
-            context = Context({ "instance": instance, })
+            context = Context({
+                "instance": instance,
+                'PAYPAL_URL': PAYPAL_URL,
+                'ROOT_URL': ROOT_URL,
+            })
             subject = Template(self.sujet).render(context)
             message = Template(self.message).render(context)
 
