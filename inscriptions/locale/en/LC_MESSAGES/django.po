@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sixhdp\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-22 23:48+0100\n"
-"PO-Revision-Date: 2014-03-22 23:26+0100\n"
+"POT-Creation-Date: 2014-03-30 20:00+0200\n"
+"PO-Revision-Date: 2014-03-30 20:18+0100\n"
 "Last-Translator: Puyb <puyb@puyb.net>\n"
 "Language-Team: English <LL@li.org>\n"
 "Language: en\n"
@@ -55,7 +55,7 @@ msgstr "Medical certificate issued after the 08.04.2012"
 msgid "Administrateur"
 msgstr "Administrator"
 
-#: models.py:40 models.py:67
+#: models.py:40 models.py:68
 msgid "Organisateur"
 msgstr "Organisator"
 
@@ -64,12 +64,12 @@ msgid "Validateur"
 msgstr "Validator"
 
 #: models.py:45
-msgid "Roller en Ligne"
-msgstr ""
+msgid "Site Roller en Ligne.com"
+msgstr "Roller in line.com website"
 
 #: models.py:46
 msgid "Facebook"
-msgstr ""
+msgstr "Facebook"
 
 #: models.py:47
 msgid "Presse"
@@ -77,301 +77,305 @@ msgstr "Press"
 
 #: models.py:48
 msgid "Bouche à oreille"
-msgstr ""
+msgstr "Word of mooth"
 
 #: models.py:49
-msgid "Fley pendant une course"
-msgstr ""
+msgid "Flyer pendant une course"
+msgstr "Flyer during a race"
 
 #: models.py:50
 msgid "Flyer pendant une randonnée"
-msgstr ""
+msgstr "Flyer during a skating ride"
 
 #: models.py:51
 msgid "Affiche"
-msgstr ""
+msgstr "Poster"
 
 #: models.py:52
 msgid "Information de la Maire de Paris"
-msgstr ""
+msgstr "Paris city official informations"
 
-#: models.py:56
+#: models.py:53
+msgid "Autre"
+msgstr "Other"
+
+#: models.py:57
 msgid "XS"
 msgstr "XS"
 
-#: models.py:57
+#: models.py:58
 msgid "S"
 msgstr "S"
 
-#: models.py:58
+#: models.py:59
 msgid "M"
 msgstr "M"
 
-#: models.py:59
+#: models.py:60
 msgid "L"
 msgstr "L"
 
-#: models.py:60
+#: models.py:61
 msgid "XL"
 msgstr "XL"
 
-#: models.py:61
+#: models.py:62
 msgid "XXL"
 msgstr "XXL"
 
-#: models.py:65
+#: models.py:66
 msgid "Gerant d'équipe"
 msgstr "Team leader"
 
-#: models.py:66
+#: models.py:67
 msgid "Equipier"
 msgstr "Teamate "
 
-#: models.py:68
+#: models.py:69
 msgid "Tous"
 msgstr "All"
 
-#: models.py:75 models.py:114 models.py:184 models.py:289 models.py:346
+#: models.py:76 models.py:115 models.py:183 models.py:292 models.py:349
 msgid "Nom"
 msgstr "Last name"
 
-#: models.py:76
+#: models.py:77
 msgid "uid"
 msgstr "uid"
 
-#: models.py:77 models.py:188
+#: models.py:78 models.py:187
 msgid "Ville"
 msgstr "City"
 
-#: models.py:79
+#: models.py:80
 msgid "Date"
 msgstr "Date"
 
-#: models.py:80
+#: models.py:81
 msgid "Date d'ouverture des inscriptionss"
 msgstr "Registration opening date"
 
-#: models.py:81
+#: models.py:82
 msgid "Date d'augmentation dss tarifs"
 msgstr "Price raise date"
 
-#: models.py:82
+#: models.py:83
 msgid "Date de fermeture des inscriptions"
 msgstr "Registration closing date"
 
-#: models.py:83
+#: models.py:84
 msgid "Limite du nombre de participants"
 msgstr ""
 
-#: models.py:84
+#: models.py:85
 msgid "Limite du nombre de solo"
 msgstr ""
 
-#: models.py:85
+#: models.py:86
 msgid "Adresse paypal"
 msgstr "Paypal address"
 
-#: models.py:86
+#: models.py:87
 msgid "Ordre des chèques"
 msgstr ""
 
-#: models.py:87 models.py:186 models.py:292 models.py:293
+#: models.py:88 models.py:185 models.py:295 models.py:296
 msgid "Adresse"
 msgstr "Address"
 
-#: models.py:88
+#: models.py:89
 msgid "URL"
 msgstr ""
 
-#: models.py:89
+#: models.py:90
 msgid "URL Réglement"
 msgstr ""
 
-#: models.py:90
+#: models.py:91
 msgid "Email contact"
 msgstr ""
 
-#: models.py:115
+#: models.py:116
 msgid "Code"
 msgstr ""
 
-#: models.py:116
+#: models.py:117
 msgid "Prix normal"
 msgstr ""
 
-#: models.py:117
+#: models.py:118
 msgid "Prix augmenté"
 msgstr ""
 
-#: models.py:118
+#: models.py:119
 msgid "Nombre minimum d'équipiers"
 msgstr "Minimum number of teammate"
 
-#: models.py:119
+#: models.py:120
 msgid "Nombre maximum d'équipiers"
 msgstr "Maximum number of teammate"
 
-#: models.py:120
+#: models.py:121
 msgid "Age minimum"
 msgstr ""
 
-#: models.py:121 models.py:291
+#: models.py:122 models.py:294
 msgid "Sexe"
 msgstr "Sex"
 
-#: models.py:122
+#: models.py:123
 msgid "Validation function (javascript)"
 msgstr ""
 
-#: models.py:123
+#: models.py:124
 msgid "Numero de dossard (début)"
 msgstr ""
 
-#: models.py:124
+#: models.py:125
 msgid "Numero de dossard (fin)"
 msgstr ""
 
-#: models.py:182
+#: models.py:181
 msgid "Nom d'équipe"
 msgstr "Team name"
 
-#: models.py:183
+#: models.py:182
 msgid "Club"
 msgstr "Club"
 
-#: models.py:185 models.py:290
+#: models.py:184 models.py:293
 msgid "Prénom"
 msgstr "First name"
 
-#: models.py:187
+#: models.py:186
 msgid "Adresse 2"
 msgstr "Address 2"
 
-#: models.py:189
+#: models.py:188
 msgid "Code postal"
 msgstr "Postal code"
 
-#: models.py:190 models.py:296
+#: models.py:189 models.py:299
 msgid "Pays"
 msgstr "Country"
 
-#: models.py:191 models.py:297
+#: models.py:190 models.py:300
 msgid "e-mail"
 msgstr "e-mail"
 
-#: models.py:192
+#: models.py:191
 msgid "Mot de passe"
 msgstr "Password"
 
-#: models.py:193
+#: models.py:192
 msgid "Téléphone"
 msgstr "Phone"
 
-#: models.py:196
+#: models.py:195
 msgid "Nombre d'équipiers"
 msgstr "Number of teammate"
 
-#: models.py:197
+#: models.py:196
 msgid "Détails"
 msgstr "Details"
 
-#: models.py:198
+#: models.py:197
 msgid "Prix"
 msgstr "Price"
 
-#: models.py:199
+#: models.py:198
 msgid "Paiement reçu"
 msgstr "Payment received"
 
-#: models.py:200
+#: models.py:199
 msgid "Dossier complet"
 msgstr "File completed"
 
-#: models.py:201
+#: models.py:200
 msgid "Date d'insciption"
 msgstr "Registration date"
 
-#: models.py:202
+#: models.py:201
 msgid "Commentaires"
 msgstr "Comments"
 
-#: models.py:204 models.py:287
+#: models.py:203 models.py:290
 msgid "Numéro"
 msgstr "Number"
 
-#: models.py:205
+#: models.py:204
 msgid "Comment avez vous connu la course ?"
 msgstr "How did you know about the race?"
 
-#: models.py:298
+#: models.py:301
 msgid "Date de naissance"
 msgstr "Birthday"
 
-#: models.py:299
+#: models.py:302
 msgid "Autorisation parentale"
 msgstr "Parental authorization"
 
-#: models.py:300
+#: models.py:303
 msgid "Autorisation parentale valide"
 msgstr "Valid parental authorization"
 
-#: models.py:301
+#: models.py:304
 msgid "Justificatif"
 msgstr "Justificative"
 
-#: models.py:302
+#: models.py:305
 msgid "Numéro de licence"
 msgstr "Licence Number"
 
-#: models.py:303
+#: models.py:306
 msgid "Certificat ou licence"
 msgstr "Certificat or licence"
 
-#: models.py:304
+#: models.py:307
 msgid "Certificat ou licence valide"
 msgstr "Valid certificate or license"
 
-#: models.py:305
+#: models.py:308
 msgid "Lien de parenté"
 msgstr "Family relationship"
 
-#: models.py:306
+#: models.py:309
 msgid "Justificatif entreprise / etudiant"
 msgstr "Enterprise / School justification"
 
-#: models.py:307
+#: models.py:310
 msgid "Justificatif valide"
 msgstr "Valid justificative"
 
-#: models.py:309
+#: models.py:312
 msgid "Code EOSkates"
 msgstr ""
 
-#: models.py:310
+#: models.py:313
 msgid "Transpondeur"
 msgstr "Tag number"
 
-#: models.py:311
+#: models.py:314
 msgid "Taille T-shirt"
 msgstr "Shirt size"
 
-#: models.py:340
+#: models.py:343
 msgid "Role"
 msgstr ""
 
-#: models.py:347
+#: models.py:350
 msgid "Destinataire"
 msgstr ""
 
-#: models.py:348
+#: models.py:351
 msgid "Copie cachée à"
 msgstr ""
 
-#: models.py:349
+#: models.py:352
 msgid "Sujet"
 msgstr ""
 
-#: models.py:350
+#: models.py:353
 msgid "Message"
 msgstr ""
 
@@ -410,34 +414,41 @@ msgstr "Registration number:"
 msgid "Un email de confirmation vient de vous être envoyé."
 msgstr "A confirmation mail has just been sent."
 
-#: templates/done.html:19
+#: templates/done.html:17
 msgid "Pour régler votre inscription vous pouvez payer par internet :"
 msgstr "You can pay your registration online:"
 
-#: templates/done.html:39
+#: templates/done.html:37
 msgid "Paypal ou Carte bancaire"
 msgstr "Paypal or credit card"
 
-#: templates/done.html:44
+#: templates/done.html:42
 #, python-format
 msgid "Pour tout paiement par internet, %(frais)s € de frais seront ajoutés."
 msgstr "For online payment, € %(frais)s fee will be added."
 
-#: templates/done.html:46
+#: templates/done.html:44
 #, python-format
 msgid "Ou envoyer un chèque de %(prix)s € à l'ordre de \"%(ordre)s\"."
 msgstr "Or send a € %(prix)s check payable to the \"%(ordre)s\"."
 
-#: templates/done.html:48
+#: templates/done.html:45
+#, python-format
+msgid ""
+"Envoyez votre paiement avant le %(date)s. Si nous n'avons pas reçu votre "
+"paiement à cette date, votre inscription sera annulée."
+msgstr ""
+
+#: templates/done.html:47
 #, python-format
 msgid "Votre paiement de %(prix)s € à bien été reçu."
 msgstr "Your payment of € %(prix)s was received."
 
-#: templates/done.html:57
+#: templates/done.html:56
 msgid "Il manque les licences de :"
 msgstr "Missing licenses:"
 
-#: templates/done.html:67
+#: templates/done.html:66
 msgid ""
 "Il manque les certificats médicaux de (<a href=\"http://www.6hdeparis.fr/wp-"
 "content/uploads/2013/03/certificat_medical.pdf\" target=\"_blank\">modèle</"
@@ -447,7 +458,7 @@ msgstr ""
 "uploads/2013/03/certificat_medical.pdf\" target=\"_blank\">model in french</"
 "a>)."
 
-#: templates/done.html:77
+#: templates/done.html:76
 msgid ""
 "Il manque les autorisations parentales (<a href=\"http://www.6hdeparis.fr/wp-"
 "content/uploads/2013/03/autorisation_parentale.pdf\" target=\"_blank"
@@ -457,7 +468,7 @@ msgstr ""
 "content/uploads/2013/03/autorisation_parentale.pdf\" target=\"_blank\">model "
 "in french</a>)."
 
-#: templates/done.html:87
+#: templates/done.html:86
 msgid ""
 "Catégorie Entreprise / Étudiants : Si ce n'est déjà fait, pensez à envoyer "
 "un certificat signé par l'employeur (un seul pour toute l'équipe, <a href="
@@ -470,11 +481,11 @@ msgstr ""
 "uploads/2013/03/attestation_entreprise.pdf\" target=\"_blank\">model</a>) or "
 "a copy of your school id cards."
 
-#: templates/done.html:95
+#: templates/done.html:94
 msgid "Vous pouvez envoyer le paiement et les justificatifs à"
 msgstr "You can send paiment and justificatives to"
 
-#: templates/done.html:98
+#: templates/done.html:97
 #, python-format
 msgid ""
 "En précisant le nom de votre équipe et le numéro d'inscription <b>"
@@ -502,12 +513,13 @@ msgstr "Teammate %(n)s"
 
 #: templates/form.html:78
 msgid ""
-"Inscrivez votre équipe, votre duo en quelques étapes. Laissez vous guider."
-msgstr "Register your team or duo in a few steps."
+"Inscrivez votre équipe, votre duo ou votre solo en quelques étapes. Laissez "
+"vous guider."
+msgstr "Register your team, duo or solo in a few steps."
 
 #: templates/form.html:80
 msgid ""
-"Vous pouvez envoyez vos justificatifs par internet ou par courrier. Vous "
+"Vous pouvez envoyer vos justificatifs par internet ou par courrier. Vous "
 "pouvez payer votre inscription par internet ou par chèque. Une fois votre "
 "inscription terminée, vous recevrez un email de confirmation."
 msgstr ""
@@ -518,7 +530,7 @@ msgstr ""
 #: templates/form.html:81
 #, python-format
 msgid ""
-"Mon pouvez modifier votre inscription, ajouter ou enlever des coéquipiers, "
+"Vous pouvez modifier votre inscription, ajouter ou enlever des coéquipiers, "
 "envoyer les certificats, changer de catégorie jusqu'au %(date)s inclus."
 msgstr ""
 "You can modify your registration, add or remove teammates, send your "
@@ -559,8 +571,8 @@ msgstr "Each teammate must be %(min_age)s at %(date)s."
 
 #: templates/form.html:96
 msgid ""
-"Chaque équipier doit avoir un certificat médical d'un an ou une licence FFRS "
-"en cours de validité pour participer."
+"Chaque équipier doit avoir un certificat médical de moins d'un an ou une "
+"licence FFRS en cours de validité pour participer."
 msgstr ""
 "Each teammate must have a medical certificate or a valid FFRS license to "
 "participate."
@@ -646,7 +658,7 @@ msgid "Résultats"
 msgstr "Results"
 
 #: templates/not_opened_yet.html:5
-#, fuzzy, python-format
+#, python-format
 msgid "Ouverture des inscriptions le %(ouverture)s."
 msgstr "Registration opening on %(ouverture)s"
 

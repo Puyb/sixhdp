@@ -42,14 +42,15 @@ ROLE_CHOICES = (
 )
 
 CONNU_CHOICES = (
-    (u'Roller en LIgne', _(u'Roller en Ligne')),
+    (u'Site Roller en LIgne.com', _(u'Site Roller en Ligne.com')),
     (u'Facebook', _('Facebook')),
     (u'Presse', _(u'Presse')),
     (u'Bouche à oreille', _(u'Bouche à oreille')),
-    (u'Flyer pendant une course', _(u'Fley pendant une course')),
+    (u'Flyer pendant une course', _(u'Flyer pendant une course')),
     (u'Flyer pendant une randonnée', _(u'Flyer pendant une randonnée')),
     (u'Affiche', _(u'Affiche')),
     (u'Informations de la Mairie de Paris', _(u'Information de la Maire de Paris')),
+    (u'Autre', _(u'Autre')),
 )
 
 TAILLES_CHOICES = (

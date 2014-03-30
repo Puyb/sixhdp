@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-29 23:02+0100\n"
+"POT-Creation-Date: 2014-03-30 20:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,7 +56,7 @@ msgstr ""
 msgid "Administrateur"
 msgstr ""
 
-#: models.py:40 models.py:67
+#: models.py:40 models.py:68
 msgid "Organisateur"
 msgstr ""
 
@@ -65,7 +65,7 @@ msgid "Validateur"
 msgstr ""
 
 #: models.py:45
-msgid "Roller en Ligne"
+msgid "Site Roller en Ligne.com"
 msgstr ""
 
 #: models.py:46
@@ -81,7 +81,7 @@ msgid "Bouche à oreille"
 msgstr ""
 
 #: models.py:49
-msgid "Fley pendant une course"
+msgid "Flyer pendant une course"
 msgstr ""
 
 #: models.py:50
@@ -96,283 +96,287 @@ msgstr ""
 msgid "Information de la Maire de Paris"
 msgstr ""
 
-#: models.py:56
-msgid "XS"
+#: models.py:53
+msgid "Autre"
 msgstr ""
 
 #: models.py:57
-msgid "S"
+msgid "XS"
 msgstr ""
 
 #: models.py:58
-msgid "M"
+msgid "S"
 msgstr ""
 
 #: models.py:59
-msgid "L"
+msgid "M"
 msgstr ""
 
 #: models.py:60
-msgid "XL"
+msgid "L"
 msgstr ""
 
 #: models.py:61
+msgid "XL"
+msgstr ""
+
+#: models.py:62
 msgid "XXL"
 msgstr ""
 
-#: models.py:65
+#: models.py:66
 msgid "Gerant d'équipe"
 msgstr ""
 
-#: models.py:66
+#: models.py:67
 msgid "Equipier"
 msgstr ""
 
-#: models.py:68
+#: models.py:69
 msgid "Tous"
 msgstr ""
 
-#: models.py:75 models.py:114 models.py:182 models.py:291 models.py:348
+#: models.py:76 models.py:115 models.py:183 models.py:292 models.py:349
 msgid "Nom"
 msgstr ""
 
-#: models.py:76
+#: models.py:77
 msgid "uid"
 msgstr ""
 
-#: models.py:77 models.py:186
+#: models.py:78 models.py:187
 msgid "Ville"
 msgstr ""
 
-#: models.py:79
+#: models.py:80
 msgid "Date"
 msgstr ""
 
-#: models.py:80
+#: models.py:81
 msgid "Date d'ouverture des inscriptionss"
 msgstr ""
 
-#: models.py:81
+#: models.py:82
 msgid "Date d'augmentation dss tarifs"
 msgstr ""
 
-#: models.py:82
+#: models.py:83
 msgid "Date de fermeture des inscriptions"
 msgstr ""
 
-#: models.py:83
+#: models.py:84
 msgid "Limite du nombre de participants"
 msgstr ""
 
-#: models.py:84
+#: models.py:85
 msgid "Limite du nombre de solo"
 msgstr ""
 
-#: models.py:85
+#: models.py:86
 msgid "Adresse paypal"
 msgstr ""
 
-#: models.py:86
+#: models.py:87
 msgid "Ordre des chèques"
 msgstr ""
 
-#: models.py:87 models.py:184 models.py:294 models.py:295
+#: models.py:88 models.py:185 models.py:295 models.py:296
 msgid "Adresse"
 msgstr ""
 
-#: models.py:88
+#: models.py:89
 msgid "URL"
 msgstr ""
 
-#: models.py:89
+#: models.py:90
 msgid "URL Réglement"
 msgstr ""
 
-#: models.py:90
+#: models.py:91
 msgid "Email contact"
 msgstr ""
 
-#: models.py:115
+#: models.py:116
 msgid "Code"
 msgstr ""
 
-#: models.py:116
+#: models.py:117
 msgid "Prix normal"
 msgstr ""
 
-#: models.py:117
+#: models.py:118
 msgid "Prix augmenté"
 msgstr ""
 
-#: models.py:118
+#: models.py:119
 msgid "Nombre minimum d'équipiers"
 msgstr ""
 
-#: models.py:119
+#: models.py:120
 msgid "Nombre maximum d'équipiers"
 msgstr ""
 
-#: models.py:120
+#: models.py:121
 msgid "Age minimum"
 msgstr ""
 
-#: models.py:121 models.py:293
+#: models.py:122 models.py:294
 msgid "Sexe"
 msgstr ""
 
-#: models.py:122
+#: models.py:123
 msgid "Validation function (javascript)"
 msgstr ""
 
-#: models.py:123
+#: models.py:124
 msgid "Numero de dossard (début)"
 msgstr ""
 
-#: models.py:124
+#: models.py:125
 msgid "Numero de dossard (fin)"
 msgstr ""
 
-#: models.py:180
+#: models.py:181
 msgid "Nom d'équipe"
 msgstr ""
 
-#: models.py:181
+#: models.py:182
 msgid "Club"
 msgstr ""
 
-#: models.py:183 models.py:292
+#: models.py:184 models.py:293
 msgid "Prénom"
 msgstr ""
 
-#: models.py:185
+#: models.py:186
 msgid "Adresse 2"
 msgstr ""
 
-#: models.py:187
+#: models.py:188
 msgid "Code postal"
 msgstr ""
 
-#: models.py:188 models.py:298
+#: models.py:189 models.py:299
 msgid "Pays"
 msgstr ""
 
-#: models.py:189 models.py:299
+#: models.py:190 models.py:300
 msgid "e-mail"
 msgstr ""
 
-#: models.py:190
+#: models.py:191
 msgid "Mot de passe"
 msgstr ""
 
-#: models.py:191
+#: models.py:192
 msgid "Téléphone"
 msgstr ""
 
-#: models.py:194
+#: models.py:195
 msgid "Nombre d'équipiers"
 msgstr ""
 
-#: models.py:195
+#: models.py:196
 msgid "Détails"
 msgstr ""
 
-#: models.py:196
+#: models.py:197
 msgid "Prix"
 msgstr ""
 
-#: models.py:197
+#: models.py:198
 msgid "Paiement reçu"
 msgstr ""
 
-#: models.py:198
+#: models.py:199
 msgid "Dossier complet"
 msgstr ""
 
-#: models.py:199
+#: models.py:200
 msgid "Date d'insciption"
 msgstr ""
 
-#: models.py:200
+#: models.py:201
 msgid "Commentaires"
 msgstr ""
 
-#: models.py:202 models.py:289
+#: models.py:203 models.py:290
 msgid "Numéro"
 msgstr ""
 
-#: models.py:203
+#: models.py:204
 msgid "Comment avez vous connu la course ?"
 msgstr ""
 
-#: models.py:300
+#: models.py:301
 msgid "Date de naissance"
 msgstr ""
 
-#: models.py:301
+#: models.py:302
 msgid "Autorisation parentale"
 msgstr ""
 
-#: models.py:302
+#: models.py:303
 msgid "Autorisation parentale valide"
 msgstr ""
 
-#: models.py:303
+#: models.py:304
 msgid "Justificatif"
 msgstr ""
 
-#: models.py:304
+#: models.py:305
 msgid "Numéro de licence"
 msgstr ""
 
-#: models.py:305
+#: models.py:306
 msgid "Certificat ou licence"
 msgstr ""
 
-#: models.py:306
+#: models.py:307
 msgid "Certificat ou licence valide"
 msgstr ""
 
-#: models.py:307
+#: models.py:308
 msgid "Lien de parenté"
 msgstr ""
 
-#: models.py:308
+#: models.py:309
 msgid "Justificatif entreprise / etudiant"
 msgstr ""
 
-#: models.py:309
+#: models.py:310
 msgid "Justificatif valide"
 msgstr ""
 
-#: models.py:311
+#: models.py:312
 msgid "Code EOSkates"
 msgstr ""
 
-#: models.py:312
+#: models.py:313
 msgid "Transpondeur"
 msgstr ""
 
-#: models.py:313
+#: models.py:314
 msgid "Taille T-shirt"
 msgstr ""
 
-#: models.py:342
+#: models.py:343
 msgid "Role"
 msgstr ""
 
-#: models.py:349
+#: models.py:350
 msgid "Destinataire"
 msgstr ""
 
-#: models.py:350
+#: models.py:351
 msgid "Copie cachée à"
 msgstr ""
 
-#: models.py:351
+#: models.py:352
 msgid "Sujet"
 msgstr ""
 
-#: models.py:352
+#: models.py:353
 msgid "Message"
 msgstr ""
 
@@ -497,12 +501,13 @@ msgstr ""
 
 #: templates/form.html:78
 msgid ""
-"Inscrivez votre équipe, votre duo en quelques étapes. Laissez vous guider."
+"Inscrivez votre équipe, votre duo ou votre solo en quelques étapes. Laissez "
+"vous guider."
 msgstr ""
 
 #: templates/form.html:80
 msgid ""
-"Vous pouvez envoyez vos justificatifs par internet ou par courrier. Vous "
+"Vous pouvez envoyer vos justificatifs par internet ou par courrier. Vous "
 "pouvez payer votre inscription par internet ou par chèque. Une fois votre "
 "inscription terminée, vous recevrez un email de confirmation."
 msgstr ""
@@ -510,7 +515,7 @@ msgstr ""
 #: templates/form.html:81
 #, python-format
 msgid ""
-"Mon pouvez modifier votre inscription, ajouter ou enlever des coéquipiers, "
+"Vous pouvez modifier votre inscription, ajouter ou enlever des coéquipiers, "
 "envoyer les certificats, changer de catégorie jusqu'au %(date)s inclus."
 msgstr ""
 
@@ -543,8 +548,8 @@ msgstr ""
 
 #: templates/form.html:96
 msgid ""
-"Chaque équipier doit avoir un certificat médical d'un an ou une licence FFRS "
-"en cours de validité pour participer."
+"Chaque équipier doit avoir un certificat médical de moins d'un an ou une "
+"licence FFRS en cours de validité pour participer."
 msgstr ""
 
 #: templates/form.html:105 templates/form.html.py:110
