@@ -437,7 +437,7 @@ msgstr "Or send a € %(prix)s check payable to the \"%(ordre)s\"."
 msgid ""
 "Envoyez votre paiement avant le %(date)s. Si nous n'avons pas reçu votre "
 "paiement à cette date, votre inscription sera annulée."
-msgstr ""
+msgstr "Send your payment before %(date)s. If you don't, your registrationwill be canceled."
 
 #: templates/done.html:47
 #, python-format
