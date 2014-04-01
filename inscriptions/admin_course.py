@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import Template, Context
 from django.template import RequestContext
 from django.conf.urls import patterns
+from django.contrib import messages
 
 
 class CourseAdminSite(admin.sites.AdminSite):
@@ -162,7 +163,7 @@ class EquipeAdmin(admin.ModelAdmin):
             msg.content_subtype = "html"
             msg.send()
             messages.add_message(request, messages.INFO, u'Message envoyé à %s' % (request.POST['mail'], ))
-            return redirect('/admin/inscriptions/equipe/%s/' % (instance.id, ))
+            return redirect('/course/inscriptions/equipe/%s/' % (instance.id, ))
 
 
         mail = get_object_or_404(TemplateMail, id=template)

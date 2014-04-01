@@ -204,14 +204,15 @@ def list(request, course_uid):
         count     = Count('id'),
         prix      = Sum('prix'), 
         nbpaye    = Count('prix'), 
-        paie      = Sum('paiement'), 
+        paiement  = Sum('paiement'), 
         club      = Count('club', distinct=True),
         villes    = Count('gerant_ville2__nom', distinct=True),
         pays      = Count('gerant_ville2__pays', distinct=True),
-        equipiers = Count('equipier'),
-
     )
-    equipes = Equipe.objects.filter(course__uid=course_uid)
+    stats['equipiers'] = Equipe.objects.filter(course__uid=course_uid).aggregate(
+        equipiers = Count('equipier'),
+    )['equipiers']
+    equipes = Equipe.objects.filter(course__uid=course_uid).order_by('date')
     return render_to_response('list.html', RequestContext(request, {
         'stats': stats,
         'equipes': equipes
