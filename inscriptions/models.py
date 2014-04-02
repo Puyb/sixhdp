@@ -357,6 +357,18 @@ class TemplateMail(models.Model):
     def send(self, instances):
         messages = []
         for instance in instances:
+            dests = set()
+            if self.destinataire in ('Organisateur', 'Tous'):
+                dests.add(self.course.email_contact)
+            if self.destinataire in ('Equipe', 'Tous') and isinstance(instance, Equipe):
+                    dests.add(instance.gerant_email)
+            if self.destinataire in ('Equipiers', 'Tous'):
+                if isinstance(instance, Equipier):
+                    dests.add(instance.email)
+                if isinstance(instance, Equipe):
+                    for equipier in instance.equipier_set.all():
+                        dests.add(equipier.email)
+            
             context = Context({
                 "instance": instance,
                 'PAYPAL_URL': PAYPAL_URL,
@@ -365,18 +377,12 @@ class TemplateMail(models.Model):
             subject = Template(self.sujet).render(context)
             message = Template(self.message).render(context)
 
-            dest = self.course.email_contact
-            if isinstance(instance, Equipe):
-                dest = instance.gerant_email
-            if isinstance(instance, Equipier):
-                dest = instance.email
-            
             bcc = []
             if self.bcc:
                 bcc = re.split('[,; ]+', self.bcc)
-            
-            message = EmailMessage(subject, message, self.course.email_contact, [ dest ], bcc)
-            message.content_subtype = "html"
-            messages.append(message)
+            for dest in dests:
+                message = EmailMessage(subject, message, self.course.email_contact, [ dest ], bcc)
+                message.content_subtype = "html"
+                messages.append(message)
         MailThread(messages).start()
 
