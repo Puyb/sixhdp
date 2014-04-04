@@ -14,8 +14,8 @@
 <form method="post">
     <label for="id_sender">{% trans "Expéditeur :" %}</label>
     <input name="sender" id="id_sender" value="{{ sender }}" />
-    <button onclick="document.getElementById('id_sender').value='{{ sender }}';">{% trans "Contact" %}</button>
-    <button onclick="document.getElementById('id_sender').value='{{ user.email }}';">{% trans "Moi" %}</button><br />
+    <button type="button" onclick="document.getElementById('id_sender').value='{{ sender }}';">{% trans "Contact" %}</button>
+    <button type="button" onclick="document.getElementById('id_sender').value='{{ user.email }}';">{% trans "Moi" %}</button><br />
     <label for="id_mail">{% trans "À :" %}</label><input name="mail" id="id_mail" value="{{ mail }}" /><br />
     <label for="id_subject">{% trans "Sujet :" %}</label><input name="subject" id="id_subject" value="{{ subject }}" /><br />
     <textarea name="message" style="height: 600px;">{{ message }}</textarea><br />

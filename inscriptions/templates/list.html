@@ -5,6 +5,9 @@
     <style>
         .container_16 .grid_11 { width: 940px; }
     </style>
+    <script>
+        var nbcomplet = 0;
+    </script>
     <h1>Inscrits</h1>
     <table width="100%">
         <tr>
@@ -32,9 +35,9 @@
             {% if user.is_staff %}
             <td>{{ equipe.nombre }}</td>
             <td>{{ equipe.date }}</td>
-            <td>{{ equipe.prix }}€ {{ equipe.paiement_complet2|safe }}</td>
+            <td>{{ equipe.prix }}€ {% if equipe.paiement_complet %}<img alt="None" src="/static/admin/img/icon-yes.gif">{% endif %}</td>
             <td>
-                {{ equipe.dossier_complet_auto2|safe }}
+                {% if equipe.dossier_complet_auto %}<img alt="None" src="/static/admin/img/icon-yes.gif">{% endif %}
                 <script>
                     nbcomplet += {{ equipe.dossier_complet_auto|yesno:"1,0,0" }};
                 </script>
@@ -49,8 +52,8 @@
             <td>{{ stats.villes }} villes</td>
             <td>{{ stats.pays }} pays</td>
             {% if user.is_staff %}
-            <td><script>document.write(nombre);</script></td>
-                <td colspan="2" style="text-align: right;">{{ stats.paye }}€ / {{ stats.prix }}€ ({{ stats.nbpaye }}<img alt="None" src="/static/admin/img/icon-yes.gif">)</td>
+            <td>{{ stats.equipiers }}</td>
+            <td colspan="2" style="text-align: right;">{{ stats.paiement }}€ / {{ stats.prix }}€ ({{ stats.nbpaye }}<img alt="None" src="/static/admin/img/icon-yes.gif">)</td>
             <td><script>document.write(nbcomplet);</script><img alt="None" src="/static/admin/img/icon-yes.gif"></td>
             {% endif %}
         </tr>

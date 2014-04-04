@@ -2,10 +2,6 @@
 /* globals COURSE, INSTANCE, CATEGORIES, UPDATE, STAFF, CHECK_URL, I18N */
 /* globals Prototype, $, $$, $F, $R, Form, Event, Ajax */
 
-function _(s) {
-    return I18N[s] || s;
-}
-
 if(![].map)
     Array.prototype.map = function(fn) {
         var r = [];
@@ -71,7 +67,7 @@ function check_nom(wait) {
         asynchronous: !wait,
         onSuccess: function(r) {
             if(r.responseText !== '0')
-                $('nom_erreur').update(_("Ce nom d'équipe est déjà utilisé !"));
+                $('nom_erreur').update(gettext("Ce nom d'équipe est déjà utilisé !"));
             else
                 $('nom_erreur').update("");
 
@@ -99,7 +95,7 @@ function check_step(data) {
                 if(CATEGORIES.filter(function(categorie) {
                     return categorie.min_equipiers <= nombre && nombre <= categorie.max_equipiers;
                 }).length === 0) {
-                    message += _("Désolé, il n'y a plus de place dans ces catégories. Changez le nombre de participants.") + '\n';
+                    message += gettext("Désolé, il n'y a plus de place dans ces catégories. Changez le nombre de participants.") + '\n';
                     return false;
                 }
                 return true;
@@ -130,7 +126,7 @@ function check_step(data) {
         }
     }
     if(!ok) {
-        return alert(message + _('Veuillez corriger les champs en rouge.'));
+        return alert(message + gettext('Veuillez corriger les champs en rouge.'));
     }
     return ok;
 }
@@ -142,15 +138,15 @@ function setup_categories(data) {
             && data.equipiers.filter(age(c.min_age)).length === data.nombre
             && ((c.sexe === 'H' && data.nombre === data.nombre_h) ||
                 (c.sexe === 'F' && data.nombre === data.nombre_f) ||
-                (c.sexe === 'HX' && data.nombre_f >= 1) ||
-                (c.sexe === 'FX' && data.nombre_h >= 1) ||
-                (c.sexe === 'X' && data.nombre_f >0 && data.nombre_h > 0))
+                (c.sexe === 'HX' && data.nombre_h >= 1) ||
+                (c.sexe === 'FX' && data.nombre_f >= 1) ||
+                (c.sexe === 'X'))
             && c.valid(data);
     });
     
     if(actual_categories.length === 0) {
         $('button_prev').click();
-        alert(_("Votre équipe n'est éligible dans aucune des catégories proposées pour cette compétition. Veuillez vous référer au réglement de la course disponible sur le site pour voir les critères de chaque catégorie."));
+        alert(gettext("Votre équipe n'est éligible dans aucune des catégories proposées pour cette compétition. Veuillez vous référer au réglement de la course disponible sur le site pour voir les critères de chaque catégorie."));
         return false;
     }
 
@@ -174,7 +170,7 @@ function setup_categories(data) {
     // select the categorie
     if(UPDATE) {
         if(!$('id_categorie-' + INSTANCE.CATEGORIE))
-            alert(_("Vos modifications impliquent un changement de catégorie. Veuillez sélectionner la nouvelle catégorie."));
+            alert(gettext("Vos modifications impliquent un changement de catégorie. Veuillez sélectionner la nouvelle catégorie."));
         else
             $('id_categorie-' + INSTANCE.CATEGORIE).checked = true;
     } else {
@@ -216,7 +212,7 @@ Event.observe(window, 'load', function() {
                 e.insert({
                     after: new Element('tr', { id: 'tr-autorisation-warning' })
                             .insert(new Element('td', { colspan: 2 })
-                            .update(_("Si vous le pouvez, scannez l'autorisation et ajoutez la en pièce jointe (formats PDF ou JPEG).") + "<br />" + _("Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier (<a href=\"http://www.6hdeparis.fr/wp-content/uploads/2013/03/autorisation_parentale.pdf\" target=\"_blank\">modèle</a>).")))
+                            .update(gettext("Si vous le pouvez, scannez l'autorisation et ajoutez la en pièce jointe (formats PDF ou JPEG).") + "<br />" + gettext("Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier (<a href=\"http://www.6hdeparis.fr/wp-content/uploads/2013/03/autorisation_parentale.pdf\" target=\"_blank\">modèle</a>).")))
                 });
         }
     
@@ -229,12 +225,12 @@ Event.observe(window, 'load', function() {
         var handler = function() {
             if($(id + '-justificatif_1').checked) {
                 tr.show()
-                    .next().show().down('label').update(_('Licence') + ':');
+                    .next().show().down('label').update(gettext('Licence') + ':');
                 tr.next(1).show();
             }
             if($(id + '-justificatif_2').checked) {
                 tr.hide()
-                    .next().show().down('label').update(_('Certificat médical') + ':');
+                    .next().show().down('label').update(gettext('Certificat médical') + ':');
                 tr.next(1).show();
             }
         };
@@ -327,11 +323,11 @@ Event.observe(window, 'load', function() {
         $('id_prix').value = CATEGORIES.filter(function(c) { return c.id === categorie; })[0].prix;
         if(!categorie) {
             event.stop();
-            alert(_('Vous devez choisir une catégorie'));
+            alert(gettext('Vous devez choisir une catégorie'));
         }
         if(!$('id_conditions').checked) {
             event.stop();
-            alert(_('Vous devez accépter le règlement de la compétition'));
+            alert(gettext('Vous devez accépter le règlement de la compétition'));
         }
         $$('input, select').each(function(e) {
             e.disabled = false;

@@ -2,7 +2,7 @@ django.jQuery(function() {
     var $ = django.jQuery;
     if(!$('#equipe_form').length) return;
 
-    $('.field-piece_jointe p', '.field-piece_jointe2 p', '.field-autorisation p').each(function() {
+    $('.field-piece_jointe p, .field-piece_jointe2 p, .field-autorisation p').each(function() {
         if(this.textContent == '')
             this.innerHTML = 'Aucun fichier joint';
         else

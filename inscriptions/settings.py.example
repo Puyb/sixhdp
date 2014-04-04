@@ -2,3 +2,5 @@ PAYPAL_URL = 'https://www.paypal.com/cgi-bin/webscr'
 # PAYPAL_URL = 'https://www.sandbox.paypal.com/cgi-bin/webscr'
 
 MAPQUEST_API_KEY = ''
+
+ROOT_URL = 'http://inscription.6hdeparis.fr'

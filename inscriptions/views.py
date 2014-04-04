@@ -89,24 +89,6 @@ def form(request, course_uid, numero=None, code=None):
                 equipier_instance.numero = i + 1
                 equipier_instance.equipe = new_instance
                 equipier_instance.save()
-            ctx = RequestContext(request, {
-                "instance": new_instance,
-                "url": request.build_absolute_uri(reverse(
-                    'inscriptions.edit', kwargs={
-                        'course_uid': course.uid,
-                        'numero': new_instance.numero,
-                        'code': new_instance.password
-                    }
-                )),
-                "url2": request.build_absolute_uri(reverse(
-                    'inscriptions.done', kwargs={
-                        'course_uid': course.uid,
-                        'numero': new_instance.numero,
-                    }
-                )),
-                "equipe_form": equipe_form,
-                "equipier_formset": equipier_formset,
-            })
             if not instance:
                 try:
                     course.send_mail('inscription', [ new_instance ])
@@ -222,14 +204,15 @@ def list(request, course_uid):
         count     = Count('id'),
         prix      = Sum('prix'), 
         nbpaye    = Count('prix'), 
-        paie      = Sum('paiement'), 
+        paiement  = Sum('paiement'), 
         club      = Count('club', distinct=True),
         villes    = Count('gerant_ville2__nom', distinct=True),
         pays      = Count('gerant_ville2__pays', distinct=True),
-        equipiers = Count('equipier'),
-
     )
-    equipes = Equipe.objects.filter(course__uid=course_uid)
+    stats['equipiers'] = Equipe.objects.filter(course__uid=course_uid).aggregate(
+        equipiers = Count('equipier'),
+    )['equipiers']
+    equipes = Equipe.objects.filter(course__uid=course_uid).order_by('date')
     return render_to_response('list.html', RequestContext(request, {
         'stats': stats,
         'equipes': equipes

@@ -5,6 +5,7 @@
 {% get_available_languages as LANGUAGES %}
 {% if create %}<h1>{% trans 'Inscription' %} - {{ TITLE }}</h1>{% endif %}
 {% if update %}<h1>{% trans 'Modification de votre inscription' %} - {{ TITLE }}</h1>{% endif %}
+<script type="text/javascript" src="{% url django.views.i18n.javascript_catalog %}"></script>
 <script src="{{ STATIC_URL }}prototype.js"></script>
 <script>
     var CATEGORIES = [
@@ -74,10 +75,10 @@
         {% endfor %}
     </div>
     <div id="part0" class="parts">
-        {% blocktrans %}Inscrivez votre équipe, votre duo en quelques étapes. Laissez vous guider.{% endblocktrans%}<br />
+        {% blocktrans %}Inscrivez votre équipe, votre duo ou votre solo en quelques étapes. Laissez vous guider.{% endblocktrans%}<br />
         <br />
-        {% blocktrans %}Vous pouvez envoyez vos justificatifs par internet ou par courrier. Vous pouvez payer votre inscription par internet ou par chèque. Une fois votre inscription terminée, vous recevrez un email de confirmation.{% endblocktrans%}<br />
-        {% blocktrans with date=COURSE.date_fermeture %}Mon pouvez modifier votre inscription, ajouter ou enlever des coéquipiers, envoyer les certificats, changer de catégorie jusqu'au {{ date }} inclus.{% endblocktrans%}<br />
+        {% blocktrans %}Vous pouvez envoyer vos justificatifs par internet ou par courrier. Vous pouvez payer votre inscription par internet ou par chèque. Une fois votre inscription terminée, vous recevrez un email de confirmation.{% endblocktrans%}<br />
+        {% blocktrans with date=COURSE.date_fermeture %}Vous pouvez modifier votre inscription, ajouter ou enlever des coéquipiers, envoyer les certificats, changer de catégorie jusqu'au {{ date }} inclus.{% endblocktrans%}<br />
         {% blocktrans %}Si vous rencontrez des problèmes lors de votre inscription, <a href="http://www.6hdeparis.fr/contact/">contactez nous</a>{% endblocktrans%}<br />
 
         <h2>{%trans 'Information générales' %}</h2>
@@ -92,7 +93,7 @@
             <tr style="display: none"><td colspan="2">{% blocktrans %}Si vous le pouvez, scannez le certificat ou la licence et ajoutez le en pièce jointe (formats PDF ou JPEG, <a href="http://www.6hdeparis.fr/wp-content/uploads/2013/03/certificat_medical.pdf" target="_blank">modèle de certificat</a>).{% endblocktrans %}<br />{% trans "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier." %}</td></tr>
         </table><br />
         {% blocktrans with min_age=COURSE.min_age date=COURSE.date %}Chaque équipier doit avoir plus de {{ min_age }} ans au {{ date }}.{% endblocktrans %}<br />
-        {% trans "Chaque équipier doit avoir un certificat médical d'un an ou une licence FFRS en cours de validité pour participer." %}<br />
+        {% trans "Chaque équipier doit avoir un certificat médical de moins d'un an ou une licence FFRS en cours de validité pour participer." %}<br />
     </div>
     {% endfor %}
 

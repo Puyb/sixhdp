@@ -12,7 +12,6 @@ from settings import *
 from threading import Thread
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 import csv, cStringIO
 
 @login_required

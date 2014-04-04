@@ -8,7 +8,7 @@ from django.core.mail import EmailMessage
 import os, re, urllib, simplejson
 from django.db import models
 from settings import *
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
@@ -42,14 +42,15 @@ ROLE_CHOICES = (
 )
 
 CONNU_CHOICES = (
-    (u'Roller en LIgne', _(u'Roller en Ligne')),
+    (u'Site Roller en LIgne.com', _(u'Site Roller en Ligne.com')),
     (u'Facebook', _('Facebook')),
     (u'Presse', _(u'Presse')),
     (u'Bouche à oreille', _(u'Bouche à oreille')),
-    (u'Flyer pendant une course', _(u'Fley pendant une course')),
+    (u'Flyer pendant une course', _(u'Flyer pendant une course')),
     (u'Flyer pendant une randonnée', _(u'Flyer pendant une randonnée')),
     (u'Affiche', _(u'Affiche')),
     (u'Informations de la Mairie de Paris', _(u'Information de la Maire de Paris')),
+    (u'Autre', _(u'Autre')),
 )
 
 TAILLES_CHOICES = (
@@ -213,7 +214,6 @@ class Ville(models.Model):
     nom      = models.CharField(max_length=200)
     region   = models.CharField(max_length=200)
     pays     = models.CharField(max_length=200)
-    response = models.CharField(max_length=65535)
 
 def lookup_ville(nom, cp, pays):
     nom = nom.lower()
@@ -253,8 +253,7 @@ def lookup_ville(nom, cp, pays):
         lng      = data['latLng']['lng'],
         nom      = data['adminArea5'],
         region   = data['adminArea3'],
-        pays     = data['adminArea1'],
-        response = simplejson.dumps(data)
+        pays     = data['adminArea1']
     )
     obj.save()
     return obj
@@ -362,6 +361,10 @@ class Equipe(models.Model):
             numero = res[0].numero + 1
         return numero
 
+    @property
+    def date_annulation(self):
+        return self.date + timedelta(days=31)
+
 class EquipierManager(models.Manager):
     def get_query_set(self):
         return super(EquipierManager, self).get_query_set().extra(select={
@@ -440,21 +443,31 @@ class TemplateMail(models.Model):
     def send(self, instances):
         messages = []
         for instance in instances:
-            context = Context({ "instance": instance, })
+            dests = set()
+            if self.destinataire in ('Organisateur', 'Tous'):
+                dests.add(self.course.email_contact)
+            if self.destinataire in ('Equipe', 'Tous') and isinstance(instance, Equipe):
+                    dests.add(instance.gerant_email)
+            if self.destinataire in ('Equipiers', 'Tous'):
+                if isinstance(instance, Equipier):
+                    dests.add(instance.email)
+                if isinstance(instance, Equipe):
+                    for equipier in instance.equipier_set.all():
+                        dests.add(equipier.email)
+            
+            context = Context({
+                "instance": instance,
+                'PAYPAL_URL': PAYPAL_URL,
+                'ROOT_URL': ROOT_URL,
+            })
             subject = Template(self.sujet).render(context)
             message = Template(self.message).render(context)
 
-            dest = self.course.email_contact
-            if isinstance(instance, Equipe):
-                dest = instance.gerant_email
-            if isinstance(instance, Equipier):
-                dest = instance.email
-            
             bcc = []
             if self.bcc:
                 bcc = re.split('[,; ]+', self.bcc)
-            
-            message = EmailMessage(subject, message, self.course.email_contact, [ dest ], bcc)
-            message.content_subtype = "html"
-            messages.append(message)
+            for dest in dests:
+                message = EmailMessage(subject, message, self.course.email_contact, [ dest ], bcc)
+                message.content_subtype = "html"
+                messages.append(message)
         MailThread(messages).start()
