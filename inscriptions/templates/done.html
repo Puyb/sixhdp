@@ -97,4 +97,47 @@
 {% blocktrans with numero=instance.numero %}En précisant le nom de votre équipe et le numéro d'inscription <b>{{ numero }}</b>.{% endblocktrans %}
 {% endif %}
 
+<div id="fb-root"></div>
+<script>
+    window.fbAsyncInit = function() {
+        FB.init({
+            appId      : '{{ FACEBOOK_APPID }}',
+            status     : true,
+            xfbml      : true
+        });
+    };
+
+    (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/all.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+</script>
+<script> 
+    function postToFeed() {
+        // calling the API ...
+        var obj = {
+            method: 'feed',
+            redirect_uri: '{{ ROOT_URL }}{% url inscriptions.done course_uid=instance.course.uid numero=instance.numero %}',
+            link: '{{ ROOT_URL }}{% url inscriptions.create course_uid=instance.course.uid %}', 
+            picture: 'http://www.6hdeparis.fr/wp-content/uploads/2013/03/logo-6h-paris-small.png',
+            name: 'Inscription aux {{ instance.course.nom }}',
+            caption: {% if instance.nombre == 1 %}
+                '{% blocktrans with nom=instance.nom %}Je suis inscrit en solo sous le nom "{{ nom }}"{% endblocktrans %}',
+            {% else %}{% if instance.nombre == 2 %}
+                '{% blocktrans with nom=instance.nom %}Je suis inscrit en duo sous le nom "{{ nom }}"{% endblocktrans %}',
+            {% else %}
+                '{% blocktrans with nom=instance.nom %}Je suis inscrit avec l\'équipe {{ nom }} avec"{% endblocktrans %}{% for e in instance.equipier_set.all %}{{ e.prenom }}{% if forloop.last %} et {% else %},{% endif %}{% endfor %}.',
+            {% endif %}{% endif %}
+            description: '{% blocktrans %}Les 6h roller de Paris sont une course d\'endurance à roller de 6h en équipe, duo ou solitaire. Le but est d\'enchainer le plus grand nombre de tours en 6h sur un circuit fermé à la circulation dans le bois de boulogne.{% endblocktrans %}'
+        };
+        function callback(response) {
+            document.getElementById('msg').innerHTML = "Blabla";
+        }
+        FB.ui(obj, callback);
+    }
+</script>
+<button onclick="postToFeed()">Partager sur Facebook</button>
 {% endblock %}

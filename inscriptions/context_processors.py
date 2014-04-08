@@ -27,4 +27,5 @@ def settings(request):
     return {
         'PAYPAL_URL':      PAYPAL_URL,
         'ROOT_URL':        ROOT_URL,
+        'FACEBOOK_APPID':  FACEBOOK_APPID,
     }
