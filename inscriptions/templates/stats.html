@@ -1,9 +1,112 @@
+{% extends "base.html" %}
 {% load i18n %}
 
-<ul>
-    {{ queries|length }}
-{% for q in queries %}
-<li><b>{{ q.time }} - {{ q.sql }}</li>
-{% endfor %}
-</ul>
-<pre>{{ json }}</pre>
+{% block content %}
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
+    <![endif]-->
+    <style>
+        .container_16 .grid_11 { width: 940px; }
+        #stats>div { clear: both; }
+        #stats>div>.bluff-wrapper { float: right; }
+        #stats>div>table { float: left; }
+        table, td, th { border: 1px solid grey; }
+        table { margin: 10px; }
+        tr:nth-child(odd) { background: #F2E5FF; }
+        #map {width: 600px; height: 600px; float: right; margin-top: 10px; }
+        #map img { border: none; padding: 0; margin: 0; }
+        hr { clear: both; margin: 30px auto; width: 40%; }
+        .entry-content { overflow: hidden; }
+        #d_canvas_sexe {
+            margin-right:  -120px;
+            margin-left:  -80px;
+            float: left;
+        }
+        #stats>#d_canvas_hommes,
+        #stats>#d_canvas_femmes {
+            clear: none;
+            margin-bottom: 100px;
+            float: left;
+        }
+        #d_canvas_hommes {
+            transform-origin: 50% 50% 0;
+            transform: rotate(270deg);
+            -webkit-transform-origin: 50% 50% 0;
+            -webkit-transform: rotate(270deg);
+            -ms-transform-origin: 50% 50% 0;
+            -ms-transform: rotate(270deg);
+        }
+        #d_canvas_femmes {
+            transform-origin: 50% 50% 0;
+            transform: rotate(270deg) scaleY(-1) translate(0, 100px);
+            -webkit-transform-origin: 50% 50% 0;
+            -webkit-transform: rotate(270deg) scaleY(-1) translate(0, 100px);
+            -ms-transform-origin: 50% 50% 0;
+            -ms-transform: rotate(270deg) scaleY(-1) translate(0, 100px);
+            margin-right: -200px;
+        }
+        #d_canvas_hommes .bluff-text {
+            transform-origin: 50% 50% 0;
+            transform: rotate(90deg);
+            -webkit-transform-origin: 50% 50% 0;
+            -webkit-transform: rotate(90deg);
+            -ms-transform-origin: 50% 50% 0;
+            -ms-transform: rotate(90deg);
+        }
+        #d_canvas_femmes .bluff-text {
+            transform-origin: 50% 50% 0;
+            transform: rotate(270deg) scaleY(-1);
+            -webkit-transform-origin: 50% 50% 0;
+            -webkit-transform: rotate(270deg) scaleY(-1);
+            -ms-transform-origin: 50% 50% 0;
+            -ms-transform: rotate(270deg) scaleY(-1);
+        }
+    </style>
+
+    <div>
+        <h1>Origine des participants</h1>
+        <table>
+            <tr><th colspan="2">Villes</th><th>#</th><th>%</th></tr>
+            {% for key, value in stats.villes.items %}
+            <tr><td>{{ key }}</td><td>{{ value.equipes }}</td><td>{% widthratio value.equipes stats.course.equipes 100 %}%</td></tr>
+            {% endfor %}
+        </table>
+        <div id="map"></div>
+        <canvas id="canvas_pays"></canvas>
+        <table style="float: right;">
+            <tr><th>Origine</th><th>#</th><th>%</th></tr>
+            {% for key, value in stats.pays.items %}
+            <tr><td><img src="/static/flags/{{ value.pays|lower }}.png" alt="{{ value.pays }}" /> {{ key }}</td><td>{{ value.equipes }}</td><td>{% widthratio value.equipes stats.course.equipes 100 %}%</td></tr>
+            {% endfor %}
+        </table>
+    </div>';
+
+    <hr />
+    
+    <div>
+        <h1>Catégories</h1>
+        <table>
+            <tr><th>Code</th><th>Catégorie</th><th>#</th><th>%</th></tr>
+            {% for cat, value in stats.categories.items %}
+            <tr><td>{{ cat }}</td><td>{{ value.name }} </td><td>' + value.equipes }}</td><td>{% widthratio value.equipes stats.course.equipes 100 %} %</td></tr>
+            {% endfor %}
+        </table>
+        <canvas id="canvas_categories"></canvas><
+        <canvas id="canvas_time"></canvas>
+        <canvas id="canvas_time2"></canvas>
+    </div>';
+
+    <hr />
+    <div><canvas id="canvas_clubs"></canvas>
+        <table>
+            <tr><th>Clubs</th><th>#</th><th>%</th></tr>
+            <tr><td>' + k + '</td><td>' + clubs[k] + '</td><td>' + Math.round(clubs[k] / nbequipe * 100) + '%</td></tr>
+        </table>
+    </div>
+
+
+
+    <pre><script>document.write(JSON.stringify({{ json|safe }}, null, '    '));</script></pre>
+
+{% endblock %}

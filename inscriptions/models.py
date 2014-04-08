@@ -128,66 +128,83 @@ class Course(models.Model):
             "ipe": 0,
             "ipv": 0,
         }
+        for categorie in Categorie.objects.all():
+            model_stats[categorie.code] = 0
         result = {
             "categories": {},
             "jours": {},
             "villes": {},
-            "regions": {},
             "pays": {},
             "course": {},
         }
 
         equipes = (Equipe.objects.filter(course=self)
-            .annotate(equipiers_count=Count('equipier'))
-            .select_related('categorie', 'gerant_ville2')
+            .annotate(
+                equipiers_count=Count('equipier'),
+                verifier_count=Count('equipier__verifier'),
+                licence_manquantes_count=Count('equipier__licence_manquante'),
+                certificat_manquants_count=Count('equipier__certificat_manquant'),
+                autorisation_manquantes_count=Count('equipier__autorisation_manquante'),
+                valide_count=Count('equipier__valide'),
+                erreur_count=Count('equipier__erreur'),
+                hommes_count=Count('equipier__homme'),
+            ).select_related('categorie', 'gerant_ville2')
             .prefetch_related('equipier_set')
         )
         for equipe in equipes:
-        #for equipe in Equipe.objects.raw("""
-        #        SELECT inscriptions_equipe.*, count(e1.id) as equipiers_count, count(e2.id) as hommes_count, count(e3.id) as femmes_count
-        #            FROM inscriptions_equipe
-        #            LEFT JOIN inscriptions_equipier e1 ON inscriptions_equipe.id = e1.equipe_id
-        #            LEFT JOIN inscriptions_equipier e2 ON inscriptions_equipe.id = e2.equipe_id AND e2.sexe = 'H'
-        #            LEFT JOIN inscriptions_equipier e3 ON inscriptions_equipe.id = e3.equipe_id AND e3.sexe = 'F'
-        #            WHERE course_id=%s GROUP BY inscriptions_equipe.id""", [ self.id ]).prefetch_selected('equipiers'):
             stats = model_stats.copy()
             keys = {
                 "categories": equipe.categorie_id and equipe.categorie.code or '',
                 "jours": (equipe.date.date() - self.date_ouverture).days,
-                "villes":  equipe.gerant_ville2_id and (equipe.gerant_ville2.pays == 'France' and equipe.gerant_ville2.nom    or equipe.gerant_ville2.pays) or '',
-                "regions": equipe.gerant_ville2_id and (equipe.gerant_ville2.pays == 'France' and equipe.gerant_ville2.region or equipe.gerant_ville2.pays) or '',
-                "pays":    equipe.gerant_ville2_id and equipe.gerant_ville2.pays or '',
+                "villes":  '',
+                "pays":    '',
             }
+            if equipe.gerant_ville2:
+                keys['villes'] = equipe.gerant_ville2.pays
+                keys['pays'] = equipe.gerant_ville2.pays
+                if equipe.gerant_ville2.pays == 'FR':
+                    keys['villes'] = equipe.gerant_ville2.nom
+                    keys['pays'] = equipe.gerant_ville2.region
+
                     
             stats['equipes'] = 1
             stats['equipiers'] = equipe.equipiers_count
-            #stats['hommes'] = equipe.hommes_count
-            #stats['femmes'] = equipe.femmes_count
+            stats['hommes'] = equipe.hommes_count
+            stats['femmes'] = equipe.equipiers_count - equipe.hommes_count
             token = ''
             if not equipe.paiement_complet():
                 token += 'i'
             token += 'p';
-            if equipe.verifier():
+            if equipe.verifier_count > 0:
                 token += 'v'
             else:
-                if equipe.dossier_complet_auto() == True:
-                    token += 'c'
-                elif equipe.dossier_complet_auto() == False:
+                if equipe.erreur_count > 0:
                     token += "e"
-                else:
+                elif equipe.valide_count < equipe.equipiers_count:
                     token += "i"
+                else:
+                    token += 'c'
             stats[token] = 1
 
             stats['paiement'] = float(equipe.paiement or 0)
             stats['prix'] = float(equipe.prix)
-            #stats['nbcertifenattente'] = len(equipe.licence_manquantes()) + len(equipe.certificat_manquantes()) + len(equipe.autorisation_manquantes())
+            stats['nbcertifenattente'] = equipe.licence_manquantes_count + equipe.certificat_manquants_count + equipe.autorisation_manquantes_count
+            stats[equipe.categorie.code] = 1;
 
 
             for key, index in keys.items():
                 if index not in result[key]:
                     result[key][index] = model_stats.copy();
+                    if equipe.gerant_ville2:
+                        if key == 'pays':
+                            result[key][index]['pays'] = equipe.gerant_ville2.pays
+                        if key == 'ville':
+                            result[key][index]['lat'] = equipe.gerant_ville2.lat
+                            result[key][index]['lng'] = equipe.gerant_ville2.lng
+
                 for stat, value in stats.items():
                     result[key][index][stat] += value
+
 
         return result
 
@@ -291,28 +308,26 @@ class Equipe(models.Model):
         return u'%s - %s - %s' % (self.id, self.categorie, self.nom)
 
     def licence_manquantes(self):
-        return [equipier for equipier in self.equipier_set.all() if equipier.justificatif == 'licence' and not equipier.piece_jointe_valide and not equipier.piece_jointe ]
+        return [equipier for equipier in self.equipier_set.all() if equipier.licence_manquante]
 
     def certificat_manquantes(self):
-        return [equipier for equipier in self.equipier_set.all() if equipier.justificatif == 'certificat' and not equipier.piece_jointe_valide and not equipier.piece_jointe ]
+        return [equipier for equipier in self.equipier_set.all() if equipier.certificat_manquant]
 
     def autorisation_manquantes(self):
-        return [equipier for equipier in self.equipier_set.all() if equipier.age() < 18 and not equipier.autorisation_valide and not equipier.autorisation ]
+        return [equipier for equipier in self.equipier_set.all() if equipier.autorisation_manquante]
 
     def verifier(self):
         return len([equipier for equipier in self.equipier_set.all() if equipier.verifer]) > 0
+
     def paiement_complet(self):
         return self.paiement >= self.prix
+    
     def dossier_complet_auto(self):
-        if len([equipier for equipier in self.equipier_set.all()
-                    if (not equipier.piece_jointe_valide) or
-                    (equipier.age() < 18 and not equipier.autorisation_valide)]) == 0:
-            return True
-        if len([equipier for equipier in self.equipier_set.all()
-                    if equipier.piece_jointe_valide == False or
-                    (equipier.age() < 18 and equipier.autorisation_valide == False)]) > 0:
+        if len([equipier for equipier in self.equipier_set.all() if equipier.erreur]) > 0:
             return False
-        return None
+        if len([equipier for equipier in self.equipier_set.all() if not equipier.valide]) > 0:
+            return None
+        return True
 
     def frais_paypal(self):
         return ( self.prix + Decimal('0.25') ) / ( Decimal('1.000') - Decimal('0.034') ) - self.prix
@@ -365,12 +380,6 @@ class Equipe(models.Model):
     def date_annulation(self):
         return self.date + timedelta(days=31)
 
-class EquipierManager(models.Manager):
-    def get_query_set(self):
-        return super(EquipierManager, self).get_query_set().extra(select={
-            "verifier": "((piece_jointe AND piece_jointe_valide IS NULL) OR (autorisation AND autorisation_valide IS NULL))",
-        })
-
 class Equipier(models.Model):
     numero            = models.IntegerField(_(u'Numéro'))
     equipe            = models.ForeignKey(Equipe)
@@ -397,6 +406,13 @@ class Equipier(models.Model):
     code_eoskates     = models.CharField(_(u'Code EOSkates'), max_length=20, blank=True)
     transpondeur      = models.CharField(_(u'Transpondeur'), max_length=20, blank=True)
     taille_tshirt     = models.CharField(_(u'Taille T-shirt'), max_length=3, choices=TAILLES_CHOICES, blank=True)
+    verifier               = models.BooleanField(_(u'Valider'), editable=False)
+    licence_manquante      = models.BooleanField(_(u'Licence manquante'), editable=False)
+    certificat_manquant    = models.BooleanField(_(u'Certificat manquant'), editable=False)
+    autorisation_manquante = models.BooleanField(_(u'Autorisation manquante'), editable=False)
+    valide                 = models.BooleanField(_(u'Valide'), editable=False)
+    erreur                 = models.BooleanField(_(u'Erreur'), editable=False)
+    homme                  = models.BooleanField(_(u'Homme'), editable=False)
     
     def age(self):
         today = self.equipe.course.date
@@ -410,6 +426,15 @@ class Equipier(models.Model):
         return u'%d' % self.numero
 
     def save(self, *args, **kwargs):
+        self.verifier = ((self.piece_jointe and self.piece_jointe_valide == None) or
+                         (self.autorisation and self.autorisation_valide == None))
+        self.licence_manquante = self.justificatif == 'licence' and not self.piece_jointe_valide and not self.piece_jointe
+        self.certificat_manquant = self.justificatif == 'certificat' and not self.piece_jointe_valide and not self.piece_jointe
+        self.autorisation_manquante = self.age() < 18 and not self.autorisation_valide and not self.autorisation
+        self.erreur = self.piece_jointe_valide == False or (self.age() < 18 and self.autorisation_valide == False)
+        self.valide = self.piece_jointe_valide == True and (self.age() >= 18 or self.autorisation_valide == True)
+        self.homme = self.sexe == 'H'
+
         super(Equipier, self).save(*args, **kwargs)
         if not self.ville2:
             self.ville2 = lookup_ville(self.ville, self.code_postal, self.pays)
@@ -420,8 +445,6 @@ class Equipier(models.Model):
 
     def send_mail(self, nom):
         self.course.send_mail(nom, [self])
-
-    objects = EquipierManager()
 
 class UserProfile(models.Model):
     user = models.ForeignKey(User, unique=True)
