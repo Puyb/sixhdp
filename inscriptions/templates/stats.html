@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load stats %}
 
 {% block content %}
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
@@ -63,14 +64,15 @@
             -ms-transform: rotate(270deg) scaleY(-1);
         }
     </style>
-
     <div>
         <h1>Origine des participants</h1>
         <table>
             <tr><th colspan="2">Villes</th><th>#</th><th>%</th></tr>
-            {% for key, value in stats.villes.items %}
-            <tr><td>{{ key }}</td><td>{{ value.equipes }}</td><td>{% widthratio value.equipes stats.course.equipes 100 %}%</td></tr>
+            {% with stats.villes|pertinent_values:"equipes" as villes %}
+            {% for key in villes %}
+            <tr><td>{{ key }}</td><td>{{ stats.villes|get:key|get:"equipes" }}</td><td>{% widthratio stats.villes|get:key|get:"equipes" stats.course.equipes 100 %}%</td></tr>
             {% endfor %}
+            {% endwith %}
         </table>
         <div id="map"></div>
         <canvas id="canvas_pays"></canvas>
@@ -109,4 +111,30 @@
 
     <pre><script>document.write(JSON.stringify({{ json|safe }}, null, '    '));</script></pre>
 
+    <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+    <script src="{{ STATIC_URL }}/js-class.js"></script>
+    <script src="{{ STATIC_URL }}/bluff-src.js"></script>
+
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 13);
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var minlat = 1000, minlng = 1000,
+            maxlng = -1000, maxlat = -1000;
+        {% for ville, value in stats.villes.items %}
+        {% if value.lat and value.lng %}
+        L.marker(
+            [{{ value.lat }}, {{ value.lng }}]
+        ).addTo(map).bindPopup({{ ville }} + ': {{ value.equipes }}');
+        minlat = Math.min(minLat, {{ value.lat }});
+        maxlat = Math.max(maxLat, {{ value.lat }});
+        minlng = Math.min(minLng, {{ value.lng }});
+        maxlng = Math.max(maxLng, {{ value.lng }});
+        {% endif %}{% endfor %}
+        var marginlat = (maxlat - minlat) * .05;
+        var marginlng = (maxlng - minlng) * .05;
+        map.fitBounds([[minlat - marginlat, minlng - marginlng], [maxlat + marginlat, maxlng + marginlng]]);
+    </script>
 {% endblock %}

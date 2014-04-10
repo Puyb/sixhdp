@@ -204,6 +204,8 @@ class Course(models.Model):
 
                 for stat, value in stats.items():
                     result[key][index][stat] += value
+            #for stat, value in stats.items():
+            #    result['course'][stat] += value
 
 
         return result
