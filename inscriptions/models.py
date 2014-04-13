@@ -135,7 +135,7 @@ class Course(models.Model):
             "jours": {},
             "villes": {},
             "pays": {},
-            "course": {},
+            "course": model_stats.copy(),
         }
 
         equipes = (Equipe.objects.filter(course=self)
@@ -198,14 +198,14 @@ class Course(models.Model):
                     if equipe.gerant_ville2:
                         if key == 'pays':
                             result[key][index]['pays'] = equipe.gerant_ville2.pays
-                        if key == 'ville':
-                            result[key][index]['lat'] = equipe.gerant_ville2.lat
-                            result[key][index]['lng'] = equipe.gerant_ville2.lng
+                        if key == 'villes':
+                            result[key][index]['lat'] = float(equipe.gerant_ville2.lat)
+                            result[key][index]['lng'] = float(equipe.gerant_ville2.lng)
 
                 for stat, value in stats.items():
                     result[key][index][stat] += value
-            #for stat, value in stats.items():
-            #    result['course'][stat] += value
+            for stat, value in stats.items():
+                result['course'][stat] += value
 
 
         return result
