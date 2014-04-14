@@ -42,7 +42,7 @@
 {% blocktrans with frais=instance.frais_paypal|floatformat:2 %}Pour tout paiement par internet, {{ frais }} € de frais seront ajoutés.{% endblocktrans %}<br />
 <br />
 {% blocktrans with prix=instance.prix ordre=COURSE.ordre %}Ou envoyer un chèque de {{ prix }} € à l'ordre de "{{ ordre }}".{% endblocktrans %}<br />
-{% blocktrans with date=instance.date_annulation %}Envoyez votre paiement avant le {{ date }}. Si nous n'avons pas reçu votre paiement à cette date, votre inscription sera annulée.{% endblocktrans %}
+{% blocktrans with date=instance.date_annulation.date %}Envoyez votre paiement avant le {{ date }}. Si nous n'avons pas reçu votre paiement à cette date, votre inscription sera annulée.{% endblocktrans %}
 {% else %}
 {% blocktrans with prix=instance.paiement %}Votre paiement de {{ prix }} € à bien été reçu.{% endblocktrans %}
 {% endif %}
@@ -96,48 +96,69 @@
 <br />
 {% blocktrans with numero=instance.numero %}En précisant le nom de votre équipe et le numéro d'inscription <b>{{ numero }}</b>.{% endblocktrans %}
 {% endif %}
+{% endblock %}
 
-<div id="fb-root"></div>
-<script>
-    window.fbAsyncInit = function() {
-        FB.init({
-            appId      : '{{ FACEBOOK_APPID }}',
-            status     : true,
-            xfbml      : true
-        });
-    };
+{% block sidebar %}
+    <div id="recent-posts-2" class="sidebar-wrap clearfix">
+        <h3>{% trans "Partager" %}</h3>
+        {% trans "Partagez votre inscription sur les réseaux sociaux !" %}<br />
+        <br />
 
-    (function(d, s, id){
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {return;}
-        js = d.createElement(s); js.id = id;
-        js.src = "//connect.facebook.net/en_US/all.js";
-        fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-</script>
-<script> 
-    function postToFeed() {
-        // calling the API ...
-        var obj = {
-            method: 'feed',
-            redirect_uri: '{{ ROOT_URL }}{% url inscriptions.done course_uid=instance.course.uid numero=instance.numero %}',
-            link: '{{ ROOT_URL }}{% url inscriptions.create course_uid=instance.course.uid %}', 
-            picture: 'http://www.6hdeparis.fr/wp-content/uploads/2013/03/logo-6h-paris-small.png',
-            name: 'Inscription aux {{ instance.course.nom }}',
-            caption: {% if instance.nombre == 1 %}
-                '{% blocktrans with nom=instance.nom %}Je suis inscrit en solo sous le nom "{{ nom }}"{% endblocktrans %}',
-            {% else %}{% if instance.nombre == 2 %}
-                '{% blocktrans with nom=instance.nom %}Je suis inscrit en duo sous le nom "{{ nom }}"{% endblocktrans %}',
-            {% else %}
-                '{% blocktrans with nom=instance.nom %}Je suis inscrit avec l\'équipe {{ nom }} avec"{% endblocktrans %}{% for e in instance.equipier_set.all %}{{ e.prenom }}{% if forloop.last %} et {% else %},{% endif %}{% endfor %}.',
-            {% endif %}{% endif %}
-            description: '{% blocktrans %}Les 6h roller de Paris sont une course d\'endurance à roller de 6h en équipe, duo ou solitaire. Le but est d\'enchainer le plus grand nombre de tours en 6h sur un circuit fermé à la circulation dans le bois de boulogne.{% endblocktrans %}'
-        };
-        function callback(response) {
-            document.getElementById('msg').innerHTML = "Blabla";
-        }
-        FB.ui(obj, callback);
-    }
-</script>
-<button onclick="postToFeed()">Partager sur Facebook</button>
+        <div id="fb-root"></div>
+        <script id="facebook-jssdk" src="http://connect.facebook.net/en_US/all.js"></script>
+        <script>
+            window.fbAsyncInit = function() {
+                FB.init({
+                    appId      : '{{ FACEBOOK_APPID }}',
+                    status     : true,
+                    xfbml      : true
+                });
+            };
+        </script>
+        <script> 
+            var obj = {
+                method: 'feed',
+                redirect_uri: '{{ ROOT_URL }}{% url inscriptions.done course_uid=instance.course.uid numero=instance.numero %}',
+                link: '{{ ROOT_URL }}{% url inscriptions.create course_uid=instance.course.uid %}', 
+                picture: 'http://www.6hdeparis.fr/wp-content/uploads/2013/03/logo-6h-paris-small.png',
+                name: 'Inscription aux {{ instance.course.nom }}',
+                description: {% if instance.nombre == 1 %}
+                    '{% blocktrans with nom=instance.nom %}"{{ nom }}" est inscrit aux 6h de Paris.{% endblocktrans %}'
+                {% else %}{% if instance.nombre == 2 %}
+                    '{% blocktrans with nom=instance.nom %}Le duo "{{ nom }}" est inscrit aux 6h de Paris.{% endblocktrans %}'
+                {% else %}
+                    '{% blocktrans with nom=instance.nom %}L\'équipe "{{ nom }}" est inscrite aux 6h de Paris.{% endblocktrans %}'
+                {% endif %}{% endif %}
+            };
+            function postToFeed() {
+                // calling the API ...
+                function callback(response) {
+                }
+                FB.ui(obj, callback);
+            }
+        </script>
+        <a onclick="postToFeed()" style=" display: block; width: 100px; padding: 3px 5px; background-color: #EEE;
+                        background-image: linear-gradient(#FFF, #DEDEDE);
+                            border: 1px solid #CCC;
+                                border-radius: 3px;
+                                    color: #333;
+                                        font-weight: bold;
+                                            text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.5);
+                                                cursor: pointer;
+                                                    height: 18px;
+                                                        max-width: 98%;
+                                                        overflow: hidden;">
+            <img src="{{ STATIC_URL }}fb.png" style="width: 22px; height: 22px; margin-bottom: -5px;" />
+            Facebook
+        </a><br />
+
+        <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://inscription.6hdeparis.fr/" data-text="" data-via="6hdeparis" data-size="large" data-hashtags="6hdp">
+            <img src="{{ STATIC_URL }}twitter.png" />
+            Tweet
+        </a>
+        <script>document.getElementsByClassName('twitter-share-button')[0].setAttribute('data-text', obj.description);</script>
+        <script  id="twitter-wjs" src="http://platform.twitter.com/widgets.js"></script>
+    </div>
+</div>
+
 {% endblock %}
