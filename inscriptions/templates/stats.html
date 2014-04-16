@@ -1,21 +1,18 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load l10n %}
 {% load stats %}
 
-{% block content %}
+{% block main %}
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
     <!--[if lte IE 8]>
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
     <![endif]-->
     <style>
-        .container_16 .grid_11 { width: 940px; }
-        #stats>div { clear: both; }
-        #stats>div>.bluff-wrapper { float: right; }
-        #stats>div>table { float: left; }
         table, td, th { border: 1px solid grey; }
         table { margin: 10px; }
         tr:nth-child(odd) { background: #F2E5FF; }
-        #map {width: 600px; height: 600px; float: right; margin-top: 10px; }
+        #map {width: 100%; height: 600px; }
         #map img { border: none; padding: 0; margin: 0; }
         hr { clear: both; margin: 30px auto; width: 40%; }
         .entry-content { overflow: hidden; }
@@ -64,8 +61,10 @@
             -ms-transform: rotate(270deg) scaleY(-1);
         }
     </style>
-    <div>
+    <div class="clearfix grid_16">
         <h1>Origine des participants</h1>
+    </div>
+    <div class="clearfix grid_4">
         <table>
             <tr><th>Villes</th><th>#</th><th>%</th></tr>
             {% with stats.villes|pertinent_values:"equipes" as villes %}
@@ -74,7 +73,9 @@
             {% endfor %}
             {% endwith %}
         </table>
-        <table style="float: right;">
+    </div>
+    <div class="grid_4">
+        <table>
             <tr><th>Origine</th><th>#</th><th>%</th></tr>
             {% with stats.pays|pertinent_values:"equipes" as pays %}
             {% for key in pays %}
@@ -82,37 +83,54 @@
             {% endfor %}
             {% endwith %}
         </table>
+    </div>
+    <div class="grid_8">
         <canvas id="canvas_pays"></canvas>
+    </div>
+    <div class="clearfix grid_16">
         <div id="map"></div>
-    </div>';
-
-    <hr />
-    
-    <div>
-        <h1>Catégories</h1>
-        <table>
-            <tr><th colspan="2">Code</th><th>Catégorie</th><th>#</th><th>%</th></tr>
-            {% for cat, value in stats.categories.items %}
-            <tr><td>{{ cat }}</td><td>{{ value.name }} </td><td>' + value.equipes }}</td><td>{% widthratio value.equipes stats.course.equipes 100 %} %</td></tr>
-            {% endfor %}
-        </table>
-        <canvas id="canvas_categories"></canvas><
-        <canvas id="canvas_time"></canvas>
-        <canvas id="canvas_time2"></canvas>
-    </div>';
-
-    <hr />
-    <div><canvas id="canvas_clubs"></canvas>
-        <table>
-            <tr><th>Clubs</th><th>#</th><th>%</th></tr>
-            <tr><td>' + k + '</td><td>' + clubs[k] + '</td><td>' + Math.round(clubs[k] / nbequipe * 100) + '%</td></tr>
-        </table>
     </div>
 
+    <div class="clearfix grid_16">
+        <hr />
+        <h1>Catégories</h1>
+    </div>
+    <div class="clearfix grid_6">
+        <table>
+            <tr><th>Code</th><th>Catégorie</th><th>#</th><th>%</th></tr>
+            {% for cat, value in stats.categories.items %}
+            <tr><td>{{ cat }}</td><td>{{ value.name }} </td><td>{{ value.equipes }}</td><td>{% widthratio value.equipes stats.course.equipes 100 %} %</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="grid_10">
+        <canvas id="canvas_categories"></canvas><
+    </div>
+    <div class="clearfix grid_16">
+        <canvas id="canvas_time"></canvas>
+        <canvas id="canvas_time2"></canvas>
+    </div>
 
+    {% if stats.clubs %}
+    <div class="clearfix grid_16">
+        <hr />
+        <h1>Clubs</h1>
+    </div>
+    <div class="clearfix grid_6">
+        <table>
+            <tr><th>Clubs</th><th>#</th><th>%</th></tr>
+            {% with stats.clubs|pertinent_values:"equipes" as clubs %}
+            {% for club, value in stats.clubs.items %}
+            <tr><td>{{ club }}</td><td><td>{{ value.equipes }}</td><td>{% widthratio value.equipes stats.course.equipes 100 %} %</td></tr>
+            {% endfor %}
+            {% endwith %}
+        </table>
+    </div>
+    <div class="grid_10">
+        <div><canvas id="canvas_clubs"></canvas>
+    </div>
+    {% endif %}
 
-    <script>stats = {{ json|safe }};</script>
-    <pre><script>document.write(JSON.stringify({{ json|safe }}, null, '    '));</script></pre>
 
     <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
     <script src="{{ STATIC_URL }}/js-class.js"></script>
@@ -126,11 +144,13 @@
         }).addTo(map);
 
         var points = [], point;
+        {% localize off %}
         {% for ville, value in stats.villes.items %}
         {% if value.lat and value.lng %}
         points.push(point=[{{ value.lat }}, {{ value.lng }}]);
         L.marker(point).addTo(map).bindPopup("{{ ville|escapejs }} : {{ value.equipes }}");
         {% endif %}{% endfor %}
+        {% endlocalize %}
         map.fitBounds(points);
     </script>
     <script>
@@ -153,7 +173,68 @@
             g.data('Autres', autre);
         }
         g.draw();
-
-
     </script>
+    <script>
+        var colors = { categories: {} };
+        var d = {};
+        var i = 0;
+        {% for cat in course.categories.all %}
+        d["{{ cat.code }}"] = [0,{% for jour in stats.jours.keys|get_max|get_range %}
+            {% if stats.jours|get:jour %}{{ stats.jours|get:jour|get:cat.code }}{% else %}0{% endif %}{% if not forloop.last %},{% endif %}
+        {% endfor %}];
+        {% endfor %}
+
+
+        var g = new Bluff.StackedArea('canvas_time', 900);
+        g.theme_pastel();
+        g.title = '';
+        g.tooltips = true;
+        g.marker_font_size = 12;
+        g.y_axis_increment = 10;
+        var g2 = new Bluff.StackedBar('canvas_time2', 900);
+        g2.theme_pastel();
+        g2.title = '';
+        g2.tooltips = true;
+        g2.marker_font_size = 12;
+        g2.y_axis_increment = 10;
+        var i = 0;
+        for(var k in d) {
+            var cumul = 0;
+            g.data(k, d[k].map(function(value) { return cumul += value; }));
+            g2.data(k, d[k]);
+            colors.categories[k] = g.colors[i];
+            i++;
+        }
+        g.labels = {};
+        for(var i = 0; i < {{ stats.jours.keys|get_max }}; i += 7) {
+            var d = new Date({{ course.date_ouverture.year }}, {{ course.date_ouverture.month }} - 1, {{ course.date_ouverture.day }} + i)
+            g.labels[i] = d.getDate() + '/' + (d.getMonth() + 1);
+        }
+        g2.labels = g.labels;
+        g.draw();
+        g._d.stroke = 'white';
+        g._d.stroke_width = 1;
+        for(var index in g.labels) {
+            var x = g._graph_left + (g._x_increment * index);
+            g._d.line(x, g._graph_bottom, x, g._graph_top);
+        }
+
+
+        g2.draw();
+        g2._d.stroke = '#ccc';
+        g2._d.stroke_width = 1;
+        for(var index in g2.labels) {
+            var x = g2._graph_left + (g2._x_increment * index);
+            g2._d.line(x, g2._graph_bottom, x, g2._graph_top);
+        }
+        var e = document.getElementById('canvas_time').parentNode;
+        var e2 = document.getElementById('canvas_time2').parentNode;
+        e2.style.display = 'none';
+        e.addEventListener('click', function() { e.style.display = 'none', e2.style.display = 'block'; });
+        e2.addEventListener('click', function() { e2.style.display = 'none', e.style.display = 'block'; });
+    </script>
+
+    <script>stats = {{ json|safe }};</script>
+    <pre><script>document.write(JSON.stringify({{ json|safe }}, null, '    '));</script></pre>
+
 {% endblock %}

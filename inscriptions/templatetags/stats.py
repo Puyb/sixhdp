@@ -29,3 +29,17 @@ def pertinent_values(dictionary, key):
     while dictionary[keys[index]][key] < limit and index > 10:
         index -= 1
     return keys[:index + 1]
+
+
+@register.filter
+def get_range(last):
+    return range(last)
+
+@register.filter
+def get_max(l):
+    return max(l)
+
+@register.filter
+def get_min(l):
+    return min(l)
+
