@@ -90,6 +90,7 @@
 
                 
                 <div id="content" class="clearfix hfeed">
+                    {% block main %}
                     <div id="content-main" class="clearfix grid_11">
                         <div class="entry clearfix">                
                             <div class="entry-content clearfix">
@@ -101,6 +102,7 @@
                     <div id="sidebar" class="sidebar grid_5">
                         {% block sidebar %}{% endblock %}
                     </div>
+                    {% endblock %}
                 </div><!-- #content -->
 
 

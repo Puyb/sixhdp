@@ -225,6 +225,8 @@ def stats(request, course_uid):
     import json
 
     return render_to_response('stats.html', RequestContext(request, {
+        'stats': stats,
+        'course': course,
         'json': json.dumps(stats),
         'queries': connection.queries
     }))
