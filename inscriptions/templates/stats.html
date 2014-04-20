@@ -233,8 +233,4 @@
         e.addEventListener('click', function() { e.style.display = 'none', e2.style.display = 'block'; });
         e2.addEventListener('click', function() { e2.style.display = 'none', e.style.display = 'block'; });
     </script>
-
-    <script>stats = {{ json|safe }};</script>
-    <pre><script>document.write(JSON.stringify({{ json|safe }}, null, '    '));</script></pre>
-
 {% endblock %}
