@@ -1,70 +1,67 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# avsd05 <avsd05@gmail.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# David Avsajanishvili <avsd05@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Georgian (http://www.transifex.net/projects/p/django/language/"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-05-26 08:39+0000\n"
+"Last-Translator: claudep <claude@2xlibre.net>\n"
+"Language-Team: Georgian (http://www.transifex.com/projects/p/django/language/"
 "ka/)\n"
-"Language: ka\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: ka\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr "კონტენტი"
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr "მეტა-მონაცემები"
 
-#: admin.py:42
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "დროშა"
+#: admin.py:55
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
 
-#: admin.py:43
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "არჩეულ კომენტარებზე დროშის დასმა"
 
-#: admin.py:47
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "დამტკიცებულია"
+#: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] ""
 
-#: admin.py:48
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "არჩეული კომენტარების დამტკიცება"
 
-#: admin.py:52
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "წაშლილია"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] ""
 
-#: admin.py:53
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "არჩეული კომენტარების წაშლა"
 
-#: admin.py:65
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] "წარმატებით %(action)s %(count)s კომენტარი"
-
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
 msgstr "%(site_name)s-ის კომენტარები"
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr "ბოლო კომენტარები %(site_name)s-ზე"
@@ -100,56 +97,56 @@ msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr "თუ თვენ შეიყვანთ რამეს ამ ველში, თქვენი კომენტარი სპამად აღიქმება"
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr "კონტენტის ტიპი"
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr "ობიექტის ID"
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr "მომხმარებელი"
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr "მომხმარებლის სახელი"
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr "მომხმარებლის ელ. ფოსტა"
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr "მომხმარებლის URL"
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr "კომენტარი"
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr "გაგზავნის თარიღი და დრო"
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr "IP-მისამართი"
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr "საყოველთაოა"
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "გადანიშნეთ ეს დროშა, რათა კომენტარი რეალურად გაქრეს საიტიდან."
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
 msgstr "წაშლილია"
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -157,11 +154,11 @@ msgstr ""
 "მონიშნეთ ეს დროშა, თუ კომენტარი შეუსაბამოა. მის ნაცვლად გაჩნდება "
 "შეტყობინება: \"კომენტარი წაშლილია\"."
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
 msgstr "კომენტარები"
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
@@ -169,7 +166,7 @@ msgstr ""
 "ეს კომენტარი გამოგზავნილია აუდენტიფიცირებული მომხმარებლის მიერ, და ამიტომ "
 "სახელის შეცვლა შეუძლებელია."
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
@@ -177,7 +174,7 @@ msgstr ""
 "ეს კომენტარი გამოგზავნილია აუდენტიფიცირებული მომხმარებლის მიერ, და ამიტომ "
 "ელ. ფოსტის შეცვლა შეუძლებელია."
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -192,19 +189,19 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
 msgstr "დროშა"
 
-#: models.py:171
+#: models.py:180
 msgid "date"
 msgstr "თარიღი"
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
 msgstr "კომენტარის დროშა"
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
 msgstr "კომენტარის დროშები"
 
@@ -285,8 +282,11 @@ msgstr "კომენტარის წინასწარი ნახვ�
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "გთხოვთ, შეასწოროთ შეცდომა ქვემოთ"
+msgstr "გთხოვთ, შეასწოროთ შეცდომა ქვემოთ"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr ""
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

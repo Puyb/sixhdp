@@ -1,8 +1,11 @@
+from collections import defaultdict
+
 from django.conf import settings
 from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
     token_kwargs, Variable
 from django.template.loader import get_template
 from django.utils.safestring import mark_safe
+from django.utils import six
 
 register = Library()
 
@@ -14,19 +17,16 @@ class ExtendsError(Exception):
 class BlockContext(object):
     def __init__(self):
         # Dictionary of FIFO queues.
-        self.blocks = {}
+        self.blocks = defaultdict(list)
 
     def add_blocks(self, blocks):
-        for name, block in blocks.iteritems():
-            if name in self.blocks:
-                self.blocks[name].insert(0, block)
-            else:
-                self.blocks[name] = [block]
+        for name, block in six.iteritems(blocks):
+            self.blocks[name].insert(0, block)
 
     def pop(self, name):
         try:
             return self.blocks[name].pop()
-        except (IndexError, KeyError):
+        except IndexError:
             return None
 
     def push(self, name, block):
@@ -35,7 +35,7 @@ class BlockContext(object):
     def get_block(self, name):
         try:
             return self.blocks[name][-1]
-        except (IndexError, KeyError):
+        except IndexError:
             return None
 
 class BlockNode(Node):
@@ -130,7 +130,7 @@ class BaseIncludeNode(Node):
 
     def render_template(self, template, context):
         values = dict([(name, var.resolve(context)) for name, var
-                       in self.extra_context.iteritems()])
+                       in six.iteritems(self.extra_context)])
         if self.isolated_context:
             return template.render(context.new(values))
         context.update(values)
@@ -174,6 +174,7 @@ def do_block(parser, token):
     """
     Define a block that can be overridden by child templates.
     """
+    # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     bits = token.contents.split()
     if len(bits) != 2:
         raise TemplateSyntaxError("'%s' tag takes only one argument" % bits[0])
@@ -205,7 +206,7 @@ def do_extends(parser, token):
     uses the literal value "base" as the name of the parent template to extend,
     or ``{% extends variable %}`` uses the value of ``variable`` as either the
     name of the parent template to extend (if it evaluates to a string) or as
-    the parent tempate itelf (if it evaluates to a Template object).
+    the parent template itself (if it evaluates to a Template object).
     """
     bits = token.split_contents()
     if len(bits) != 2:

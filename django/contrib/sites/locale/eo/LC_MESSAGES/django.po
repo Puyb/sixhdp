@@ -1,34 +1,39 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-#   <kristjan.schmidt@googlemail.com>, 2011.
+# Baptiste <baptiste+transifex@darthenay.fr>, 2013
+# kristjan <kristjan.schmidt@googlemail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:43+0100\n"
-"PO-Revision-Date: 2012-02-14 13:49+0000\n"
-"Last-Translator: kristjan <kristjan.schmidt@googlemail.com>\n"
-"Language-Team: Esperanto (http://www.transifex.net/projects/p/django/"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-06-05 06:29+0000\n"
+"Last-Translator: Baptiste <baptiste+transifex@darthenay.fr>\n"
+"Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
 "language/eo/)\n"
-"Language: eo\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: eo\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:37
+#: models.py:25
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "Tiu domajna nomo ne povas enteni nek spacojn nek tabojn."
+
+#: models.py:58
 msgid "domain name"
 msgstr "domajna nomo"
 
-#: models.py:38
+#: models.py:60
 msgid "display name"
 msgstr "vidiga nomo"
 
-#: models.py:43
+#: models.py:65
 msgid "site"
 msgstr "retejo"
 
-#: models.py:44
+#: models.py:66
 msgid "sites"
 msgstr "retejoj"

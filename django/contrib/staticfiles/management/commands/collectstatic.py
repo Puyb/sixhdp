@@ -1,4 +1,4 @@
-from __future__ import with_statement
+from __future__ import unicode_literals
 
 import os
 import sys
@@ -6,8 +6,9 @@ from optparse import make_option
 
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError, NoArgsCommand
-from django.utils.encoding import smart_str, smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.datastructures import SortedDict
+from django.utils.six.moves import input
 
 from django.contrib.staticfiles import finders, storage
 
@@ -59,9 +60,6 @@ class Command(NoArgsCommand):
             self.local = False
         else:
             self.local = True
-        # Use ints for file times (ticket #14665), if supported
-        if hasattr(os, 'stat_float_times'):
-            os.stat_float_times(False)
 
     def set_options(self, **options):
         """
@@ -118,12 +116,18 @@ class Command(NoArgsCommand):
             processor = self.storage.post_process(found_files,
                                                   dry_run=self.dry_run)
             for original_path, processed_path, processed in processor:
+                if isinstance(processed, Exception):
+                    self.stderr.write("Post-processing '%s' failed!" % original_path)
+                    # Add a blank line before the traceback, otherwise it's
+                    # too easy to miss the relevant part of the error message.
+                    self.stderr.write("")
+                    raise processed
                 if processed:
-                    self.log(u"Post-processed '%s' as '%s" %
+                    self.log("Post-processed '%s' as '%s'" %
                              (original_path, processed_path), level=1)
                     self.post_processed_files.append(original_path)
                 else:
-                    self.log(u"Skipped post-processing '%s'" % original_path)
+                    self.log("Skipped post-processing '%s'" % original_path)
 
         return {
             'modified': self.copied_files + self.symlinked_files,
@@ -133,32 +137,38 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, **options):
         self.set_options(**options)
-        # Warn before doing anything more.
-        if (isinstance(self.storage, FileSystemStorage) and
+
+        message = ['\n']
+        if self.dry_run:
+            message.append(
+                'You have activated the --dry-run option so no files will be modified.\n\n'
+            )
+
+        message.append(
+            'You have requested to collect static files at the destination\n'
+            'location as specified in your settings'
+        )
+
+        if (isinstance(self.storage._wrapped, FileSystemStorage) and
                 self.storage.location):
             destination_path = self.storage.location
-            destination_display = ':\n\n    %s' % destination_path
+            message.append(':\n\n    %s\n\n' % destination_path)
         else:
             destination_path = None
-            destination_display = '.'
+            message.append('.\n\n')
 
         if self.clear:
-            clear_display = 'This will DELETE EXISTING FILES!'
+            message.append('This will DELETE EXISTING FILES!\n')
         else:
-            clear_display = 'This will overwrite existing files!'
+            message.append('This will overwrite existing files!\n')
 
-        if self.interactive:
-            confirm = raw_input(u"""
-You have requested to collect static files at the destination
-location as specified in your settings%s
+        message.append(
+            'Are you sure you want to do this?\n\n'
+            "Type 'yes' to continue, or 'no' to cancel: "
+        )
 
-%s
-Are you sure you want to do this?
-
-Type 'yes' to continue, or 'no' to cancel: """
-% (destination_display, clear_display))
-            if confirm != 'yes':
-                raise CommandError("Collecting static files cancelled.")
+        if self.interactive and input(''.join(message)) != 'yes':
+            raise CommandError("Collecting static files cancelled.")
 
         collected = self.collect()
         modified_count = len(collected['modified'])
@@ -170,40 +180,35 @@ Type 'yes' to continue, or 'no' to cancel: """
                         "%(destination)s%(unmodified)s%(post_processed)s.\n")
             summary = template % {
                 'modified_count': modified_count,
-                'identifier': 'static file' + (modified_count != 1 and 's' or ''),
-                'action': self.symlink and 'symlinked' or 'copied',
-                'destination': (destination_path and " to '%s'"
-                                % destination_path or ''),
-                'unmodified': (collected['unmodified'] and ', %s unmodified'
-                               % unmodified_count or ''),
+                'identifier': 'static file' + ('' if modified_count == 1 else 's'),
+                'action': 'symlinked' if self.symlink else 'copied',
+                'destination': (" to '%s'" % destination_path if destination_path else ''),
+                'unmodified': (', %s unmodified' % unmodified_count if collected['unmodified'] else ''),
                 'post_processed': (collected['post_processed'] and
                                    ', %s post-processed'
                                    % post_processed_count or ''),
             }
-            self.stdout.write(smart_str(summary))
+            self.stdout.write(summary)
 
     def log(self, msg, level=2):
         """
         Small log helper
         """
-        msg = smart_str(msg)
-        if not msg.endswith("\n"):
-            msg += "\n"
         if self.verbosity >= level:
             self.stdout.write(msg)
 
     def clear_dir(self, path):
         """
-        Deletes the given relative path using the destinatin storage backend.
+        Deletes the given relative path using the destination storage backend.
         """
         dirs, files = self.storage.listdir(path)
         for f in files:
             fpath = os.path.join(path, f)
             if self.dry_run:
-                self.log(u"Pretending to delete '%s'" %
-                         smart_unicode(fpath), level=1)
+                self.log("Pretending to delete '%s'" %
+                         smart_text(fpath), level=1)
             else:
-                self.log(u"Deleting '%s'" % smart_unicode(fpath), level=1)
+                self.log("Deleting '%s'" % smart_text(fpath), level=1)
                 self.storage.delete(fpath)
         for d in dirs:
             self.clear_dir(os.path.join(path, d))
@@ -233,20 +238,22 @@ Type 'yes' to continue, or 'no' to cancel: """
                     else:
                         full_path = None
                     # Skip the file if the source file is younger
-                    if target_last_modified >= source_last_modified:
+                    # Avoid sub-second precision (see #14665, #19540)
+                    if (target_last_modified.replace(microsecond=0)
+                            >= source_last_modified.replace(microsecond=0)):
                         if not ((self.symlink and full_path
                                  and not os.path.islink(full_path)) or
                                 (not self.symlink and full_path
                                  and os.path.islink(full_path))):
                             if prefixed_path not in self.unmodified_files:
                                 self.unmodified_files.append(prefixed_path)
-                            self.log(u"Skipping '%s' (not modified)" % path)
+                            self.log("Skipping '%s' (not modified)" % path)
                             return False
             # Then delete the existing file if really needed
             if self.dry_run:
-                self.log(u"Pretending to delete '%s'" % path)
+                self.log("Pretending to delete '%s'" % path)
             else:
-                self.log(u"Deleting '%s'" % path)
+                self.log("Deleting '%s'" % path)
                 self.storage.delete(prefixed_path)
         return True
 
@@ -256,7 +263,7 @@ Type 'yes' to continue, or 'no' to cancel: """
         """
         # Skip this file if it was already copied earlier
         if prefixed_path in self.symlinked_files:
-            return self.log(u"Skipping '%s' (already linked earlier)" % path)
+            return self.log("Skipping '%s' (already linked earlier)" % path)
         # Delete the target file if needed or break
         if not self.delete_file(path, prefixed_path, source_storage):
             return
@@ -264,9 +271,9 @@ Type 'yes' to continue, or 'no' to cancel: """
         source_path = source_storage.path(path)
         # Finally link the file
         if self.dry_run:
-            self.log(u"Pretending to link '%s'" % source_path, level=1)
+            self.log("Pretending to link '%s'" % source_path, level=1)
         else:
-            self.log(u"Linking '%s'" % source_path, level=1)
+            self.log("Linking '%s'" % source_path, level=1)
             full_path = self.storage.path(prefixed_path)
             try:
                 os.makedirs(os.path.dirname(full_path))
@@ -282,7 +289,7 @@ Type 'yes' to continue, or 'no' to cancel: """
         """
         # Skip this file if it was already copied earlier
         if prefixed_path in self.copied_files:
-            return self.log(u"Skipping '%s' (already copied earlier)" % path)
+            return self.log("Skipping '%s' (already copied earlier)" % path)
         # Delete the target file if needed or break
         if not self.delete_file(path, prefixed_path, source_storage):
             return
@@ -290,9 +297,9 @@ Type 'yes' to continue, or 'no' to cancel: """
         source_path = source_storage.path(path)
         # Finally start copying
         if self.dry_run:
-            self.log(u"Pretending to copy '%s'" % source_path, level=1)
+            self.log("Pretending to copy '%s'" % source_path, level=1)
         else:
-            self.log(u"Copying '%s'" % source_path, level=1)
+            self.log("Copying '%s'" % source_path, level=1)
             if self.local:
                 full_path = self.storage.path(prefixed_path)
                 try:

@@ -1,22 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# André Hagenbruch <ahagenbruch@googlemail.com>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# André Hagenbruch <ahagenbruch@googlemail.com>, 2012
+# Jannis , 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:38+0100\n"
-"PO-Revision-Date: 2012-02-18 10:56+0000\n"
-"Last-Translator: André Hagenbruch <ahagenbruch@googlemail.com>\n"
-"Language-Team: German (http://www.transifex.net/projects/p/django/language/"
+"POT-Creation-Date: 2013-08-16 15:07+0200\n"
+"PO-Revision-Date: 2013-10-23 08:25+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: German (http://www.transifex.com/projects/p/django/language/"
 "de/)\n"
-"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: de\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: templates/formtools/wizard/wizard_form.html:15
 msgid "first step"
@@ -30,10 +31,6 @@ msgstr "Vorheriger Schritt"
 msgid "submit"
 msgstr "Abschicken"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
-msgstr ""
-"Es tut uns leid, aber das Formular hat seine Gültigkeit verloren. Bitte "
-"füllen Sie es erneut aus."
+#: wizard/views.py:275
+msgid "ManagementForm data is missing or has been tampered."
+msgstr "ManagementForm-Daten fehlen oder wurden manipuliert."

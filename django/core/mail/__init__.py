@@ -1,10 +1,10 @@
 """
 Tools for sending email.
 """
+from __future__ import unicode_literals
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.importlib import import_module
+from django.utils.module_loading import import_by_path
 
 # Imported for backwards compatibility, and for the sake
 # of a cleaner namespace. These symbols used to be in
@@ -26,18 +26,7 @@ def get_connection(backend=None, fail_silently=False, **kwds):
     Both fail_silently and other keyword arguments are used in the
     constructor of the backend.
     """
-    path = backend or settings.EMAIL_BACKEND
-    try:
-        mod_name, klass_name = path.rsplit('.', 1)
-        mod = import_module(mod_name)
-    except ImportError, e:
-        raise ImproperlyConfigured(('Error importing email backend module %s: "%s"'
-                                    % (mod_name, e)))
-    try:
-        klass = getattr(mod, klass_name)
-    except AttributeError:
-        raise ImproperlyConfigured(('Module "%s" does not define a '
-                                    '"%s" class' % (mod_name, klass_name)))
+    klass = import_by_path(backend or settings.EMAIL_BACKEND)
     return klass(fail_silently=fail_silently, **kwds)
 
 
@@ -78,7 +67,8 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=None,
     connection = connection or get_connection(username=auth_user,
                                     password=auth_password,
                                     fail_silently=fail_silently)
-    messages = [EmailMessage(subject, message, sender, recipient)
+    messages = [EmailMessage(subject, message, sender, recipient,
+                             connection=connection)
                 for subject, message, sender, recipient in datatuple]
     return connection.send_messages(messages)
 
@@ -88,7 +78,7 @@ def mail_admins(subject, message, fail_silently=False, connection=None,
     """Sends a message to the admins, as defined by the ADMINS setting."""
     if not settings.ADMINS:
         return
-    mail = EmailMultiAlternatives(u'%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
+    mail = EmailMultiAlternatives('%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
                 message, settings.SERVER_EMAIL, [a[1] for a in settings.ADMINS],
                 connection=connection)
     if html_message:
@@ -101,7 +91,7 @@ def mail_managers(subject, message, fail_silently=False, connection=None,
     """Sends a message to the managers, as defined by the MANAGERS setting."""
     if not settings.MANAGERS:
         return
-    mail = EmailMultiAlternatives(u'%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
+    mail = EmailMultiAlternatives('%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
                 message, settings.SERVER_EMAIL, [a[1] for a in settings.MANAGERS],
                 connection=connection)
     if html_message:

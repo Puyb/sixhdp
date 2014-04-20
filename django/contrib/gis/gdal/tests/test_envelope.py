@@ -1,5 +1,9 @@
-from django.contrib.gis.gdal import Envelope, OGRException
+from django.contrib.gis.gdal import HAS_GDAL
 from django.utils import unittest
+from django.utils.unittest import skipUnless
+
+if HAS_GDAL:
+    from django.contrib.gis.gdal import Envelope, OGRException
 
 
 class TestPoint(object):
@@ -7,11 +11,13 @@ class TestPoint(object):
         self.x = x
         self.y = y
 
+
+@skipUnless(HAS_GDAL, "GDAL is required")
 class EnvelopeTest(unittest.TestCase):
 
     def setUp(self):
         self.e = Envelope(0, 0, 5, 5)
-
+    
     def test01_init(self):
         "Testing Envelope initilization."
         e1 = Envelope((0, 0, 5, 5))
@@ -23,7 +29,7 @@ class EnvelopeTest(unittest.TestCase):
         self.assertRaises(OGRException, Envelope, (0, 0, 5, 5, 3))
         self.assertRaises(OGRException, Envelope, ())
         self.assertRaises(ValueError, Envelope, 0, 'a', 5, 5)
-        self.assertRaises(TypeError, Envelope, u'foo')
+        self.assertRaises(TypeError, Envelope, 'foo')
         self.assertRaises(OGRException, Envelope, (1, 1, 0, 0))
         try:
             Envelope(0, 0, 0, 0)
@@ -85,11 +91,3 @@ class EnvelopeTest(unittest.TestCase):
         self.assertEqual((-1, 0, 5, 5), self.e)
         self.e.expand_to_include(TestPoint(10, 10))
         self.assertEqual((-1, 0, 10, 10), self.e)
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(EnvelopeTest))
-    return s
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())

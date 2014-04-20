@@ -8,13 +8,13 @@ certain test -- e.g. being a DateField or ForeignKey.
 import datetime
 
 from django.db import models
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.encoding import smart_unicode
+from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.utils.encoding import smart_text, force_text
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-
 from django.contrib.admin.util import (get_model_from_relation,
     reverse_field_path, get_limit_choices_to_from_path, prepare_lookup_value)
+from django.contrib.admin.options import IncorrectLookupParameters
 
 class ListFilter(object):
     title = None  # Human-readable title to appear in the right sidebar.
@@ -102,7 +102,7 @@ class SimpleListFilter(ListFilter):
         }
         for lookup, title in self.lookup_choices:
             yield {
-                'selected': self.value() == lookup,
+                'selected': self.value() == force_text(lookup),
                 'query_string': cl.get_query_string({
                     self.parameter_name: lookup,
                 }, []),
@@ -129,7 +129,10 @@ class FieldListFilter(ListFilter):
         return True
 
     def queryset(self, request, queryset):
-        return queryset.filter(**self.used_parameters)
+        try:
+            return queryset.filter(**self.used_parameters)
+        except ValidationError as e:
+            raise IncorrectLookupParameters(e)
 
     @classmethod
     def register(cls, test, list_filter_class, take_priority=False):
@@ -155,7 +158,10 @@ class FieldListFilter(ListFilter):
 class RelatedFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         other_model = get_model_from_relation(field)
-        rel_name = other_model._meta.pk.name
+        if hasattr(field, 'rel'):
+            rel_name = field.rel.get_related_field().name
+        else:
+            rel_name = other_model._meta.pk.name
         self.lookup_kwarg = '%s__%s__exact' % (field_path, rel_name)
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
         self.lookup_val = request.GET.get(self.lookup_kwarg, None)
@@ -192,7 +198,7 @@ class RelatedFieldListFilter(FieldListFilter):
         }
         for pk_val, val in self.lookup_choices:
             yield {
-                'selected': self.lookup_val == smart_unicode(pk_val),
+                'selected': self.lookup_val == smart_text(pk_val),
                 'query_string': cl.get_query_string({
                     self.lookup_kwarg: pk_val,
                 }, [self.lookup_kwarg_isnull]),
@@ -210,7 +216,7 @@ class RelatedFieldListFilter(FieldListFilter):
             }
 
 FieldListFilter.register(lambda f: (
-        hasattr(f, 'rel') and bool(f.rel) or
+        bool(f.rel) if hasattr(f, 'rel') else
         isinstance(f, models.related.RelatedObject)), RelatedFieldListFilter)
 
 
@@ -269,7 +275,7 @@ class ChoicesFieldListFilter(FieldListFilter):
         }
         for lookup, title in self.field.flatchoices:
             yield {
-                'selected': smart_unicode(lookup) == self.lookup_val,
+                'selected': smart_text(lookup) == self.lookup_val,
                 'query_string': cl.get_query_string({
                                     self.lookup_kwarg: lookup}),
                 'display': title,
@@ -287,19 +293,20 @@ class DateFieldListFilter(FieldListFilter):
         now = timezone.now()
         # When time zone support is enabled, convert "now" to the user's time
         # zone so Django's definition of "Today" matches what the user expects.
-        if now.tzinfo is not None:
-            current_tz = timezone.get_current_timezone()
-            now = now.astimezone(current_tz)
-            if hasattr(current_tz, 'normalize'):
-                # available for pytz time zones
-                now = current_tz.normalize(now)
+        if timezone.is_aware(now):
+            now = timezone.localtime(now)
 
         if isinstance(field, models.DateTimeField):
             today = now.replace(hour=0, minute=0, second=0, microsecond=0)
         else:       # field is a models.DateField
             today = now.date()
         tomorrow = today + datetime.timedelta(days=1)
-    
+        if today.month == 12:
+            next_month = today.replace(year=today.year + 1, month=1, day=1)
+        else:
+            next_month = today.replace(month=today.month + 1, day=1)
+        next_year = today.replace(year=today.year + 1, month=1, day=1)
+
         self.lookup_kwarg_since = '%s__gte' % field_path
         self.lookup_kwarg_until = '%s__lt' % field_path
         self.links = (
@@ -314,11 +321,11 @@ class DateFieldListFilter(FieldListFilter):
             }),
             (_('This month'), {
                 self.lookup_kwarg_since: str(today.replace(day=1)),
-                self.lookup_kwarg_until: str(tomorrow),
+                self.lookup_kwarg_until: str(next_month),
             }),
             (_('This year'), {
                 self.lookup_kwarg_since: str(today.replace(month=1, day=1)),
-                self.lookup_kwarg_until: str(tomorrow),
+                self.lookup_kwarg_until: str(next_year),
             }),
         )
         super(DateFieldListFilter, self).__init__(
@@ -382,7 +389,7 @@ class AllValuesFieldListFilter(FieldListFilter):
             if val is None:
                 include_none = True
                 continue
-            val = smart_unicode(val)
+            val = smart_text(val)
             yield {
                 'selected': self.lookup_val == val,
                 'query_string': cl.get_query_string({

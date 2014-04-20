@@ -1,35 +1,38 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Tran  <hongdiepkien@gmail.com>, 2011.
-# Tran Van <vantxm@yahoo.co.uk>, 2011.
+# Lê Thanh <lethanhx2k@gmail.com>, 2013
+# Tran <hongdiepkien@gmail.com>, 2011
+# Tran Van <vantxm@yahoo.co.uk>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:40+0100\n"
-"PO-Revision-Date: 2012-03-08 12:32+0000\n"
-"Last-Translator: Tran Van <vantxm@yahoo.co.uk>\n"
-"Language-Team: Vietnamese (http://www.transifex.net/projects/p/django/"
+"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"PO-Revision-Date: 2013-05-11 02:24+0000\n"
+"Last-Translator: Lê Thanh <lethanhx2k@gmail.com>\n"
+"Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
 "language/vi/)\n"
-"Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Language: vi\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
-#: views.py:7
+#: views.py:9
 msgid "No feeds are registered."
-msgstr ""
+msgstr "Không có feed nào được đăng kí"
 
-#: views.py:17
+#: views.py:19
 #, python-format
 msgid "Slug %r isn't registered."
-msgstr ""
+msgstr "Slug %r không được đăng kí"
 
-#: db/models/fields.py:50
+#: db/models/fields.py:51
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"Trường GIS cơ bản -- ánh xạ đến kiểu đặc tả hình học của OpenGIS ( OpenGIS "
+"Specification Geometry)"
 
 #: db/models/fields.py:270
 msgid "Point"
@@ -37,7 +40,7 @@ msgstr "Điểm"
 
 #: db/models/fields.py:274
 msgid "Line string"
-msgstr ""
+msgstr "Đường"
 
 #: db/models/fields.py:278
 msgid "Polygon"
@@ -49,45 +52,45 @@ msgstr "Đa điểm"
 
 #: db/models/fields.py:286
 msgid "Multi-line string"
-msgstr ""
+msgstr "Multi-line string"
 
 #: db/models/fields.py:290
 msgid "Multi polygon"
-msgstr "Nhiều đa giác"
+msgstr "Multi polygon"
 
 #: db/models/fields.py:294
 msgid "Geometry collection"
-msgstr ""
+msgstr "Kiểu hình học"
 
-#: forms/fields.py:17
+#: forms/fields.py:23
 msgid "No geometry value provided."
-msgstr ""
+msgstr "Không có giá trị geometry"
 
-#: forms/fields.py:18
+#: forms/fields.py:24
 msgid "Invalid geometry value."
-msgstr "Giá trị của hình dạng không phù h"
+msgstr "Giá trị geometry không hợp lệ"
 
-#: forms/fields.py:19
+#: forms/fields.py:25
 msgid "Invalid geometry type."
-msgstr "Kiểu hình dạng không phù hợp"
+msgstr "Kiểu geometry không hợp lệ"
 
-#: forms/fields.py:20
+#: forms/fields.py:26
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
-msgstr ""
+msgstr "Có lỗi khi chuyển đổi hình học từ SRID của trường geometry"
 
-#: sitemaps/views.py:44
+#: sitemaps/views.py:46
 #, python-format
 msgid "No sitemap available for section: %r"
-msgstr ""
-
-#: sitemaps/views.py:58
-#, python-format
-msgid "Page %s empty"
-msgstr ""
+msgstr "Không có sitemap cho mục: %r"
 
 #: sitemaps/views.py:60
 #, python-format
+msgid "Page %s empty"
+msgstr "Trang %s trống"
+
+#: sitemaps/views.py:62
+#, python-format
 msgid "No page '%s'"
-msgstr ""
+msgstr "Không có trang '%s'"

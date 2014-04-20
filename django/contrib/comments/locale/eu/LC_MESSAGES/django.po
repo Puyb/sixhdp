@@ -1,74 +1,71 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aitzol Naberan <anaberan@codesyntax.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Aitzol Naberan <anaberan@codesyntax.com>, 2011
+# Ander Martínez <ander.basaundi@gmail.com>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django-core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:37+0100\n"
-"PO-Revision-Date: 2012-02-14 13:24+0000\n"
-"Last-Translator: Aitzol Naberan <anaberan@codesyntax.com>\n"
-"Language-Team: Basque (http://www.transifex.net/projects/p/django/language/"
+"POT-Creation-Date: 2013-05-25 14:19+0200\n"
+"PO-Revision-Date: 2013-06-10 21:56+0000\n"
+"Last-Translator: Ander Martínez <ander.basaundi@gmail.com>\n"
+"Language-Team: Basque (http://www.transifex.com/projects/p/django/language/"
 "eu/)\n"
-"Language: eu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: eu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin.py:12
+#: admin.py:25
 msgid "Content"
 msgstr "Edukia"
 
-#: admin.py:15
+#: admin.py:28
 msgid "Metadata"
 msgstr "Metada"
 
-#: admin.py:42
-msgid "flagged"
-msgid_plural "flagged"
-msgstr[0] "markaduna"
-msgstr[1] "markadunak"
+#: admin.py:55
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "iruzkin %d ondo markatu da"
+msgstr[1] "%d iruzkin ondo markatu dira"
 
-#: admin.py:43
+#: admin.py:57
 msgid "Flag selected comments"
 msgstr "Markatu aukeratutako iruzkinak"
 
-#: admin.py:47
-msgid "approved"
-msgid_plural "approved"
-msgstr[0] "onartua"
-msgstr[1] "onartuak"
+#: admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "iruzkin %d ondo onartu da"
+msgstr[1] "%d iruzkin ondo onartu dira"
 
-#: admin.py:48
+#: admin.py:63
 msgid "Approve selected comments"
 msgstr "Onartu aukeratutako iruzkinak"
 
-#: admin.py:52
-msgid "removed"
-msgid_plural "removed"
-msgstr[0] "ezabatua"
-msgstr[1] "ezabatuak"
+#: admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "iruzkin %d ondo ezabatu da"
+msgstr[1] "%d iruzkin ondo ezabatu dira"
 
-#: admin.py:53
+#: admin.py:69
 msgid "Remove selected comments"
 msgstr "Ezabatu aukeratutako iruzkinak"
 
-#: admin.py:65
-#, python-format
-msgid "1 comment was successfully %(action)s."
-msgid_plural "%(count)s comments were successfully %(action)s."
-msgstr[0] ""
-msgstr[1] "%(count)s iruzkin ondo %(action)s dira."
-
-#: feeds.py:13
+#: feeds.py:14
 #, python-format
 msgid "%(site_name)s comments"
 msgstr "%(site_name)s guneko iruzkinak"
 
-#: feeds.py:23
+#: feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
 msgstr "%(site_name)s guneko azken iruzkinak"
@@ -106,56 +103,56 @@ msgid ""
 msgstr ""
 "Eremu honetan zerbait idazten baduzu zure iruzkina spam gisa tratatuko da."
 
-#: models.py:22
+#: models.py:23
 msgid "content type"
 msgstr "eduki mota"
 
-#: models.py:24
+#: models.py:25
 msgid "object ID"
 msgstr "objetuaren ID"
 
-#: models.py:50 models.py:168
+#: models.py:53 models.py:177
 msgid "user"
 msgstr "Erabiltzailea"
 
-#: models.py:52
+#: models.py:55
 msgid "user's name"
 msgstr "erabiltzailearen izena"
 
-#: models.py:53
+#: models.py:56
 msgid "user's email address"
 msgstr "erabiltzailearen eposta helbidea"
 
-#: models.py:54
+#: models.py:57
 msgid "user's URL"
 msgstr "erabiltzailearen URL"
 
-#: models.py:56 models.py:76 models.py:169
+#: models.py:59 models.py:79 models.py:178
 msgid "comment"
 msgstr "iruzkina"
 
-#: models.py:59
+#: models.py:62
 msgid "date/time submitted"
 msgstr "data/hordua bidalia"
 
-#: models.py:60
+#: models.py:63
 msgid "IP address"
 msgstr "IP helbidea"
 
-#: models.py:61
+#: models.py:64
 msgid "is public"
 msgstr "publikoa"
 
-#: models.py:62
+#: models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
 msgstr "Markatu kutxa hau iruzkina webgunetik desagertarazteko."
 
-#: models.py:64
+#: models.py:67
 msgid "is removed"
 msgstr "ezabatua"
 
-#: models.py:65
+#: models.py:68
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
@@ -163,11 +160,11 @@ msgstr ""
 "Markatu kutxa hau komentario ezegokia bada. \"Komentario hau ezabatua izan da"
 "\" mezua erakutsiko da bere ordez."
 
-#: models.py:77
+#: models.py:80
 msgid "comments"
 msgstr "iruzkinak"
 
-#: models.py:119
+#: models.py:124
 msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
@@ -175,7 +172,7 @@ msgstr ""
 "Iruzkin hau autentikatutako erabiltzaile batek egin du. Hori dela eta, izena "
 "irakurtzeko moduan dago bakarrik. "
 
-#: models.py:128
+#: models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
@@ -183,7 +180,7 @@ msgstr ""
 "Iruzkin hau autentikatutako erabiltzaile batek egin du. Hori dela eta, "
 "eposta irakurtzeko moduan dago bakarrik. "
 
-#: models.py:153
+#: models.py:160
 #, python-format
 msgid ""
 "Posted by %(user)s at %(date)s\n"
@@ -198,19 +195,19 @@ msgstr ""
 "\n"
 "http://%(domain)s%(url)s"
 
-#: models.py:170
+#: models.py:179
 msgid "flag"
 msgstr "marka"
 
-#: models.py:171
+#: models.py:180
 msgid "date"
 msgstr "data"
 
-#: models.py:181
+#: models.py:190
 msgid "comment flag"
 msgstr "iruzkin marka"
 
-#: models.py:182
+#: models.py:191
 msgid "comment flags"
 msgstr "iruzkin markak"
 
@@ -292,9 +289,11 @@ msgstr "Aurreikusi zure iruzkina"
 
 #: templates/comments/preview.html:11
 msgid "Please correct the error below"
-msgid_plural "Please correct the errors below"
-msgstr[0] "Mesedez zuzendu azpiko errorea"
-msgstr[1] "Mesedez zuzendu azpiko erroreak"
+msgstr "Mesedez zuzendu azpiko erroreak"
+
+#: templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Mesedez zuzendu azpiko erroreak"
 
 #: templates/comments/preview.html:16
 msgid "Post your comment"

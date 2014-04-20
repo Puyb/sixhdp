@@ -1,8 +1,10 @@
 from datetime import datetime
 from django.conf.urls import patterns, url
 from django.contrib.sitemaps import Sitemap, GenericSitemap, FlatPageSitemap, views
-from django.contrib.auth.models import User
 from django.views.decorators.cache import cache_page
+
+from django.contrib.sitemaps.tests.base import TestModel
+
 
 class SimpleSitemap(Sitemap):
     changefreq = "never"
@@ -18,7 +20,7 @@ simple_sitemaps = {
 }
 
 generic_sitemaps = {
-    'generic': GenericSitemap({'queryset': User.objects.all()}),
+    'generic': GenericSitemap({'queryset': TestModel.objects.all()}),
 }
 
 flatpage_sitemaps = {

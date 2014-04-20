@@ -1,10 +1,14 @@
-from django.db.backends import BaseDatabaseIntrospection
+from __future__ import unicode_literals
+
+from django.db.backends import BaseDatabaseIntrospection, FieldInfo
+from django.utils.encoding import force_text
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     # Maps type codes to Django Field types.
     data_types_reverse = {
         16: 'BooleanField',
+        17: 'BinaryField',
         20: 'BigIntegerField',
         21: 'SmallIntegerField',
         23: 'IntegerField',
@@ -21,7 +25,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         1266: 'TimeField',
         1700: 'DecimalField',
     }
-        
+
+    ignored_tables = []
+
     def get_table_list(self, cursor):
         "Returns a list of table names in the current database."
         cursor.execute("""
@@ -31,7 +37,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE c.relkind IN ('r', 'v', '')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)""")
-        return [row[0] for row in cursor.fetchall()]
+        return [row[0] for row in cursor.fetchall() if row[0] not in self.ignored_tables]
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
@@ -43,8 +49,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE table_name = %s""", [table_name])
         null_map = dict(cursor.fetchall())
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [tuple([item for item in line[:6]] + [null_map[line[0]]==u'YES'])
-            for line in cursor.description]
+        return [FieldInfo(*((force_text(line[0]),) + line[1:6] + (null_map[force_text(line[0])]=='YES',)))
+                for line in cursor.description]
 
     def get_relations(self, cursor, table_name):
         """
@@ -64,13 +70,24 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             relations[row[0][0] - 1] = (row[1][0] - 1, row[2])
         return relations
 
+    def get_key_columns(self, cursor, table_name):
+        key_columns = []
+        cursor.execute("""
+            SELECT kcu.column_name, ccu.table_name AS referenced_table, ccu.column_name AS referenced_column
+            FROM information_schema.constraint_column_usage ccu
+            LEFT JOIN information_schema.key_column_usage kcu
+                ON ccu.constraint_catalog = kcu.constraint_catalog
+                    AND ccu.constraint_schema = kcu.constraint_schema
+                    AND ccu.constraint_name = kcu.constraint_name
+            LEFT JOIN information_schema.table_constraints tc
+                ON ccu.constraint_catalog = tc.constraint_catalog
+                    AND ccu.constraint_schema = tc.constraint_schema
+                    AND ccu.constraint_name = tc.constraint_name
+            WHERE kcu.table_name = %s AND tc.constraint_type = 'FOREIGN KEY'""" , [table_name])
+        key_columns.extend(cursor.fetchall())
+        return key_columns
+
     def get_indexes(self, cursor, table_name):
-        """
-        Returns a dictionary of fieldname -> infodict for the given table,
-        where each infodict is in the format:
-            {'primary_key': boolean representing whether it's the primary key,
-             'unique': boolean representing whether it's a unique index}
-        """
         # This query retrieves each index on the given table, including the
         # first associated field name
         cursor.execute("""
