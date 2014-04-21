@@ -206,6 +206,7 @@ class EquipeAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super(EquipeAdmin, self).get_urls()
         my_urls = patterns('',
+            (r'^version/$', self.version),
             (r'^send/$', self.send_mails),
             (r'^send/preview/$', self.preview_mail),
             (r'^(?P<id>\d+)/send/(?P<template>.*)/$', self.send_mail),
@@ -225,8 +226,13 @@ class EquipeAdmin(admin.ModelAdmin):
 
 
         mail = get_object_or_404(TemplateMail, id=template)
-        sujet = Template(mail.sujet).render(Context({ "course": instance.course, "instance": instance, }))
-        message = Template(mail.message).render(Context({ "course": instance.course, "instance": instance, }))
+        sujet = ''
+        message = ''
+        try:
+            sujet = Template(mail.sujet).render(Context({ "course": instance.course, "instance": instance, }))
+            message = Template(mail.message).render(Context({ "course": instance.course, "instance": instance, }))
+        except Exception, e:
+            message = '<p style="color: red">Error in template: %s</p>' % str(e)
 
         return render_to_response('admin/equipe/send_mail.html', RequestContext(request, {
             'message': message,
@@ -239,14 +245,23 @@ class EquipeAdmin(admin.ModelAdmin):
         instance = get_object_or_404(Equipe, id=request.GET['id'])
 
         mail = get_object_or_404(TemplateMail, id=request.GET['template'])
-        sujet = Template(mail.sujet).render(Context({ "course": instance.course, "instance": instance, }))
-        message = Template(mail.message).render(Context({ "course": instance.course, "instance": instance, }))
+        sujet = ''
+        message = ''
+        try:
+            sujet = Template(mail.sujet).render(Context({ "course": instance.course, "instance": instance, }))
+            message = Template(mail.message).render(Context({ "course": instance.course, "instance": instance, }))
+        except Exception, e:
+            message = '<p style="color: red">Error in template: %s</p>' % str(e)
 
         return HttpResponse(simplejson.dumps({
             'mail': instance.gerant_email,
             'subject': sujet,
             'message': message,
         }))
+
+    def version(self, request):
+        import django
+        return HttpResponse(django.__file__ + ' ' + simplejson.dumps(list(django.VERSION)))
 
     def send_mails(self, request, queryset=None):
         course = get_object_or_404(Course, uid=request.COOKIES['course_uid'])

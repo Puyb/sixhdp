@@ -15,7 +15,7 @@ framework.
 """
 import os, sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sixhdp.settings")
 
