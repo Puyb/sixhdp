@@ -44,14 +44,12 @@ EquipierFormset.model = Equipier
 
 @open_closed
 def form(request, course_uid, numero=None, code=None):
-    course = get_object_or_404(Course, uid=request.path.split('/')[1])
+    course = get_object_or_404(Course, uid=course_uid)
     instance = None
     old_password = None
     equipiers_count = Equipier.objects.filter(equipe__course=course).count()
     if numero:
-        instance = get_object_or_404(Equipe, numero=numero)
-        if instance.course != course:
-            raise Http404()
+        instance = get_object_or_404(Equipe, course=course, numero=numero)
         old_password = instance.password
         #if 'password' not in request.session or instance.password != request.session['password']:
         #    return render_to_response('login.html', RequestContext(request, {
@@ -106,8 +104,6 @@ def form(request, course_uid, numero=None, code=None):
         else:
             equipier_formset = EquipierFormset(queryset=Equipier.objects.none())
     date_prix2 = timezone.make_aware(datetime(2013, 6, 17), timezone.get_default_timezone())
-    if instance:
-        return done(request, course_uid, instance.numero)
 
     nombres_par_tranche = {}
     for categorie in Categorie.objects.filter(course=course):

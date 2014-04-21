@@ -2,11 +2,16 @@
 from inscriptions.models import *
 from django.contrib import admin
 from django.core.mail import EmailMessage
+from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import Template, Context
 from django.template import RequestContext
 from django.conf.urls import patterns
 from django.contrib import messages
+from django.db.models import Sum, F, Q
+from django.utils.translation import ugettext_lazy as _
+from django.contrib.admin import SimpleListFilter
+import simplejson
 
 
 class CourseAdminSite(admin.sites.AdminSite):
@@ -25,6 +30,8 @@ class CourseAdminSite(admin.sites.AdminSite):
             return True
         course_uid = request.COOKIES['course_uid']
         return request.user.profile.course.filter(uid=course_uid)
+
+    index_template = 'admin/dashboard.html'
 
 
 site = CourseAdminSite(name='course')
@@ -87,41 +94,93 @@ class EquipierInline(admin.StackedInline):
         (None, { 'classes': ('wide', ), 'fields': (('date_de_naissance', 'age', ), ('autorisation_valide', 'autorisation'), ('justificatif', 'num_licence', ), ('piece_jointe_valide', 'piece_jointe'), ('piece_jointe2_valide', 'piece_jointe2')) }),
     )
 
+class StatusFilter(SimpleListFilter):
+    title = _('Statut')
+    parameter_name = 'status'
+    def lookups(self, request, model_admin):
+        return (
+            ('verifier', _(u'À vérifier')),
+            ('complet', _(u'Complet')),
+            ('incomplet', _(u'Incomplet')),
+            ('erreur', _(u'Erreur')),
+        )
+    def queryset(self, request, queryset):
+        if self.value() == 'verifier':
+            return queryset.filter(verifier_count__gt=0)
+        if self.value() == 'erreur':
+            return queryset.filter(erreur_count__gt=0)
+        if self.value() == 'complet':
+            return queryset.filter(erreur_count=0).filter(valide_count=F('nombre'))
+        if self.value() == 'incomplet':
+            return (queryset
+                .exclude(verifier_count__gt=0)
+                .exclude(valide_count__gt=0)
+                .exclude(erreur_count__gt=0))
+        return queryset
+
+class PaiementCompletFilter(SimpleListFilter):
+    title = _('Paiement complet')
+    parameter_name = 'paiement_complet'
+    def lookups(self, request, model_admin):
+        return (
+            ('paye', _(u'Payé')),
+            ('impaye', _(u'Impayé')),
+        )
+    def queryset(self, request, queryset):
+        if self.value() == 'paye':
+            return queryset.filter(paiement__gte=F('prix'))
+        if self.value() == 'impaye':
+            return queryset.filter(Q(paiement__isnull=True) | Q(paiement__lt=F('prix')))
+        return queryset
+
+class CategorieFilter(SimpleListFilter):
+    title = _(u'Catégories')
+    parameter_name = 'categorie'
+    def lookups(self, request, model_admin):
+        return [
+            (c.code, u'%s - %s' % (c.code, c.nom))
+            for c in Categorie.objects.filter(course__uid=request.COOKIES['course_uid']).order_by('max_equipiers', 'code')
+        ]
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(categorie__code=self.value())
+        return queryset
+
 class EquipeAdmin(admin.ModelAdmin):
     def queryset(self, request):
         qs = super(EquipeAdmin, self).queryset(request)
         course_uid = request.COOKIES['course_uid']
         qs = qs.filter(course__uid=course_uid)
+        qs = qs.annotate(
+            verifier_count= Sum('equipier__verifier'),
+            valide_count  = Sum('equipier__valide'),
+            erreur_count  = Sum('equipier__erreur'),
+        )
         return qs
     class Media:
         css = {"all": ("admin.css",)}
         js = ('custom_admin/equipe.js', )
-    readonly_fields = [ 'id', 'nom', 'club', 'gerant_nom', 'gerant_prenom', 'gerant_adresse1', 'gerant_adress2', 'gerant_ville', 'gerant_code_postal', 'gerant_pays', 'gerant_email', 'gerant_telephone', 'categorie', 'nombre', 'prix', 'date', 'password']
-    list_display = ['numero', 'categorie', 'nom', 'club', 'gerant_email', 'date', 'nombre2', 'paiement_complet2', 'documents_manquants2', 'verifier2', 'dossier_complet_auto2']
+    readonly_fields = [ 'numero', 'nom', 'club', 'gerant_nom', 'gerant_prenom', 'gerant_adresse1', 'gerant_adress2', 'gerant_ville', 'gerant_code_postal', 'gerant_pays', 'gerant_email', 'gerant_telephone', 'categorie', 'nombre', 'prix', 'date', 'password']
+    list_display = ['numero', 'categorie', 'nom', 'club', 'gerant_email', 'date', 'nombre2', 'paiement_complet2', 'documents_manquants2', 'dossier_complet_auto2']
     list_display_links = ['numero', 'categorie', 'nom', 'club', ]
-    list_filter = ['categorie', 'dossier_complet', 'nombre', 'date']
+    list_filter = [PaiementCompletFilter, StatusFilter, CategorieFilter, 'nombre', 'date']
     ordering = ['-date', ]
     inlines = [ EquipierInline ]
 
     fieldsets = (
         ("Instructions", { 'description': HELP_TEXT, 'classes': ('collapse', 'collapsed'), 'fields': () }),
-        (None, { 'fields': (('id', 'nom', 'club'), ('categorie', 'nombre'), ('paiement', 'prix', 'paiement_info'), 'commentaires')}),
+        (None, { 'fields': (('numero', 'nom', 'club'), ('categorie', 'nombre'), ('paiement', 'prix', 'paiement_info'), 'commentaires')}),
         (u'Gérant', { 'classes': ('collapse', 'collapsed'), 'fields': (('gerant_nom', 'gerant_prenom'), 'gerant_adresse1', 'gerant_adress2', ('gerant_ville', 'gerant_code_postal'), 'gerant_pays', 'gerant_email', 'gerant_telephone', 'password') }),
         ("Autre", { 'description': '<div id="autre"></div>', 'classes': ('collapse', 'collapsed'), 'fields': () }),
 
     )
-    actions = []
+    actions = ['send_mails']
     search_fields = ('id', 'nom', 'club', 'gerant_nom', 'gerant_prenom', 'equipier__nom', 'equipier__prenom')
     list_per_page = 500
 
     def documents_manquants2(self, obj):
         return (len(obj.licence_manquantes()) + len(obj.certificat_manquantes()) + len(obj.autorisation_manquantes())) or ''
     documents_manquants2.short_description = u'✉'
-
-    def verifier2(self, obj):
-        return obj.verifier() and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u''
-    verifier2.allow_tags = True
-    verifier2.short_description = 'V'
 
     def paiement_complet2(self, obj):
         return obj.paiement_complet() and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
@@ -132,12 +191,9 @@ class EquipeAdmin(admin.ModelAdmin):
         return obj.nombre
     nombre2.short_description = u'☺'
 
-    def dossier_complet2(self, obj):
-        return obj.dossier_complet and u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""" or u"""<img alt="None" src="/static/admin/img/icon-no.gif">"""
-    dossier_complet2.allow_tags = True
-    dossier_complet2.short_description = mark_safe(u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""")
-
     def dossier_complet_auto2(self, obj):
+        if obj.verifier():
+            return u"""<img alt="None" src="/static/admin/img/icon-unknown.gif">"""
         auto = obj.dossier_complet_auto()
         if auto:
             return u"""<img alt="None" src="/static/admin/img/icon-yes.gif">"""
@@ -150,6 +206,8 @@ class EquipeAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super(EquipeAdmin, self).get_urls()
         my_urls = patterns('',
+            (r'^send/$', self.send_mails),
+            (r'^send/preview/$', self.preview_mail),
             (r'^(?P<id>\d+)/send/(?P<template>.*)/$', self.send_mail),
             (r'^(?P<id>\d+)/autre/$', self.autre),
         )
@@ -176,6 +234,35 @@ class EquipeAdmin(admin.ModelAdmin):
             'mail': instance.gerant_email,
             'subject': sujet,
         }))
+
+    def preview_mail(self, request):
+        instance = get_object_or_404(Equipe, id=request.GET['id'])
+
+        mail = get_object_or_404(TemplateMail, id=request.GET['template'])
+        sujet = Template(mail.sujet).render(Context({ "course": instance.course, "instance": instance, }))
+        message = Template(mail.message).render(Context({ "course": instance.course, "instance": instance, }))
+
+        return HttpResponse(simplejson.dumps({
+            'mail': instance.gerant_email,
+            'subject': sujet,
+            'message': message,
+        }))
+
+    def send_mails(self, request, queryset=None):
+        course = get_object_or_404(Course, uid=request.COOKIES['course_uid'])
+
+        if 'template' in request.POST and 'id' in request.POST:
+            mail = get_object_or_404(TemplateMail, id=request.POST['template'])
+            equipes = Equipe.objects.filter(id__in=request.POST['id'].split(','))
+            mail.send(equipes)
+            messages.add_message(request, messages.INFO, u'Message envoyé à %d équipes' % (len(equipes), ))
+            return redirect('/course/inscriptions/equipe/')
+
+        return render_to_response('admin/equipe/send_mails.html', RequestContext(request, {
+            'queryset': queryset,
+            'templates': TemplateMail.objects.filter(course=course),
+        }))
+    send_mails.short_description = _(u'Envoyer un mail groupé')
 
     def autre(self, request, id):
         instance = get_object_or_404(Equipe, id=id)

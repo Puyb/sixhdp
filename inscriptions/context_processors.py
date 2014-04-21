@@ -3,12 +3,17 @@ from models import Course
 from django.db.models import Min, Max
 
 def course(request):
+    uid = request.path.split('/')[1]
+    if uid in ('course', 'admin'):
+        if 'course_uid' not in request.COOKIES:
+            return {}
+        uid = request.COOKIES['course_uid']
     course = (Course.objects
         .prefetch_related('categories')
         .annotate(min_age=Min('categories__min_age'), max_equipiers=Max('categories__max_equipiers'))
-        .filter(uid=request.path.split('/')[1]))
+        .filter(uid=uid))
     if not len(course):
-        return ()
+        return {}
     return {
         'COURSE':          course[0],
         'YEAR':            course[0].date.year,

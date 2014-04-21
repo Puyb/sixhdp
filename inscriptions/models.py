@@ -12,7 +12,7 @@ from datetime import date, timedelta
 from decimal import Decimal
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
-from django.db.models import Min, Max, Count, Avg
+from django.db.models import Min, Max, Count, Avg, Sum
 from utils import iriToUri, MailThread
 import traceback
 
@@ -141,13 +141,13 @@ class Course(models.Model):
         equipes = (Equipe.objects.filter(course=self)
             .annotate(
                 equipiers_count=Count('equipier'),
-                verifier_count=Count('equipier__verifier'),
-                licence_manquantes_count=Count('equipier__licence_manquante'),
-                certificat_manquants_count=Count('equipier__certificat_manquant'),
-                autorisation_manquantes_count=Count('equipier__autorisation_manquante'),
-                valide_count=Count('equipier__valide'),
-                erreur_count=Count('equipier__erreur'),
-                hommes_count=Count('equipier__homme'),
+                verifier_count=Sum('equipier__verifier'),
+                licence_manquantes_count=Sum('equipier__licence_manquante'),
+                certificat_manquants_count=Sum('equipier__certificat_manquant'),
+                autorisation_manquantes_count=Sum('equipier__autorisation_manquante'),
+                valide_count=Sum('equipier__valide'),
+                erreur_count=Sum('equipier__erreur'),
+                hommes_count=Sum('equipier__homme'),
             ).select_related('categorie', 'gerant_ville2')
             .prefetch_related('equipier_set')
         )
@@ -175,12 +175,12 @@ class Course(models.Model):
             if not equipe.paiement_complet():
                 token += 'i'
             token += 'p';
-            if equipe.verifier_count > 0:
+            if equipe.verifier():
                 token += 'v'
             else:
-                if equipe.erreur_count > 0:
+                if equipe.dossier_complet_auto() == False:
                     token += "e"
-                elif equipe.valide_count < equipe.equipiers_count:
+                elif equipe.dossier_complet_auto() == None:
                     token += "i"
                 else:
                     token += 'c'
@@ -319,15 +319,23 @@ class Equipe(models.Model):
         return [equipier for equipier in self.equipier_set.all() if equipier.autorisation_manquante]
 
     def verifier(self):
-        return len([equipier for equipier in self.equipier_set.all() if equipier.verifer]) > 0
+        if hasattr(self, 'verifier_count'):
+            return self.verifier_count > 0
+        return len([equipier for equipier in self.equipier_set.all() if equipier.verifier]) > 0
 
     def paiement_complet(self):
         return self.paiement >= self.prix
     
     def dossier_complet_auto(self):
-        if len([equipier for equipier in self.equipier_set.all() if equipier.erreur]) > 0:
+        if hasattr(self, 'erreur_count'):
+            if self.erreur_count > 0:
+                return False
+        elif len([equipier for equipier in self.equipier_set.all() if equipier.erreur]) > 0:
             return False
-        if len([equipier for equipier in self.equipier_set.all() if not equipier.valide]) > 0:
+        if hasattr(self, 'valide_count'):
+            if self.valide_count < self.nombre:
+                return None
+        elif len([equipier for equipier in self.equipier_set.all() if not equipier.valide]) > 0:
             return None
         return True
 
@@ -408,7 +416,7 @@ class Equipier(models.Model):
     code_eoskates     = models.CharField(_(u'Code EOSkates'), max_length=20, blank=True)
     transpondeur      = models.CharField(_(u'Transpondeur'), max_length=20, blank=True)
     taille_tshirt     = models.CharField(_(u'Taille T-shirt'), max_length=3, choices=TAILLES_CHOICES, blank=True)
-    verifier               = models.BooleanField(_(u'Valider'), editable=False)
+    verifier               = models.BooleanField(_(u'Verifier'), editable=False)
     licence_manquante      = models.BooleanField(_(u'Licence manquante'), editable=False)
     certificat_manquant    = models.BooleanField(_(u'Certificat manquant'), editable=False)
     autorisation_manquante = models.BooleanField(_(u'Autorisation manquante'), editable=False)
@@ -428,6 +436,18 @@ class Equipier(models.Model):
         return u'%d' % self.numero
 
     def save(self, *args, **kwargs):
+        if self.id:
+            original = Equipier.objects.get(id=self.id)
+            if (original.nom != self.nom or 
+                original.prenom != self.prenom or
+                original.piece_jointe != self.piece_jointe):
+                print 'toto'
+                self.piece_jointe_valide = None
+            if (original.nom != self.nom or 
+                original.prenom != self.prenom or
+                original.autorisation != self.autorisation):
+                print 'coucou'
+                self.autorisation_valide = None
         self.verifier = ((self.piece_jointe and self.piece_jointe_valide == None) or
                          (self.autorisation and self.autorisation_valide == None))
         self.licence_manquante = self.justificatif == 'licence' and not self.piece_jointe_valide and not self.piece_jointe
