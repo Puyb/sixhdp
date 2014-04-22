@@ -112,7 +112,7 @@
             <table></table>
         </div>
         <br />
-        <input type="checkbox" name="conditions" id="id_conditions" {% if update %}checked {% endif %}/><label for="id_conditions">{% blocktrans %}J'accepte le <a href="{{ COURSE.url_reglement }}" target="_blank">règlement de la course</a>{% endblocktrans %}</label>
+        <input type="checkbox" name="conditions" id="id_conditions" {% if update %}checked {% endif %}/><label for="id_conditions">{% blocktrans with url=COURSE.url_reglement %}J'accepte le <a href="{{ url }}" target="_blank">règlement de la course</a>{% endblocktrans %}</label>
         <br />
     </div>
 
