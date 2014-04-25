@@ -42,9 +42,9 @@
         MAX_EQUIPIERS: {{ COURSE.limite_participants }},
         URL: "{{ COURSE.url|escapejs }}"
     };
-    var INSTANCE = {% if instance %}{}{% else %}{
-        ID: 0{{ instance.id }},
-        CATEGORIE: 0{{ instance.categorie_id }},
+    var INSTANCE = {% if not instance %}{}{% else %}{
+        ID: {{ instance.id }},
+        CATEGORIE: {{ instance.categorie_id }},
         CATEGORIE_CODE: '{{ instance.categorie.code }}'
     }{% endif %};
     var CHECK_URL = '{% url "inscriptions.check_name" course_uid=COURSE.uid %}';
