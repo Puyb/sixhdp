@@ -62,17 +62,18 @@ function disable_form_if_needed() {
 }
 
 function check_nom(wait) {
-    new Ajax.Request(CHECK_URL, {
-        parameters: { nom: $F('id_nom'), id: INSTANCE.ID },
-        asynchronous: !wait,
-        onSuccess: function(r) {
-            if(r.responseText !== '0')
-                $('nom_erreur').update(gettext("Ce nom d'équipe est déjà utilisé !"));
-            else
-                $('nom_erreur').update("");
+    if($F('id_nom'))
+        new Ajax.Request(CHECK_URL, {
+            parameters: { nom: $F('id_nom'), id: INSTANCE.ID || '0' },
+            asynchronous: !wait,
+            onSuccess: function(r) {
+                if(r.responseText !== '0')
+                    $('nom_erreur').update(gettext("Ce nom d'équipe est déjà utilisé !"));
+                else
+                    $('nom_erreur').update("");
 
-        }
-    });
+            }
+        });
 }
 
 function check_step(data) {
