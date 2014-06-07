@@ -67,11 +67,9 @@
     <div class="clearfix grid_4">
         <table>
             <tr><th>Villes</th><th>#</th><th>%</th></tr>
-            {% with stats.villes|pertinent_values:"equipes" as villes %}
-            {% for key in villes %}
-            <tr><td>{{ key }}</td><td>{{ stats.villes|get:key|get:"equipes" }}</td><td>{% widthratio stats.villes|get:key|get:"equipes" stats.course.equipes 100 %}%</td></tr>
+            {% for ville in stats.villes|slice:":20" %}
+            <tr><td>{{ ville.nom }}</td><td>{{ ville.count }}</td><td>{% widthratio villes.count stats.course.equipiers 100 %}%</td></tr>
             {% endfor %}
-            {% endwith %}
         </table>
     </div>
     <div class="grid_4">
@@ -121,15 +119,30 @@
             <tr><th>Clubs</th><th>#</th><th>%</th></tr>
             {% with stats.clubs|pertinent_values:"equipes" as clubs %}
             {% for club, value in stats.clubs.items %}
-            <tr><td>{{ club }}</td><td><td>{{ value.equipes }}</td><td>{% widthratio value.equipes stats.course.equipes 100 %} %</td></tr>
+            <tr><td>{{ club }}</td><td>{{ value.equipes }}</td><td>{% widthratio value.equipes stats.course.equipes 100 %} %</td></tr>
             {% endfor %}
             {% endwith %}
         </table>
     </div>
     <div class="grid_10">
-        <div><canvas id="canvas_clubs"></canvas>
+        <canvas id="canvas_clubs"></canvas>
     </div>
     {% endif %}
+    <div class="clearfix grid_16">
+        <hr />
+        <h1>Autre</h1>
+    </div>
+    <div class="clearfix grid_6">
+        <table>
+            <tr><th>Comment ont-il connu la course</th><th>#</th><th>%</th></tr>
+            {% for connu, count in stats.connu %}
+            <tr><td>{{ connu }}</td><td>{{ count }}</td><td>{% widthratio count stats.course.equipes 100 %} %</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="grid_8">
+        <canvas id="canvas_connu"></canvas><
+    </div>
 
 
     <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
@@ -145,10 +158,10 @@
 
         var points = [], point;
         {% localize off %}
-        {% for ville, value in stats.villes.items %}
-        {% if value.lat and value.lng %}
-        points.push(point=[{{ value.lat }}, {{ value.lng }}]);
-        L.marker(point).addTo(map).bindPopup("{{ ville|escapejs }} : {{ value.equipes }}");
+        {% for ville in stats.villes %}
+        {% if ville.lat and ville.lng %}
+        points.push(point=[{{ ville.lat }}, {{ ville.lng }}]);
+        L.marker(point).addTo(map).bindPopup("{{ ville.nom|escapejs }} : {{ ville.count }}");
         {% endif %}{% endfor %}
         {% endlocalize %}
         map.fitBounds(points);
@@ -232,5 +245,19 @@
         e2.style.display = 'none';
         e.addEventListener('click', function() { e.style.display = 'none', e2.style.display = 'block'; });
         e2.addEventListener('click', function() { e2.style.display = 'none', e.style.display = 'block'; });
+    </script>
+    <script>
+        var colors = {};
+        // pies
+        var g = new Bluff.Pie('canvas_connu', 400);
+        g.theme_pastel();
+        g.title = '';
+        g.tooltips = true;
+        g.sort = false;
+        g.zero_degree = -90;
+        {% for connu, count in stats.connu %}
+        g.data("{{ connu }}", {{ count }});
+        {% endfor %}
+        g.draw();
     </script>
 {% endblock %}
