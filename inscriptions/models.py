@@ -31,8 +31,8 @@ MIXITE_CHOICES = (
 )
 
 JUSTIFICATIF_CHOICES = (
-    ('licence',    _(u'Licence FFRS 2013')),
-    ('certificat', _(u'Certificat médical établi après le 4/08/2012')),
+    ('licence',    _(u'Licence FFRS 2014')),
+    ('certificat', _(u'Certificat médical établi après le 3/08/2013')),
 )
 
 ROLE_CHOICES = (
@@ -242,15 +242,8 @@ def lookup_ville(nom, cp, pays):
     except Ville.DoesNotExist, e:
         pass
 
-    f = urllib.urlopen(iriToUri('http://open.mapquestapi.com/geocoding/v1/address?key=%s&location=%s' % (MAPQUEST_API_KEY, nom + ' ' + cp + ', ' + str(pays))))
-    data = simplejson.load(f)
-    f.close()
-
-    if('results' not in data or
-       not len(data['results']) or
-       'locations' not in data['results'][0] or
-       not len(data['results'][0]['locations'])):
-        f = urllib.urlopen(iriToUri('http://open.mapquestapi.com/geocoding/v1/address?key=%s&location=%s' % (MAPQUEST_API_KEY, nom + ', ' + str(pays))))
+    try:
+        f = urllib.urlopen(iriToUri('http://open.mapquestapi.com/geocoding/v1/address?key=%s&location=%s' % (MAPQUEST_API_KEY, nom + ' ' + cp + ', ' + str(pays))))
         data = simplejson.load(f)
         f.close()
 
@@ -258,24 +251,35 @@ def lookup_ville(nom, cp, pays):
            not len(data['results']) or
            'locations' not in data['results'][0] or
            not len(data['results'][0]['locations'])):
-            return None
+            f = urllib.urlopen(iriToUri('http://open.mapquestapi.com/geocoding/v1/address?key=%s&location=%s' % (MAPQUEST_API_KEY, nom + ', ' + str(pays))))
+            data = simplejson.load(f)
+            f.close()
 
-    data = data['results'][0]['locations'][0]
-    data['latLng']['lat'] = str(data['latLng']['lat'])
-    data['latLng']['lng'] = str(data['latLng']['lng'])
-    try:
-        return Ville.objects.get(lat=data['latLng']['lat'], lng=data['latLng']['lng'])
-    except Ville.DoesNotExist, e:
-        pass
-    obj = Ville(
-        lat      = data['latLng']['lat'],
-        lng      = data['latLng']['lng'],
-        nom      = data['adminArea5'],
-        region   = data['adminArea3'],
-        pays     = data['adminArea1']
-    )
-    obj.save()
-    return obj
+            if('results' not in data or
+               not len(data['results']) or
+               'locations' not in data['results'][0] or
+               not len(data['results'][0]['locations'])):
+                return None
+
+        data = data['results'][0]['locations'][0]
+        data['latLng']['lat'] = str(data['latLng']['lat'])
+        data['latLng']['lng'] = str(data['latLng']['lng'])
+        try:
+            return Ville.objects.get(lat=data['latLng']['lat'], lng=data['latLng']['lng'])
+        except Ville.DoesNotExist, e:
+            pass
+        obj = Ville(
+            lat      = data['latLng']['lat'],
+            lng      = data['latLng']['lng'],
+            nom      = data['adminArea5'],
+            region   = data['adminArea3'],
+            pays     = data['adminArea1']
+        )
+        obj.save()
+        return obj
+    except e:
+        traceback.print_exc(e)
+        return None
 
 class Equipe(models.Model):
     nom                = models.CharField(_(u"Nom d'équipe"), max_length=30)

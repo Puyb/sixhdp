@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-30 20:00+0200\n"
+"POT-Creation-Date: 2014-06-07 12:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,13 +18,53 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 
-#: admin_course.py:15
+#: admin_course.py:21
 msgid ""
 "You're not allowed to access this part of the site. Please contact your site "
 "adminstrator."
 msgstr ""
 
-#: models.py:21 models.py:26
+#: admin_course.py:98
+msgid "Statut"
+msgstr ""
+
+#: admin_course.py:102
+msgid "À vérifier"
+msgstr ""
+
+#: admin_course.py:103
+msgid "Complet"
+msgstr ""
+
+#: admin_course.py:104
+msgid "Incomplet"
+msgstr ""
+
+#: admin_course.py:105 models.py:428
+msgid "Erreur"
+msgstr ""
+
+#: admin_course.py:122
+msgid "Paiement complet"
+msgstr ""
+
+#: admin_course.py:126
+msgid "Payé"
+msgstr ""
+
+#: admin_course.py:127
+msgid "Impayé"
+msgstr ""
+
+#: admin_course.py:137
+msgid "Catégories"
+msgstr ""
+
+#: admin_course.py:280
+msgid "Envoyer un mail groupé"
+msgstr ""
+
+#: models.py:21 models.py:26 models.py:429
 msgid "Homme"
 msgstr ""
 
@@ -45,11 +85,11 @@ msgid "Mixte"
 msgstr ""
 
 #: models.py:34
-msgid "Licence FFRS 2013"
+msgid "Licence FFRS 2014"
 msgstr ""
 
 #: models.py:35
-msgid "Certificat médical établi après le 4/08/2012"
+msgid "Certificat médical établi après le 3/08/2013"
 msgstr ""
 
 #: models.py:39
@@ -136,7 +176,7 @@ msgstr ""
 msgid "Tous"
 msgstr ""
 
-#: models.py:76 models.py:115 models.py:183 models.py:292 models.py:349
+#: models.py:76 models.py:215 models.py:287 models.py:400 models.py:484
 msgid "Nom"
 msgstr ""
 
@@ -144,7 +184,7 @@ msgstr ""
 msgid "uid"
 msgstr ""
 
-#: models.py:78 models.py:187
+#: models.py:78 models.py:291
 msgid "Ville"
 msgstr ""
 
@@ -180,7 +220,7 @@ msgstr ""
 msgid "Ordre des chèques"
 msgstr ""
 
-#: models.py:88 models.py:185 models.py:295 models.py:296
+#: models.py:88 models.py:289 models.py:403 models.py:404
 msgid "Adresse"
 msgstr ""
 
@@ -196,187 +236,207 @@ msgstr ""
 msgid "Email contact"
 msgstr ""
 
-#: models.py:116
+#: models.py:216
 msgid "Code"
 msgstr ""
 
-#: models.py:117
+#: models.py:217
 msgid "Prix normal"
 msgstr ""
 
-#: models.py:118
+#: models.py:218
 msgid "Prix augmenté"
 msgstr ""
 
-#: models.py:119
+#: models.py:219
 msgid "Nombre minimum d'équipiers"
 msgstr ""
 
-#: models.py:120
+#: models.py:220
 msgid "Nombre maximum d'équipiers"
 msgstr ""
 
-#: models.py:121
+#: models.py:221
 msgid "Age minimum"
 msgstr ""
 
-#: models.py:122 models.py:294
+#: models.py:222 models.py:402
 msgid "Sexe"
 msgstr ""
 
-#: models.py:123
+#: models.py:223
 msgid "Validation function (javascript)"
 msgstr ""
 
-#: models.py:124
+#: models.py:224
 msgid "Numero de dossard (début)"
 msgstr ""
 
-#: models.py:125
+#: models.py:225
 msgid "Numero de dossard (fin)"
 msgstr ""
 
-#: models.py:181
+#: models.py:285
 msgid "Nom d'équipe"
 msgstr ""
 
-#: models.py:182
+#: models.py:286
 msgid "Club"
 msgstr ""
 
-#: models.py:184 models.py:293
+#: models.py:288 models.py:401
 msgid "Prénom"
 msgstr ""
 
-#: models.py:186
+#: models.py:290
 msgid "Adresse 2"
 msgstr ""
 
-#: models.py:188
+#: models.py:292
 msgid "Code postal"
 msgstr ""
 
-#: models.py:189 models.py:299
+#: models.py:293 models.py:407
 msgid "Pays"
 msgstr ""
 
-#: models.py:190 models.py:300
+#: models.py:294 models.py:408
 msgid "e-mail"
 msgstr ""
 
-#: models.py:191
+#: models.py:295
 msgid "Mot de passe"
 msgstr ""
 
-#: models.py:192
+#: models.py:296
 msgid "Téléphone"
 msgstr ""
 
-#: models.py:195
+#: models.py:299
 msgid "Nombre d'équipiers"
 msgstr ""
 
-#: models.py:196
+#: models.py:300
 msgid "Détails"
 msgstr ""
 
-#: models.py:197
+#: models.py:301
 msgid "Prix"
 msgstr ""
 
-#: models.py:198
+#: models.py:302
 msgid "Paiement reçu"
 msgstr ""
 
-#: models.py:199
+#: models.py:303
 msgid "Dossier complet"
 msgstr ""
 
-#: models.py:200
+#: models.py:304
 msgid "Date d'insciption"
 msgstr ""
 
-#: models.py:201
+#: models.py:305
 msgid "Commentaires"
 msgstr ""
 
-#: models.py:203 models.py:290
+#: models.py:307 models.py:398
 msgid "Numéro"
 msgstr ""
 
-#: models.py:204
+#: models.py:308
 msgid "Comment avez vous connu la course ?"
 msgstr ""
 
-#: models.py:301
+#: models.py:409
 msgid "Date de naissance"
 msgstr ""
 
-#: models.py:302
+#: models.py:410
 msgid "Autorisation parentale"
 msgstr ""
 
-#: models.py:303
+#: models.py:411
 msgid "Autorisation parentale valide"
 msgstr ""
 
-#: models.py:304
+#: models.py:412
 msgid "Justificatif"
 msgstr ""
 
-#: models.py:305
+#: models.py:413
 msgid "Numéro de licence"
 msgstr ""
 
-#: models.py:306
+#: models.py:414
 msgid "Certificat ou licence"
 msgstr ""
 
-#: models.py:307
+#: models.py:415
 msgid "Certificat ou licence valide"
 msgstr ""
 
-#: models.py:308
+#: models.py:416
 msgid "Lien de parenté"
 msgstr ""
 
-#: models.py:309
+#: models.py:417
 msgid "Justificatif entreprise / etudiant"
 msgstr ""
 
-#: models.py:310
+#: models.py:418
 msgid "Justificatif valide"
 msgstr ""
 
-#: models.py:312
+#: models.py:420
 msgid "Code EOSkates"
 msgstr ""
 
-#: models.py:313
+#: models.py:421
 msgid "Transpondeur"
 msgstr ""
 
-#: models.py:314
+#: models.py:422
 msgid "Taille T-shirt"
 msgstr ""
 
-#: models.py:343
+#: models.py:423
+msgid "Verifier"
+msgstr ""
+
+#: models.py:424
+msgid "Licence manquante"
+msgstr ""
+
+#: models.py:425
+msgid "Certificat manquant"
+msgstr ""
+
+#: models.py:426
+msgid "Autorisation manquante"
+msgstr ""
+
+#: models.py:427
+msgid "Valide"
+msgstr ""
+
+#: models.py:478
 msgid "Role"
 msgstr ""
 
-#: models.py:350
+#: models.py:485
 msgid "Destinataire"
 msgstr ""
 
-#: models.py:351
+#: models.py:486
 msgid "Copie cachée à"
 msgstr ""
 
-#: models.py:352
+#: models.py:487
 msgid "Sujet"
 msgstr ""
 
-#: models.py:353
+#: models.py:488
 msgid "Message"
 msgstr ""
 
@@ -482,6 +542,36 @@ msgid ""
 "%(numero)s</b>."
 msgstr ""
 
+#: templates/done.html:103
+msgid "Partager"
+msgstr ""
+
+#: templates/done.html:104
+msgid "Partagez votre inscription sur les réseaux sociaux !"
+msgstr ""
+
+#: templates/done.html:124
+msgid ""
+"Les 6h Roller de Paris sont une course d\\'endurance à roller, en relai par "
+"équipe de 5 ou en solitaire. Ouverte à tous, elle aura lieu le 3 août 2014 "
+"dans le Bois de Boulogne, sur un circuit de 2,6 km fermé à la circulation."
+msgstr ""
+
+#: templates/done.html:126
+#, python-format
+msgid "\"%(nom)s\" est inscrit aux 6h de Paris."
+msgstr ""
+
+#: templates/done.html:128
+#, python-format
+msgid "Le duo \"%(nom)s\" est inscrit aux 6h de Paris."
+msgstr ""
+
+#: templates/done.html:130
+#, python-format
+msgid "L\\'équipe \"%(nom)s\" est inscrite aux 6h de Paris."
+msgstr ""
+
 #: templates/form.html:6 templates/index.html:12
 msgid "Inscription"
 msgstr ""
@@ -575,8 +665,7 @@ msgstr ""
 #: templates/form.html:115
 #, python-format
 msgid ""
-"J'accepte le <a href=\"%(COURSE.url_reglement)s\" target=\"_blank"
-"\">règlement de la course</a>"
+"J'accepte le <a href=\"%(url)s\" target=\"_blank\">règlement de la course</a>"
 msgstr ""
 
 #: templates/form.html:121
@@ -631,66 +720,117 @@ msgstr ""
 msgid "Ouverture des inscriptions le %(ouverture)s."
 msgstr ""
 
-#: templates/stats.html:221 templates/stats2.html:221
+#: templates/stats2.html:221
 msgid "Individuel Homme"
 msgstr ""
 
-#: templates/stats.html:222 templates/stats2.html:222
+#: templates/stats2.html:222
 msgid "Individuel Femme"
 msgstr ""
 
-#: templates/stats.html:223 templates/stats2.html:223
+#: templates/stats2.html:223
 msgid "Duo Homme ou Mixte"
 msgstr ""
 
-#: templates/stats.html:224 templates/stats2.html:224
+#: templates/stats2.html:224
 msgid "Duo Femme"
 msgstr ""
 
-#: templates/stats.html:225 templates/stats2.html:225
+#: templates/stats2.html:225
 msgid "Junior"
 msgstr ""
 
-#: templates/stats.html:226 templates/stats2.html:226
+#: templates/stats2.html:226
 msgid "Sénior Homme ou Mixte"
 msgstr ""
 
-#: templates/stats.html:227 templates/stats2.html:227
+#: templates/stats2.html:227
 msgid "Sénior Femme"
 msgstr ""
 
-#: templates/stats.html:228 templates/stats2.html:228
+#: templates/stats2.html:228
 msgid "Vétéran"
 msgstr ""
 
-#: templates/stats.html:229 templates/stats2.html:229
+#: templates/stats2.html:229
 msgid "Famille"
 msgstr ""
 
-#: templates/stats.html:230 templates/stats2.html:230
+#: templates/stats2.html:230
 msgid "Entreprise / Étudiants"
 msgstr ""
 
-#: templates/admin/equipe/send_mail.html:15
+#: templates/admin/dashboard.html:18
+msgid "Résumé"
+msgstr ""
+
+#: templates/admin/dashboard.html:49
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr ""
+
+#: templates/admin/dashboard.html:50
+#, python-format
+msgid "%(name)s"
+msgstr ""
+
+#: templates/admin/dashboard.html:62
+msgid "Add"
+msgstr ""
+
+#: templates/admin/dashboard.html:68
+msgid "Change"
+msgstr ""
+
+#: templates/admin/dashboard.html:78
+msgid "You don't have permission to edit anything."
+msgstr ""
+
+#: templates/admin/dashboard.html:86
+msgid "Recent Actions"
+msgstr ""
+
+#: templates/admin/dashboard.html:87
+msgid "My Actions"
+msgstr ""
+
+#: templates/admin/dashboard.html:91
+msgid "None available"
+msgstr ""
+
+#: templates/admin/dashboard.html:105
+msgid "Unknown content"
+msgstr ""
+
+#: templates/admin/equipe/send_mail.html:23
 msgid "Expéditeur :"
 msgstr ""
 
-#: templates/admin/equipe/send_mail.html:17
+#: templates/admin/equipe/send_mail.html:25
 msgid "Contact"
 msgstr ""
 
-#: templates/admin/equipe/send_mail.html:18
+#: templates/admin/equipe/send_mail.html:26
 msgid "Moi"
 msgstr ""
 
-#: templates/admin/equipe/send_mail.html:19
+#: templates/admin/equipe/send_mail.html:27
 msgid "À :"
 msgstr ""
 
-#: templates/admin/equipe/send_mail.html:20
+#: templates/admin/equipe/send_mail.html:28
 msgid "Sujet :"
 msgstr ""
 
-#: templates/admin/equipe/send_mail.html:22
+#: templates/admin/equipe/send_mail.html:30
 msgid "Envoyer"
+msgstr ""
+
+#: templates/admin/equipe/send_mails.html:24
+msgid "Prévisualiser"
+msgstr ""
+
+#: templates/admin/equipe/send_mails.html:42
+#, python-format
+msgid "Envoyer à %(num)s équipes"
 msgstr ""
