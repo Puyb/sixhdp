@@ -19,24 +19,84 @@
             </caption>
             <tr>
                 <th>Dossiers</th>
-                <td><a href="inscriptions/equipe/?status=complet"><img alt="None" src="/static/admin/img/icon-yes.gif"> Complet</a></th>
-                <td><a href="inscriptions/equipe/?status=incomplet">Incomplet</a></th>
-                <td><a href="inscriptions/equipe/?status=erreur"><img alt="None" src="/static/admin/img/icon-no.gif">  Erreur</a></th>
-                <td><a href="inscriptions/equipe/?status=verifier"><img alt="None" src="/static/admin/img/icon-unknown.gif"> A vérifier</a></th>
+                <td>
+                    <a href="inscriptions/equipe/?status=complet">
+                        <img alt="None" src="/static/admin/img/icon-yes.gif">
+                        Complet
+                    </a>
+                </th>
+                <td>
+                    <a href="inscriptions/equipe/?status=incomplet">Incomplet</a>
+                </th>
+                <td>
+                    <a href="inscriptions/equipe/?status=erreur">
+                        <img alt="None" src="/static/admin/img/icon-no.gif">
+                        Erreur
+                    </a>
+                </th>
+                <td>
+                    <a href="inscriptions/equipe/?status=verifier">
+                        <img alt="None" src="/static/admin/img/icon-unknown.gif">
+                        A vérifier
+                    </a>
+                </th>
             </tr>
             <tr>
-                <th><a href="inscriptions/equipe/?paiement_complet=paye">Payé</a></th>
-                <td><a href="inscriptions/equipe/?paiement_complet=paye&status=complet">{{ COURSE.stats.course.pc }}</a></td>
-                <td><a href="inscriptions/equipe/?paiement_complet=paye&status=incomplet">{{ COURSE.stats.course.pi }}</a></td>
-                <td><a href="inscriptions/equipe/?paiement_complet=paye&status=erreur">{{ COURSE.stats.course.pe }}</a></td>
-                <td><a href="inscriptions/equipe/?paiement_complet=paye&status=verifier">{{ COURSE.stats.course.pv }}</a></td>
+                <th>
+                    <a href="inscriptions/equipe/?paiement_complet=paye">Payé</a>
+                </th>
+                <td>
+                    <a href="inscriptions/equipe/?paiement_complet=paye&status=complet">
+                        {{ COURSE.stats.course.pc }}
+                        ({% widthratio COURSE.stats.course.pc COURSE.stats.course.equipes 100 %}%)
+                    </a>
+                </td>
+                <td>
+                    <a href="inscriptions/equipe/?paiement_complet=paye&status=incomplet">
+                        {{ COURSE.stats.course.pi }}
+                        ({% widthratio COURSE.stats.course.pi COURSE.stats.course.equipes 100 %}%)
+                    </a>
+                </td>
+                <td>
+                    <a href="inscriptions/equipe/?paiement_complet=paye&status=erreur">
+                        {{ COURSE.stats.course.pe }}
+                        ({% widthratio COURSE.stats.course.pe COURSE.stats.course.equipes 100 %}%)
+                    </a>
+                </td>
+                <td>
+                    <a href="inscriptions/equipe/?paiement_complet=paye&status=verifier">
+                        {{ COURSE.stats.course.pv }}
+                        ({% widthratio COURSE.stats.course.pv COURSE.stats.course.equipes 100 %}%)
+                    </a>
+                </td>
             </tr>
             <tr>
-                <th><a href="inscriptions/equipe/?paiement_complet=impaye">Impayé</a></th>
-                <td><a href="inscriptions/equipe/?paiement_complet=impaye&status=complet">{{ COURSE.stats.course.ipc }}</a></td>
-                <td><a href="inscriptions/equipe/?paiement_complet=impaye&status=incomplet">{{ COURSE.stats.course.ipi }}</a></td>
-                <td><a href="inscriptions/equipe/?paiement_complet=impaye&status=erreur">{{ COURSE.stats.course.ipe }}</a></td>
-                <td><a href="inscriptions/equipe/?paiement_complet=impaye&status=verifier">{{ COURSE.stats.course.ipv }}</a></td>
+                <th>
+                    <a href="inscriptions/equipe/?paiement_complet=impaye">Impayé</a>
+                </th>
+                <td>
+                    <a href="inscriptions/equipe/?paiement_complet=impaye&status=complet">
+                        {{ COURSE.stats.course.ipc }}
+                        ({% widthratio COURSE.stats.course.ipc COURSE.stats.course.equipes 100 %}%)
+                    </a>
+                </td>
+                <td>
+                    <a href="inscriptions/equipe/?paiement_complet=impaye&status=incomplet">
+                        {{ COURSE.stats.course.ipi }}
+                        ({% widthratio COURSE.stats.course.ipi COURSE.stats.course.equipes 100 %}%)
+                    </a>
+                </td>
+                <td>
+                    <a href="inscriptions/equipe/?paiement_complet=impaye&status=erreur">
+                        {{ COURSE.stats.course.ipe }}
+                        ({% widthratio COURSE.stats.course.ipe COURSE.stats.course.equipes 100 %}%)
+                    </a>
+                </td>
+                <td>
+                    <a href="inscriptions/equipe/?paiement_complet=impaye&status=verifier">
+                        {{ COURSE.stats.course.ipv }}
+                        ({% widthratio COURSE.stats.course.ipv COURSE.stats.course.equipes 100 %}%)
+                    </a>
                 </td>
             </tr>
         </table>

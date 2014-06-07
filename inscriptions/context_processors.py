@@ -9,10 +9,10 @@ def course(request):
             return {}
         uid = request.COOKIES['course_uid']
     course = (Course.objects
+        .filter(uid=uid)
         .prefetch_related('categories')
-        .annotate(min_age=Min('categories__min_age'), max_equipiers=Max('categories__max_equipiers'))
-        .filter(uid=uid))
-    if not len(course):
+        .annotate(min_age=Min('categories__min_age'), max_equipiers=Max('categories__max_equipiers')))
+    if not course.count():
         return {}
     return {
         'COURSE':          course[0],

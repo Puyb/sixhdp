@@ -133,9 +133,9 @@ class Course(models.Model):
         result = {
             "categories": {},
             "jours": {},
-            "villes": {},
             "pays": {},
             "course": model_stats.copy(),
+            "connu": {},
         }
 
         equipes = (Equipe.objects.filter(course=self)
@@ -156,14 +156,11 @@ class Course(models.Model):
             keys = {
                 "categories": equipe.categorie_id and equipe.categorie.code or '',
                 "jours": (equipe.date.date() - self.date_ouverture).days,
-                "villes":  '',
                 "pays":    '',
             }
             if equipe.gerant_ville2:
-                keys['villes'] = equipe.gerant_ville2.pays
                 keys['pays'] = equipe.gerant_ville2.pays
                 if equipe.gerant_ville2.pays == 'FR':
-                    keys['villes'] = equipe.gerant_ville2.nom
                     keys['pays'] = equipe.gerant_ville2.region
 
                     
@@ -198,15 +195,28 @@ class Course(models.Model):
                     if equipe.gerant_ville2:
                         if key == 'pays':
                             result[key][index]['pays'] = equipe.gerant_ville2.pays
-                        if key == 'villes':
-                            result[key][index]['lat'] = float(equipe.gerant_ville2.lat)
-                            result[key][index]['lng'] = float(equipe.gerant_ville2.lng)
 
                 for stat, value in stats.items():
                     result[key][index][stat] += value
             for stat, value in stats.items():
                 result['course'][stat] += value
+            if equipe.connu not in result['connu']:
+                result['connu'][equipe.connu] = 0;
+            result['connu'][equipe.connu] += 1;
 
+        result['connu'] = result['connu'].items()
+        result['connu'].sort(lambda a, b: cmp(b[1], a[1]))
+
+        result['villes'] = [
+            {
+                'nom': ville.nom,
+                'pays': ville.pays,
+                'lat': float(ville.lat),
+                'lng': float(ville.lng),
+                'count': ville.count,
+            } for ville in Ville.objects.filter(equipier__equipe__course=self).annotate(count=Count('equipier'))
+            if ville.count > 0 ]
+        result['villes'].sort(lambda a, b: cmp(b['count'], a['count']))
 
         return result
 
