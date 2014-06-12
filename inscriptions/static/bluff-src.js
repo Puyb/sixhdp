@@ -2642,6 +2642,8 @@ Bluff.Renderer = new JS.Class({
     div.className = this.klass.TEXT_CLASS;
     div.style.position = 'absolute';
     div.appendChild(document.createTextNode(content));
+    div.innerHTML = content;
+
     this._text_container().appendChild(div);
     return div;
   },

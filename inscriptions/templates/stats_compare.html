@@ -56,6 +56,9 @@
         g.labels = {};
         for(var i = min; i < max; i += 7) {
             g.labels[i] = i;
+            var d1 = new Date({{ course1.date_ouverture.year }}, {{ course1.date_ouverture.month }} - 1, {{ course1.date_ouverture.day }} + i + {{ delta }});
+            var d2 = new Date({{ course2.date_ouverture.year }}, {{ course2.date_ouverture.month }} - 1, {{ course2.date_ouverture.day }} + i);
+            g.labels[i] = d1.getDate() + '/' + (d1.getMonth() + 1) + '<br />' + d2.getDate() + '/' + (d2.getMonth() + 1);
         }
         g2.labels = g.labels;
         g.draw();
