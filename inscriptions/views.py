@@ -18,6 +18,7 @@ from django.db.models import Count, Sum
 from settings import *
 from datetime import datetime, date
 from django.utils import timezone
+import json
 
 class EquipeForm(ModelForm):
     class Meta:
@@ -217,14 +218,35 @@ def list(request, course_uid):
 def stats(request, course_uid):
     course = get_object_or_404(Course, uid=request.path.split('/')[1])
     stats = course.stats()
-    from django.db import connection
-    import json
 
     return render_to_response('stats.html', RequestContext(request, {
         'stats': stats,
         'course': course,
         'json': json.dumps(stats),
-        'queries': connection.queries
+    }))
+
+def stats_compare(request, course_uid, course_uid2):
+    course1 = get_object_or_404(Course, uid=course_uid)
+    stats1 = course1.stats()
+    course2 = get_object_or_404(Course, uid=course_uid2)
+    stats2 = course2.stats()
+
+    duree1 = course1.date - course1.date_ouverture
+    duree2 = course2.date - course2.date_ouverture
+    delta = duree1.days - duree2.days
+    if 'delta' in request.GET:
+        delta = request.GET['delta'] or 0
+
+    return render_to_response('stats_compare.html', RequestContext(request, {
+        'stats1': stats1,
+        'course1': course1,
+        'json1': json.dumps(stats1),
+        'stats2': stats2,
+        'course2': course2,
+        'json2': json.dumps(stats2),
+        'delta': delta,
+        'augment1': (course1.date_augmentation - course1.date_ouverture).days,
+        'augment2': (course2.date_augmentation - course2.date_ouverture).days,
     }))
 
 def index(request):
