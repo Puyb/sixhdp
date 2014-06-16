@@ -15,7 +15,7 @@
             code:  "{{ cat.code|escapejs }}",
             label: "{{ cat.nom|escapejs }}",
             prix: {% if instance %} 
-                    new Date("{{ COURSE.date_augmentation|date:'c' }}") <= new Date("{{ instance.date|date:'%c' }}") 
+                    new Date("{{ COURSE.date_augmentation|date:'c' }}") <= new Date("{{ instance.date|date:'c' }}") 
                   {% else %}
                     new Date("{{ COURSE.date_augmentation|date:'c' }}") <= new Date()
                   {% endif %} ? {{ cat.prix2 }} : {{ cat.prix1 }},
