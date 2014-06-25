@@ -215,6 +215,21 @@ def list(request, course_uid):
         'equipes': equipes
     }))
 
+def change(request, course_uid, numero=None, sent=None):
+    if numero:
+        equipe = get_object_or_404(Equipe, course__uid=course_uid, numero=numero)
+        if 'question' in request.POST and request.POST['question'] == '7':
+            equipe.send_mail('inscription')
+            return redirect('inscriptions.change_sent', course_uid=course_uid)
+        return render_to_response('change_numero.html', RequestContext(request, {
+            'equipe': equipe
+        }))
+    equipes = Equipe.objects.filter(course__uid=course_uid).order_by('date')
+    return render_to_response('change.html', RequestContext(request, {
+        'sent': sent,
+        'equipes': equipes
+    }))
+
 def stats(request, course_uid):
     course = get_object_or_404(Course, uid=request.path.split('/')[1])
     stats = course.stats()

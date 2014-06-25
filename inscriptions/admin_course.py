@@ -31,6 +31,15 @@ class CourseAdminSite(admin.sites.AdminSite):
         course_uid = request.COOKIES['course_uid']
         return request.user.profile.course.filter(uid=course_uid)
 
+    def get_urls(self):
+        urls = patterns('',
+            (r'choose/', self.admin_view(self.course_choose), {}, '%sadmin_choose' % self.name)
+        ) + super(CourseAdminSite, self).get_urls()
+        return urls
+
+    def course_choose(self, request):
+        return render_to_response('admin/course_choose.html', RequestContext(request, { 'courses': request.user.profile.course.all() }))
+
     index_template = 'admin/dashboard.html'
 
 
@@ -175,7 +184,7 @@ class EquipeAdmin(admin.ModelAdmin):
 
     )
     actions = ['send_mails']
-    search_fields = ('id', 'nom', 'club', 'gerant_nom', 'gerant_prenom', 'equipier__nom', 'equipier__prenom')
+    search_fields = ('numero', 'nom', 'club', 'gerant_nom', 'gerant_prenom', 'equipier__nom', 'equipier__prenom')
     list_per_page = 500
 
     def documents_manquants2(self, obj):

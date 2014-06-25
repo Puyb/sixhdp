@@ -10,6 +10,9 @@
 {% block breadcrumbs %}{% endblock %}
 
 {% block content %}
+{% if not COURSE %}<script>
+location.href = "choose/";
+</script>{% endif %}
 <div id="content-main">
 
     <div class="module">
