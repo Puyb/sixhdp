@@ -321,7 +321,7 @@ class Equipe(models.Model):
         unique_together = ( ('course', 'numero'), )
 
     def __unicode__(self):
-        return u'%s - %s - %s' % (self.id, self.categorie, self.nom)
+        return u'%s - %s - %s - %s' % (self.numero, self.course.uid, self.categorie, self.nom)
 
     def licence_manquantes(self):
         return [equipier for equipier in self.equipier_set.all() if equipier.licence_manquante]
@@ -361,6 +361,17 @@ class Equipe(models.Model):
         
     def save(self, *args, **kwargs):
         if self.id:
+            if not (self.categorie.numero_debut < self.numero and self.categore.numero_fin <= self.numero):
+                self.numero = self.getNumero()
+                try:
+                    self.send_mail('changement_numero')
+                except e:
+                    traceback.print_exc(e)
+                try:
+                    self.send_mail('changement_numero_admin')
+                except e:
+                    traceback.print_exc(e)
+
             paiement = Equipe.objects.get(id=self.id).paiement
             if paiement != self.paiement:
                 try:
@@ -384,8 +395,6 @@ class Equipe(models.Model):
         self.course.send_mail(nom, [self])
 
     def getNumero(self):
-        if self.numero:
-            return self.numero
         start = self.categorie.numero_debut
         end = self.categorie.numero_fin
 
