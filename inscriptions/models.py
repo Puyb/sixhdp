@@ -5,7 +5,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.template import Template, Context
 from django.core.mail import EmailMessage
-import os, re, urllib, simplejson
+import os, re, urllib, simplejson, sys
 from django.db import models
 from settings import *
 from datetime import date, timedelta
@@ -361,7 +361,7 @@ class Equipe(models.Model):
         
     def save(self, *args, **kwargs):
         if self.id:
-            if not (self.categorie.numero_debut < self.numero and self.categorie.numero_fin <= self.numero):
+            if not (self.categorie.numero_debut < self.numero and self.numero <= self.categorie.numero_fin):
                 self.numero = self.getNumero()
                 try:
                     self.send_mail('changement_numero')
