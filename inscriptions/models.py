@@ -361,7 +361,7 @@ class Equipe(models.Model):
         
     def save(self, *args, **kwargs):
         if self.id:
-            if not (self.categorie.numero_debut < self.numero and self.categore.numero_fin <= self.numero):
+            if not (self.categorie.numero_debut < self.numero and self.categorie.numero_fin <= self.numero):
                 self.numero = self.getNumero()
                 try:
                     self.send_mail('changement_numero')
