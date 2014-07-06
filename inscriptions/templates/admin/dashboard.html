@@ -104,6 +104,19 @@ location.href = "choose/";
             </tr>
         </table>
     </div>
+    <div class="module">
+        <table>
+            <caption>
+                {% blocktrans %}Documents à vérifier{% endblocktrans %}
+            </caption>
+            <tr>
+                <th>Documents à vérifier</th>
+                <td>
+                    <a href="document/review/">Vérifier</a>
+                </td>
+            </tr>
+        </table>
+    </div>
 {% if app_list %}
     {% for app in app_list %}
         <div class="app-{{ app.app_label }} module">

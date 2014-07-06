@@ -33,12 +33,48 @@ class CourseAdminSite(admin.sites.AdminSite):
 
     def get_urls(self):
         urls = patterns('',
-            (r'choose/', self.admin_view(self.course_choose), {}, '%sadmin_choose' % self.name)
+            (r'choose/', self.admin_view(self.course_choose), {}, '%sadmin_choose' % self.name),
+            (r'document/review/', self.admin_view(self.document_review), {}, '%sadmin_documenr_review' % self.name)
         ) + super(CourseAdminSite, self).get_urls()
         return urls
 
     def course_choose(self, request):
         return render_to_response('admin/course_choose.html', RequestContext(request, { 'courses': request.user.profile.course.all() }))
+
+    def document_review(self, request):
+        uid = request.COOKIES['course_uid']
+        course = Course.objects.get(uid=uid)
+        
+        skip = []
+        
+        equipier = None
+
+        if request.method == 'POST':
+            if 'skip' in request.POST and request.POST['skip'] != '':
+                skip = request.POST['skip'].split(',')
+            equipier = Equipier.objects.get(id=request.POST['id'])
+            print 'value:', request.POST['value']
+            if request.POST['value'] == 'yes' or request.POST['value'] == 'no':
+                equipier.piece_jointe_valide = request.POST['value'] == 'yes'
+                equipier.save()
+                equipier.equipe.commentaires = request.POST['commentaires']
+                equipier.equipe.save()
+            else:
+                skip.append(str(equipier.id))
+        equipier = Equipier.objects.filter(equipe__course=course).exclude(id__in=skip).filter(verifier=True)
+        print equipier.query
+
+        print equipier.count()
+        if equipier.count() == 0:
+            return redirect('/course/')
+
+
+        return render_to_response('admin/document_review.html', RequestContext(request, {
+            'count': equipier.count(),
+            'index': len(skip) + 1,
+            'equipier': equipier[0],
+            'skip': ','.join(skip)
+        }))
 
     index_template = 'admin/dashboard.html'
 
