@@ -200,7 +200,7 @@ def list(request, course_uid):
     stats = Equipe.objects.filter(course__uid=course_uid).aggregate(
         count     = Count('id'),
         prix      = Sum('prix'), 
-        nbpaye    = Count('prix'), 
+        nbpaye    = Count('paiement'), 
         paiement  = Sum('paiement'), 
         club      = Count('club', distinct=True),
         villes    = Count('gerant_ville2__nom', distinct=True),
@@ -219,7 +219,7 @@ def change(request, course_uid, numero=None, sent=None):
     if numero:
         equipe = get_object_or_404(Equipe, course__uid=course_uid, numero=numero)
         if 'question' in request.POST and request.POST['question'] == '7':
-            equipe.send_mail('inscription')
+            equipe.send_mail('change_request')
             return redirect('inscriptions.change_sent', course_uid=course_uid)
         return render_to_response('change_numero.html', RequestContext(request, {
             'equipe': equipe

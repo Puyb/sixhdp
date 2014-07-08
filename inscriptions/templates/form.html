@@ -30,6 +30,9 @@
     {% endfor %}];
     var nombres_par_tranche = { {% for k, v in nombres_par_tranche.items %}"{{ k }}": {{ v }}{% if not forloop.last %},{% endif %}{% endfor %} };
     CATEGORIES = CATEGORIES.filter(function(categorie) {
+        {% if update %}
+        if(categorie.code === '{{ instance.categorie.code }}') return true;
+        {% endif %}
         return nombres_par_tranche[categorie.numero_debut + '-' + categorie.numero_fin] < categorie.numero_fin - categorie.numero_debut + 1;
     });
     var COURSE = {

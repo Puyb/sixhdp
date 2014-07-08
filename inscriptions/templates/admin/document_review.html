@@ -111,7 +111,7 @@
                 </div>
             </form>
         </div>
-        <iframe style="position: absolute; left: 50%; width: 50%; height: 100%;" src="{% if equipier.piece_jointe_valide == None %}{{ equipier.piece_jointe.url }}{% else %}{{ equipier.piece_jointe2.url }}{% endif %}"></iframe>
+        <iframe style="position: absolute; left: 50%; width: 50%; height: 100%;" src="{% if equipier.piece_jointe_valide == None %}{% if equipier.piece_jointe %}{{ equipier.piece_jointe.url }}{% endif %}{% else %}{% if equipier.piece_jointe2 %}{{ equipier.piece_jointe2.url }}{% endif %}{% endif %}"></iframe>
     </div>
 </div>
 <script>
