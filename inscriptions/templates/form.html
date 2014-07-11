@@ -33,6 +33,7 @@
         {% if update %}
         if(categorie.code === '{{ instance.categorie.code }}') return true;
         {% endif %}
+        {% if user.is_staff %}return true;{% endif %}
         return nombres_par_tranche[categorie.numero_debut + '-' + categorie.numero_fin] < categorie.numero_fin - categorie.numero_debut + 1;
     });
     var COURSE = {

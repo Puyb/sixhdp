@@ -153,14 +153,15 @@ class StatusFilter(SimpleListFilter):
         if self.value() == 'verifier':
             return queryset.filter(verifier_count__gt=0)
         if self.value() == 'erreur':
-            return queryset.filter(erreur_count__gt=0)
+            return queryset.filter(verifier_count=0).filter(erreur_count__gt=0)
         if self.value() == 'complet':
-            return queryset.filter(erreur_count=0).filter(valide_count=F('nombre'))
+            return queryset.filter(verifier_count=0).filter(erreur_count=0).filter(valide_count=F('nombre'))
         if self.value() == 'incomplet':
             return (queryset
-                .exclude(verifier_count__gt=0)
-                .exclude(valide_count__gt=0)
-                .exclude(erreur_count__gt=0))
+                .filter(verifier_count=0)
+                .filter(erreur_count=0)
+                .exclude(valide_count=F('nombre'))
+            )
         return queryset
 
 class PaiementCompletFilter(SimpleListFilter):
@@ -205,7 +206,7 @@ class EquipeAdmin(admin.ModelAdmin):
     class Media:
         css = {"all": ("admin.css",)}
         js = ('custom_admin/equipe.js', )
-    readonly_fields = [ 'numero', 'nom', 'club', 'gerant_nom', 'gerant_prenom', 'gerant_adresse1', 'gerant_adress2', 'gerant_ville', 'gerant_code_postal', 'gerant_pays', 'gerant_email', 'gerant_telephone', 'categorie', 'nombre', 'prix', 'date', 'password']
+    readonly_fields = [ 'numero', 'nom', 'club', 'gerant_nom', 'gerant_prenom', 'gerant_adresse1', 'gerant_adress2', 'gerant_ville', 'gerant_code_postal', 'gerant_pays', 'gerant_email', 'gerant_telephone', 'categorie', 'nombre', 'prix', 'date', 'password', 'date']
     list_display = ['numero', 'categorie', 'nom', 'club', 'gerant_email', 'date', 'nombre2', 'paiement_complet2', 'documents_manquants2', 'dossier_complet_auto2']
     list_display_links = ['numero', 'categorie', 'nom', 'club', ]
     list_filter = [PaiementCompletFilter, StatusFilter, CategorieFilter, 'nombre', 'date']
@@ -214,7 +215,7 @@ class EquipeAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ("Instructions", { 'description': HELP_TEXT, 'classes': ('collapse', 'collapsed'), 'fields': () }),
-        (None, { 'fields': (('numero', 'nom', 'club'), ('categorie', 'nombre'), ('paiement', 'prix', 'paiement_info'), 'commentaires')}),
+        (None, { 'fields': (('numero', 'nom', 'club'), ('categorie', 'nombre', 'date'), ('paiement', 'prix', 'paiement_info'), 'commentaires')}),
         (u'Gérant', { 'classes': ('collapse', 'collapsed'), 'fields': (('gerant_nom', 'gerant_prenom'), 'gerant_adresse1', 'gerant_adress2', ('gerant_ville', 'gerant_code_postal'), 'gerant_pays', 'gerant_email', 'gerant_telephone', 'password') }),
         ("Autre", { 'description': '<div id="autre"></div>', 'classes': ('collapse', 'collapsed'), 'fields': () }),
 

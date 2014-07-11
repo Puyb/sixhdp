@@ -6,6 +6,7 @@ django.jQuery(function() {
         $(this)
             .val(res[1])
             .parents('.form-row').hide();
+        return;
         tinymce.init({
             selector:'#id_message',
             plugins: [

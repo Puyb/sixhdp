@@ -308,7 +308,7 @@ Event.observe(window, 'load', function() {
             if(actual_part === 1) {
                 $$('[name*=gerant_]').each(function(element) {
                     var element2 = $('id_form-0-' + element.name.substr('gerant_'.length));
-                    if(element2) {
+                    if(element2 && !element2.getValue()) {
                         element2.setValue(element.getValue());
                     }
                 });
