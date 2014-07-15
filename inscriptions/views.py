@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys, urllib2, random, traceback
-from models import Equipe, Equipier, Categorie, Ville, Course, SEXE_CHOICES, JUSTIFICATIF_CHOICES
+from models import Equipe, Equipier, Categorie, Ville, Course, SEXE_CHOICES, JUSTIFICATIF_CHOICES, NoPlaceLeftException
 from decorators import open_closed
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template.loader import render_to_string
@@ -14,16 +14,17 @@ from django.forms.models import BaseModelFormSet
 from django.utils.translation import ugettext as _
 from django.utils.http import urlencode
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, F
 from settings import *
 from datetime import datetime, date
 from django.utils import timezone
+from easy_pdf.views import PDFTemplateView
 import json
 
 class EquipeForm(ModelForm):
     class Meta:
         model = Equipe
-        exclude = ('paiement', 'dossier_complet', 'password', 'date', 'commentaires', 'paiement_info', 'gerant_ville2', 'numero', 'course')
+        exclude = ('paiement', 'dossier_complet', 'password', 'date', 'commentaires', 'paiement_info', 'gerant_ville2', 'numero', 'course', 'date_facture')
         widgets = {
             'categorie': HiddenInput(),
             'prix': HiddenInput(),
@@ -49,6 +50,7 @@ def form(request, course_uid, numero=None, code=None):
     instance = None
     old_password = None
     equipiers_count = Equipier.objects.filter(equipe__course=course).count()
+    message = ''
     if numero:
         instance = get_object_or_404(Equipe, course=course, numero=numero)
         old_password = instance.password
@@ -60,44 +62,49 @@ def form(request, course_uid, numero=None, code=None):
         if instance.password != code:
             raise Http404()
     if request.method == 'POST':
-        equipe_form = EquipeForm(request.POST, request.FILES, instance=instance)
-        if instance:
-            equipier_formset = EquipierFormset(request.POST, request.FILES, queryset=instance.equipier_set.all())
-        else:
-            if date.today() >= course.date_fermeture or equipiers_count >= course.limite_participants:
-                if not request.user.is_staff:
-                    return redirect('/')
-            equipier_formset = EquipierFormset(request.POST, request.FILES)
+        try:
+            equipe_form = EquipeForm(request.POST, request.FILES, instance=instance)
+            if instance:
+                equipier_formset = EquipierFormset(request.POST, request.FILES, queryset=instance.equipier_set.all())
+            else:
+                if date.today() >= course.date_fermeture or equipiers_count >= course.limite_participants:
+                    if not request.user.is_staff:
+                        return redirect('/')
+                equipier_formset = EquipierFormset(request.POST, request.FILES)
 
-        # FIXME: change date naissance years
-        # years=range(course.date.year - course.min_age, course.date.year - 120, -1)
+            # FIXME: change date naissance years
+            # years=range(course.date.year - course.min_age, course.date.year - 120, -1)
 
-        if equipe_form.is_valid() and equipier_formset.is_valid():
-            new_instance = equipe_form.save(commit=False)
-            new_instance.course = course
-            new_instance.password = old_password
-            if not instance:
-                new_instance.password = '%06x' % random.randrange(0x100000, 0xffffff)
-            #if instance and instance.categorie == new_instance.categorie and instance.prix:
-            #    new_instance.prix = instance.prix
-            #else:
-            #    new_instance.prix = CATEGORIES[new_instance.categorie]['prix']
-            new_instance.save()
-            for i in range(0, new_instance.nombre):
-                equipier_instance = equipier_formset.forms[i].save(commit=False)
-                equipier_instance.numero = i + 1
-                equipier_instance.equipe = new_instance
-                equipier_instance.save()
-            if not instance:
-                try:
-                    course.send_mail('inscription', [ new_instance ])
-                except Exception, e:
-                    traceback.print_exc(e)
-                try:
-                    course.send_mail('inscription_admin', [ new_instance ])
-                except Exception, e:
-                    traceback.print_exc(e)
-            return redirect('inscriptions.done', course_uid=course.uid, numero=new_instance.numero)
+            if equipe_form.is_valid() and equipier_formset.is_valid():
+                new_instance = equipe_form.save(commit=False)
+                new_instance.course = course
+                new_instance.password = old_password
+                if not instance:
+                    new_instance.password = '%06x' % random.randrange(0x100000, 0xffffff)
+                #if instance and instance.categorie == new_instance.categorie and instance.prix:
+                #    new_instance.prix = instance.prix
+                #else:
+                #    new_instance.prix = CATEGORIES[new_instance.categorie]['prix']
+                new_instance.save()
+                for i in range(0, new_instance.nombre):
+                    equipier_instance = equipier_formset.forms[i].save(commit=False)
+                    equipier_instance.numero = i + 1
+                    equipier_instance.equipe = new_instance
+                    equipier_instance.save()
+                if not instance:
+                    try:
+                        course.send_mail('inscription', [ new_instance ])
+                    except Exception, e:
+                        traceback.print_exc(e)
+                    try:
+                        course.send_mail('inscription_admin', [ new_instance ])
+                    except Exception, e:
+                        traceback.print_exc(e)
+                return redirect('inscriptions.done', course_uid=course.uid, numero=new_instance.numero)
+        except NoPlaceLeftException, e:
+            message = _(u"Désolé, il n'y a plus de place dans cette catégorie")
+        except Exception, e:
+            raise e
     else:
         equipe_form = EquipeForm(instance=instance)
         if instance:
@@ -121,6 +128,7 @@ def form(request, course_uid, numero=None, code=None):
         "nombres_par_tranche": nombres_par_tranche,
         "equipiers_count": equipiers_count,
         "course": course,
+        "message": message,
     }))
 
 @open_closed
@@ -269,5 +277,17 @@ def index(request):
         'prochaines_courses': Course.objects.filter(date__gt=date.today()).order_by('date'),
         'anciennes_courses': Course.objects.filter(date__lte=date.today()).order_by('date'),
     }))
+
+class FactureView(PDFTemplateView):
+    template_name = 'facture.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(FactureView, self).get_context_data(*args, **kwargs)
+        equipe = get_object_or_404(Equipe, course__uid=self.kwargs['course_uid'], numero=self.kwargs['numero'], paiement__gte=F('prix'))
+        if not equipe.date_facture:
+            equipe.date_facture = date.today();
+            equipe.save()
+        context['equipe'] = equipe
+        return context
 
 

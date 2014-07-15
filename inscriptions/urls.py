@@ -2,6 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.views.generic import TemplateView
 from django.views.generic import ListView
 from models import Equipe
+from views import FactureView
 
 import admin
 
@@ -15,6 +16,7 @@ urlpatterns = patterns('',
     (r'^$', 'index', {}, 'inscriptions.index'),
     (r'^(?P<course_uid>[^/]+)/vars.js$', TemplateView.as_view(template_name='vars.js')),
     (r'^(?P<course_uid>[^/]+)/(?P<numero>\d+)/done/$', 'done', {}, 'inscriptions.done'),
+    (r'^(?P<course_uid>[^/]+)/(?P<numero>\d+)/facture/$', FactureView.as_view(), {}, 'inscriptions.facture'),
     (r'^(?P<course_uid>[^/]+)/(?P<numero>\d+)/(?P<code>\w+)/$', 'form', {}, 'inscriptions.edit'),
     (r'^(?P<course_uid>[^/]+)/$', 'form', {}, 'inscriptions.create'),
     (r'^(?P<course_uid>[^/]+)/ipn/$', 'ipn', {}, 'inscriptions.ipn'),

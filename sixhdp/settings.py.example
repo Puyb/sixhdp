@@ -143,6 +143,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'inscriptions',
+    'easy_pdf',
 )
 
 # A sample logging configuration. The only tangible logging

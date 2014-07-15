@@ -16,6 +16,8 @@ from django.db.models import Min, Max, Count, Avg, Sum
 from utils import iriToUri, MailThread
 import traceback
 
+class NoPlaceLeftException(Exception):
+    pass
 
 SEXE_CHOICES = (
     ('H', _(u'Homme')),
@@ -117,12 +119,17 @@ class Course(models.Model):
             "hommes": 0,
             "femmes": 0,
             "paiement": 0,
+            "paiement_paypal": 0,
             "prix": 0,
             "nbcertifenattente": 0,
+            "documents": 0,
+            "documents_electroniques": 0,
+            "p": 0,
             "pc": 0,
             "pi": 0,
             "pe": 0,
             "pv": 0,
+            "ip": 0,
             "ipc": 0,
             "ipi": 0,
             "ipe": 0,
@@ -171,6 +178,9 @@ class Course(models.Model):
             token = ''
             if not equipe.paiement_complet():
                 token += 'i'
+                stats['ip'] += 1
+            else:
+                stats['p'] += 1
             token += 'p';
             if equipe.verifier():
                 token += 'v'
@@ -186,7 +196,9 @@ class Course(models.Model):
             stats['paiement'] = float(equipe.paiement or 0)
             stats['prix'] = float(equipe.prix)
             stats['nbcertifenattente'] = equipe.licence_manquantes_count + equipe.certificat_manquants_count + equipe.autorisation_manquantes_count
-            stats[equipe.categorie.code] = 1;
+            stats[equipe.categorie.code] += 1;
+            if equipe.paiement_paypal():
+                stats['paiement_paypal'] += 1
 
 
             for key, index in keys.items():
@@ -217,6 +229,18 @@ class Course(models.Model):
             } for ville in Ville.objects.filter(equipier__equipe__course=self).annotate(count=Count('equipier'))
             if ville.count > 0 ]
         result['villes'].sort(lambda a, b: cmp(b['count'], a['count']))
+
+        result['course']['documents'] = 0
+        result['course']['documents_electroniques'] = 0
+        for equipier in Equipier.objects.filter(equipe__course=self):
+            if equipier.piece_jointe_valide:
+                result['course']['documents'] += 1
+                if equipier.piece_jointe:
+                    result['course']['documents_electroniques'] += 1
+            if equipier.age() >= 18 and equipier.piece_jointe2_valide:
+                result['course']['documents'] += 1
+                if equipier.piece_jointe2:
+                    result['course']['documents_electroniques'] += 1
 
         return result
 
@@ -316,6 +340,7 @@ class Equipe(models.Model):
     gerant_ville2      = models.ForeignKey(Ville, null=True)
     numero             = models.IntegerField(_(u'Numéro'))
     connu              = models.CharField(_('Comment avez vous connu la course ?'), max_length=200, choices=CONNU_CHOICES)
+    date_facture       = models.DateField(_('Date facture'), blank=True, null=True)
 
     class Meta:
         unique_together = ( ('course', 'numero'), )
@@ -358,6 +383,9 @@ class Equipe(models.Model):
 
     def prix_paypal(self):
         return self.prix + self.frais_paypal()
+
+    def paiement_paypal(self):
+        return self.paiement_info.startswith('Paypal ') # and self.prix_paypal() - Decimal('0.01') < self.paiement and self.paiement < self.prix_paypal() + Decimal('0.01')
         
     def save(self, *args, **kwargs):
         if self.id:
@@ -407,6 +435,8 @@ class Equipe(models.Model):
             numero = start
         else:
             numero = res[0].numero + 1
+        if numero > end:
+            raise NoPlaceLeftException
         return numero
 
     @property
@@ -535,6 +565,8 @@ class TemplateMail(models.Model):
             if self.bcc:
                 bcc = re.split('[,; ]+', self.bcc)
             for dest in dests:
+                if settings.DEBUG:
+                    dest = 'puyb@puyb.net'
                 message = EmailMessage(subject, message, self.course.email_contact, [ dest ], bcc)
                 message.content_subtype = "html"
                 messages.append(message)

@@ -143,6 +143,14 @@
     <div class="grid_8">
         <canvas id="canvas_connu"></canvas>
     </div>
+    {% if user.is_staff %}
+    <div class="grid_8 clearfix">
+        <canvas id="canvas_paiement"></canvas>
+    </div>
+    <div class="grid_8">
+        <canvas id="canvas_documents"></canvas>
+    </div>
+    {% endif %}
 
 
     <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
@@ -260,4 +268,32 @@
         {% endfor %}
         g.draw();
     </script>
+    {% if user.is_staff %}
+    <script>
+        var colors = {};
+        // pies
+        var g = new Bluff.Pie('canvas_paiement', 400);
+        g.theme_pastel();
+        g.title = '';
+        g.tooltips = true;
+        g.sort = false;
+        g.zero_degree = -90;
+        g.data("Paypal", {{ stats.course.paiement_paypal }});
+        g.data("Autre", {{ stats.course.p }} - {{ stats.course.paiement_paypal }});
+        g.draw();
+    </script>
+    <script>
+        var colors = {};
+        // pies
+        var g = new Bluff.Pie('canvas_documents', 400);
+        g.theme_pastel();
+        g.title = '';
+        g.tooltips = true;
+        g.sort = false;
+        g.zero_degree = -90;
+        g.data("Electronique", {{ stats.course.documents_electroniques }});
+        g.data("Papier", {{ stats.course.documents }} - {{ stats.course.documents_electroniques }});
+        g.draw();
+    </script>
+    {% endif %}
 {% endblock %}
