@@ -295,5 +295,18 @@
         g.data("Papier", {{ stats.course.documents }} - {{ stats.course.documents_electroniques }});
         g.draw();
     </script>
+    <script>
+        var colors = {};
+        // pies
+        var g = new Bluff.Pie('canvas_documents', 400);
+        g.theme_pastel();
+        g.title = '';
+        g.tooltips = true;
+        g.sort = false;
+        g.zero_degree = -90;
+        g.data("Licenciés", {{ stats.course.licencies }});
+        g.data("Non licenciés", {{ stats.course.equipiers }} - {{ stats.course.licencies }});
+        g.draw();
+    </script>
     {% endif %}
 {% endblock %}
