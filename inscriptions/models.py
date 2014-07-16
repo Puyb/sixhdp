@@ -118,7 +118,6 @@ class Course(models.Model):
             "equipiers": 0,
             "hommes": 0,
             "femmes": 0,
-            "licencies": 0,
             "paiement": 0,
             "paiement_paypal": 0,
             "prix": 0,
@@ -156,7 +155,6 @@ class Course(models.Model):
                 valide_count=Sum('equipier__valide'),
                 erreur_count=Sum('equipier__erreur'),
                 hommes_count=Sum('equipier__homme'),
-                licencies_count=Count('equipier__num_licence'),
             ).select_related('categorie', 'gerant_ville2')
             .prefetch_related('equipier_set')
         )
@@ -177,7 +175,6 @@ class Course(models.Model):
             stats['equipiers'] = equipe.equipiers_count
             stats['hommes'] = equipe.hommes_count
             stats['femmes'] = equipe.equipiers_count - equipe.hommes_count
-            stats['licencies'] = equipe.licencies_count
             token = ''
             if not equipe.paiement_complet():
                 token += 'i'
@@ -235,6 +232,7 @@ class Course(models.Model):
 
         result['course']['documents'] = 0
         result['course']['documents_electroniques'] = 0
+        result['course']['licencies'] = 0
         for equipier in Equipier.objects.filter(equipe__course=self):
             if equipier.piece_jointe_valide:
                 result['course']['documents'] += 1
@@ -244,6 +242,8 @@ class Course(models.Model):
                 result['course']['documents'] += 1
                 if equipier.piece_jointe2:
                     result['course']['documents_electroniques'] += 1
+            if equipier.justificatif == 'licence':
+                result['course']['licencies'] +=1
 
         return result
 

@@ -102,7 +102,7 @@
         </table>
     </div>
     <div class="grid_10">
-        <canvas id="canvas_categories"></canvas><
+        <canvas id="canvas_categories"></canvas>
     </div>
     <div class="clearfix grid_16">
         <canvas id="canvas_time"></canvas>
@@ -149,6 +149,9 @@
     </div>
     <div class="grid_8">
         <canvas id="canvas_documents"></canvas>
+    </div>
+    <div class="grid_8 clearfix">
+        <canvas id="canvas_licencies"></canvas>
     </div>
     {% endif %}
 
@@ -253,6 +256,20 @@
         e2.style.display = 'none';
         e.addEventListener('click', function() { e.style.display = 'none', e2.style.display = 'block'; });
         e2.addEventListener('click', function() { e2.style.display = 'none', e.style.display = 'block'; });
+
+        // pies
+        var g = new Bluff.Pie('canvas_categories', 400);
+        g.theme_pastel();
+        g.title = '';
+        g.tooltips = true;
+        g.sort = false;
+        g.zero_degree = -90;
+        {% with stats.categories|pertinent_values:"equipes,2%" as categories %}
+        {% for key in categories %}
+        g.data("{{ key }}", {{ stats.categories|get:key|get:"equipes" }}, colors.categories && colors.categories["{{ key }}"]);
+        {% endfor %}
+        {% endwith %}
+        g.draw();
     </script>
     <script>
         var colors = {};
@@ -278,8 +295,8 @@
         g.tooltips = true;
         g.sort = false;
         g.zero_degree = -90;
-        g.data("Paypal", {{ stats.course.paiement_paypal }});
-        g.data("Autre", {{ stats.course.p }} - {{ stats.course.paiement_paypal }});
+        g.data("Paypal (" +       Math.round({{ stats.course.paiement_paypal }} / {{ stats.course.p }} * 100) + "%)", {{ stats.course.paiement_paypal }});
+        g.data("Autre (" + (100 - Math.round({{ stats.course.paiement_paypal }} / {{ stats.course.p }} * 100)) + "%)", {{ stats.course.p }} - {{ stats.course.paiement_paypal }});
         g.draw();
     </script>
     <script>
@@ -291,21 +308,21 @@
         g.tooltips = true;
         g.sort = false;
         g.zero_degree = -90;
-        g.data("Electronique", {{ stats.course.documents_electroniques }});
-        g.data("Papier", {{ stats.course.documents }} - {{ stats.course.documents_electroniques }});
+        g.data("Electronique ("  + Math.round({{ stats.course.documents_electroniques }} / {{ stats.course.documents }} * 100) + "%)", {{ stats.course.documents_electroniques }});
+        g.data("Papier (" + (100 - Math.round({{ stats.course.documents_electroniques }} / {{ stats.course.documents }} * 100)) + "%)", {{ stats.course.documents }} - {{ stats.course.documents_electroniques }});
         g.draw();
     </script>
     <script>
         var colors = {};
         // pies
-        var g = new Bluff.Pie('canvas_documents', 400);
+        var g = new Bluff.Pie('canvas_licencies', 400);
         g.theme_pastel();
         g.title = '';
         g.tooltips = true;
         g.sort = false;
         g.zero_degree = -90;
-        g.data("Licenciés", {{ stats.course.licencies }});
-        g.data("Non licenciés", {{ stats.course.equipiers }} - {{ stats.course.licencies }});
+        g.data("Licenciés (" +            Math.round({{ stats.course.licencies }} / {{ stats.course.equipiers }} * 100) + "%)", {{ stats.course.licencies }});
+        g.data("Non licenciés (" + (100 - Math.round({{ stats.course.licencies }} / {{ stats.course.equipiers }} * 100)) + "%)", {{ stats.course.equipiers }} - {{ stats.course.licencies }});
         g.draw();
     </script>
     {% endif %}
