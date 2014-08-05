@@ -23,21 +23,23 @@ def dossards(request, course_uid):
 @login_required
 def listing(request, course_uid, template='listing.html'):
     return render_to_response(template, RequestContext(request, {
-        'equipes': Equipe.objects.filter(course__uid=course_uid).order_by(*request.GET.get('order','id').split(','))
+        'equipes': Equipe.objects.filter(course__uid=course_uid).order_by(*request.GET.get('order','numero').split(',')),
+        'order': request.GET.get('order','numero')
     }))
 
 @login_required
 def listing_dossards(request, course_uid, template='listing_dossards.html'):
-    equipes = Equipe.objects.exclude(categorie__startswith='ID').order_by(*request.GET.get('order','id').split(','))
-    return render_to_response(template, RequestContext(request, {
-        'solo': Equipe.objects.filter(course__uid=course_uid, categorie__startswith='ID').order_by(*request.GET.get('order','id').split(',')),
-        'equipes': {
-            u'1 à 100':   equipes.filter(id__lt=101),
-            u'101 à 145': equipes.filter(id__gt=100, id__lt=146),
-            u'146 à 190': equipes.filter(id__gt=145, id__lt=191),
-            u'191 à 239': equipes.filter(id__gt=190),
-        }
-    }))
+    equipes = Equipe.objects.filter(course__uid=course_uid).order_by(*request.GET.get('order','numero').split(','))
+    splits = ('1,' + request.GET.get('split', '1000')).split(',')
+    splits = map(int, splits)
+    datas = {}
+    keys = []
+    for i in range(len(splits) - 1):
+        key = u'%d à %d' % (splits[i], splits[i + 1] - 1)
+        datas[key] = equipes.filter(numero__gte=splits[i],  numero__lt=splits[i + 1])
+        keys.append(key)
+
+    return render_to_response(template, RequestContext(request, { 'equipes': datas, 'keys': keys }))
 
 def equipiers(request, course_uid):
     return render_to_response('equipiers.html', RequestContext(request, {
@@ -50,7 +52,6 @@ def dossardsCSV(request, course_uid):
     out = cStringIO.StringIO()
     o=csv.writer(out)
     o.writerow([
-        'inscription',
         'equipe',
         'nom',
         'categorie',
@@ -68,7 +69,6 @@ def dossardsCSV(request, course_uid):
     ])
     for e in Equipier.objects.filter(equipe__course__uid=course_uid):
         row = [
-            e.equipe.id,
             e.equipe.numero,
             e.equipe.nom,
             e.equipe.categorie,
@@ -96,7 +96,6 @@ def dossardsEquipesCSV(request, course_uid):
     out = cStringIO.StringIO()
     o=csv.writer(out)
     o.writerow([
-        'inscription',
         'equipe',
         'nom',
         'categorie',
@@ -108,7 +107,6 @@ def dossardsEquipesCSV(request, course_uid):
     ])
     for e in Equipe.objects.filter(course__uid=course_uid):
         row = [
-            e.id,
             e.numero,
             e.nom,
             e.categorie,

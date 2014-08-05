@@ -1,3 +1,4 @@
+{% load stats %}
 <style>
     @page  { 
         size: A4 landscape;
@@ -15,37 +16,13 @@
     .nopb { page-break-after: avoid }
     .pb { page-break-after: auto }
 </style>
-<h1>SOLO</h1>
-<table>
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Nom</tH>
-            <th>Dossard</th>
-            <th>Coureur</th>
-            <th>Remarques</th>
-            <th>Caution</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for e in solo %}
-        <tr class="{% cycle 'odd' 'even' %}">
-            <td class="r">{{ e.id }}</td>
-            <td>{{ e.nom }}</td>
-            <td class="r">{{ e.numero }}</td>
-            <td>{{ e.gerant_prenom }} {{ e.gerant_nom }}</td>
-            <td style="color: red">
-                {% if not e.paiement_complet %}{{ e.prix }}€{% endif %}
-                {% for e2 in e.equipier_set.all %}{% if not e2.piece_jointe_valide %}Certif.{%endif %}{% endfor %}
-            </td>
-            <td></td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
 
-{% for k, l in equipes.items %}
-{% for e in l %}
+{% for k in keys %}
+<h1>Equipes {{ k }}: {% with equipes|get:k as es %}{{ es.count }}{% endwith %} équipes</h1>
+{% endfor %}
+<div style="page-break-before: always"></div>
+{% for k in keys %}
+{% for e in equipes|get:k %}
 {% if forloop.counter0|divisibleby:"10" %}
 <div style="page-break-before: always"></div>
 <div style="float: right; width: 3cm; text-align: right">{{ forloop.counter }}</div>
@@ -55,7 +32,6 @@
         <tr>
             <th>#</th>
             <th>Nom</tH>
-            <th>Dossard</th>
             <th>Gerant</th>
             <th>Nombre</tH>
             <th>Remarques</th>
@@ -65,10 +41,9 @@
 {% endif %}
     <tbody>
         <tr class="{% cycle 'odd' 'even' %} nopb">
-            <td  rowspan="2" class="r">{{ e.id }}</td>
+            <td  rowspan="2" class="r">{{ e.numero }}</td>
             <td>{{ e.nom }}</td>
-            <td class="r">{{ e.numero }}</td>
-            <td>{{ e.prenom }} {{ e.nom }}</td>
+            <td>{{ e.gerant_prenom }} {{ e.gerant_nom }}</td>
             <td class="r">{{ e.nombre }}</td>
             <td style="color: red">
                 {% if not e.paiement_complet %}{{ e.prix }}€{% endif %}
@@ -82,7 +57,7 @@
                     {{ e2.prenom }} {{ e2.nom }}
                     <b>{% if e2.age < 18 %}{% if not e2.autorisation_valide %}Aut. parentale{% endif %}{% endif %}
                         {% if not e2.piece_jointe_valide %}Certif.{% endif %}</b>
-                </span>,
+                </span>{% if not forloop.last %},{% endif %}
                 {% endfor %}
             </td>
         </tr>

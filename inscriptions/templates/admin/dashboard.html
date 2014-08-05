@@ -15,6 +15,7 @@ location.href = "choose/";
 </script>{% endif %}
 <div id="content-main">
 
+    {% with COURSE.stats as stats %}
     <div class="module">
         <table>
             <caption>
@@ -50,26 +51,26 @@ location.href = "choose/";
                 </th>
                 <td>
                     <a href="inscriptions/equipe/?paiement_complet=paye&status=complet">
-                        {{ COURSE.stats.course.pc }}
-                        ({% widthratio COURSE.stats.course.pc COURSE.stats.course.equipes 100 %}%)
+                        {{ stats.course.pc }}
+                        ({% widthratio stats.course.pc stats.course.equipes 100 %}%)
                     </a>
                 </td>
                 <td>
                     <a href="inscriptions/equipe/?paiement_complet=paye&status=incomplet">
-                        {{ COURSE.stats.course.pi }}
-                        ({% widthratio COURSE.stats.course.pi COURSE.stats.course.equipes 100 %}%)
+                        {{ stats.course.pi }}
+                        ({% widthratio stats.course.pi stats.course.equipes 100 %}%)
                     </a>
                 </td>
                 <td>
                     <a href="inscriptions/equipe/?paiement_complet=paye&status=erreur">
-                        {{ COURSE.stats.course.pe }}
-                        ({% widthratio COURSE.stats.course.pe COURSE.stats.course.equipes 100 %}%)
+                        {{ stats.course.pe }}
+                        ({% widthratio stats.course.pe stats.course.equipes 100 %}%)
                     </a>
                 </td>
                 <td>
                     <a href="inscriptions/equipe/?paiement_complet=paye&status=verifier">
-                        {{ COURSE.stats.course.pv }}
-                        ({% widthratio COURSE.stats.course.pv COURSE.stats.course.equipes 100 %}%)
+                        {{ stats.course.pv }}
+                        ({% widthratio stats.course.pv stats.course.equipes 100 %}%)
                     </a>
                 </td>
             </tr>
@@ -79,31 +80,32 @@ location.href = "choose/";
                 </th>
                 <td>
                     <a href="inscriptions/equipe/?paiement_complet=impaye&status=complet">
-                        {{ COURSE.stats.course.ipc }}
-                        ({% widthratio COURSE.stats.course.ipc COURSE.stats.course.equipes 100 %}%)
+                        {{ stats.course.ipc }}
+                        ({% widthratio stats.course.ipc stats.course.equipes 100 %}%)
                     </a>
                 </td>
                 <td>
                     <a href="inscriptions/equipe/?paiement_complet=impaye&status=incomplet">
-                        {{ COURSE.stats.course.ipi }}
-                        ({% widthratio COURSE.stats.course.ipi COURSE.stats.course.equipes 100 %}%)
+                        {{ stats.course.ipi }}
+                        ({% widthratio stats.course.ipi stats.course.equipes 100 %}%)
                     </a>
                 </td>
                 <td>
                     <a href="inscriptions/equipe/?paiement_complet=impaye&status=erreur">
-                        {{ COURSE.stats.course.ipe }}
-                        ({% widthratio COURSE.stats.course.ipe COURSE.stats.course.equipes 100 %}%)
+                        {{ stats.course.ipe }}
+                        ({% widthratio stats.course.ipe stats.course.equipes 100 %}%)
                     </a>
                 </td>
                 <td>
                     <a href="inscriptions/equipe/?paiement_complet=impaye&status=verifier">
-                        {{ COURSE.stats.course.ipv }}
-                        ({% widthratio COURSE.stats.course.ipv COURSE.stats.course.equipes 100 %}%)
+                        {{ stats.course.ipv }}
+                        ({% widthratio stats.course.ipv stats.course.equipes 100 %}%)
                     </a>
                 </td>
             </tr>
         </table>
     </div>
+    {% endwith %}
     <div class="module">
         <table>
             <caption>
