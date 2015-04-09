@@ -112,6 +112,10 @@ class Course(models.Model):
         mail = TemplateMail.objects.get(course=self, nom=nom)
         mail.send(instances)
 
+    @property
+    def date_certificat(self):
+        return self.date - timedelta(days=365)
+
     def stats(self):
         model_stats = {
             "equipes": 0,
