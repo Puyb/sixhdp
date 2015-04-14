@@ -86,6 +86,7 @@ class Course(models.Model):
     limite_participants = models.DecimalField(_(u"Limite du nombre de participants"), max_digits=6, decimal_places=0)
     limite_solo         = models.DecimalField(_(u"Limite du nombre de solo"), max_digits=6, decimal_places=0)
     paypal              = models.EmailField(_(u'Adresse paypal'))
+    frais_paypal_inclus = models.BooleanField(_(u'Frais paypal inclus'))
     ordre               = models.CharField(_(u'Ordre des chèques'), max_length=200)
     adresse             = models.TextField(_(u'Adresse'), blank=True)
     url                 = models.URLField(_(u'URL'))
@@ -386,6 +387,8 @@ class Equipe(models.Model):
         return True
 
     def frais_paypal(self):
+        if self.course.frais_paypal_inclus:
+            return Decimal('0.00')
         return ( self.prix + Decimal('0.25') ) / ( Decimal('1.000') - Decimal('0.034') ) - self.prix
 
     def prix_paypal(self):

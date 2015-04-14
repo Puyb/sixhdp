@@ -337,10 +337,6 @@ class EquipeAdmin(admin.ModelAdmin):
 #main_site.disable_action('delete_selected')
 site.register(Equipe, EquipeAdmin)
 
-class MaCourse(Course):
-    class Meta:
-        verbose_name = "Course"
-        proxy = True
 class CourseAdmin(admin.ModelAdmin):
     def queryset(self, request):
         qs = super(CourseAdmin, self).queryset(request)
@@ -348,7 +344,7 @@ class CourseAdmin(admin.ModelAdmin):
         qs = qs.filter(uid=course_uid)
         return qs
     pass
-site.register(MaCourse, CourseAdmin)
+site.register(Course, CourseAdmin)
 
 
 class CategorieAdmin(admin.ModelAdmin):
