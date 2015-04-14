@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-24 23:36+0100\n"
+"POT-Creation-Date: 2015-04-15 00:23+0200\n"
 "PO-Revision-Date: 2014-03-24 23:43+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,21 +17,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.6.4\n"
 
-#: static/form.js:70
+#: static/form.js:71
 msgid "Ce nom d'équipe est déjà utilisé !"
 msgstr "This team name is not avilable!"
 
-#: static/form.js:98
+#: static/form.js:99
 msgid ""
 "Désolé, il n'y a plus de place dans ces catégories. Changez le nombre de "
 "participants."
 msgstr "Sorry, no more seat in this category. Change the number of teammate."
 
-#: static/form.js:129
+#: static/form.js:130
 msgid "Veuillez corriger les champs en rouge."
 msgstr "Please correct the fields in red."
 
-#: static/form.js:149
+#: static/form.js:150
 msgid ""
 "Votre équipe n'est éligible dans aucune des catégories proposées pour cette "
 "compétition. Veuillez vous référer au réglement de la course disponible sur "
@@ -40,13 +40,13 @@ msgstr ""
 "Your team could not fit in any of the categories for this race. Please look "
 "at the rules of the race for the requirements of each category."
 
-#: static/form.js:173
+#: static/form.js:174
 msgid ""
 "Vos modifications impliquent un changement de catégorie. Veuillez "
 "sélectionner la nouvelle catégorie."
 msgstr "Your change need you to choose another category."
 
-#: static/form.js:215
+#: static/form.js:216
 msgid ""
 "Si vous le pouvez, scannez l'autorisation et ajoutez la en pièce jointe "
 "(formats PDF ou JPEG)."
@@ -54,7 +54,7 @@ msgstr ""
 "If you can, scan the parental authaurization and add it to the form (PDF or "
 "JPEG)."
 
-#: static/form.js:215
+#: static/form.js:216
 msgid ""
 "Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier (<a "
 "href=\"http://www.6hdeparis.fr/wp-content/uploads/2013/03/"
@@ -64,18 +64,18 @@ msgstr ""
 "www.6hdeparis.fr/wp-content/uploads/2013/03/autorisation_parentale.pdf\" "
 "target=\"_blank\">model</a>)."
 
-#: static/form.js:228
+#: static/form.js:229
 msgid "Licence"
 msgstr "License"
 
-#: static/form.js:233
+#: static/form.js:234
 msgid "Certificat médical"
 msgstr "Medical certificat"
 
-#: static/form.js:326
+#: static/form.js:327
 msgid "Vous devez choisir une catégorie"
 msgstr "You must choose a category"
 
-#: static/form.js:330
+#: static/form.js:331
 msgid "Vous devez accépter le règlement de la compétition"
 msgstr "You must accept the race rules"
