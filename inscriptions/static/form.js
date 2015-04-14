@@ -91,6 +91,7 @@ function check_step(data) {
             gerant_ville:       /^.+$/i,
             gerant_code_postal: /^[0-9]{4,6}$/i,
             gerant_email:       /^[a-z0-9+\-\._]+@([a-z0-9\-_]+\.)+[a-z]{2,5}$/i,
+            gerant_email2:      function(k) { return this.gerant_email === this.gerant_email2; },
             nombre:             function(k) {
                 var nombre = this.nombre;
                 if(CATEGORIES.filter(function(categorie) {
@@ -101,8 +102,8 @@ function check_step(data) {
                 }
                 return true;
             },
-            gerant_telephone:   /^\+?[0-9]{10,15}$/i
-
+            gerant_telephone:   /^\+?[0-9]{10,15}$/i,
+            connu:              /^.+$/i
         };
     } else {
         tests = {
@@ -249,6 +250,16 @@ Event.observe(window, 'load', function() {
         var tr = e.up('tr').hide();
         $('justif_EPX').down('table').insert(tr);
     });
+
+    var tr_email = $('id_gerant_email').up('tr');
+    var email_bis = tr_email.clone(true);
+    email_bis.down('input').id = "id_gerant_email2";
+    email_bis.down('input').setAttribute('name', "gerant_email2");
+    email_bis.down('label').setAttribute('for', "id_gerant_email2");
+    email_bis.down('label').innerHTML = gettext("E-mail (confirmation) :");
+    tr_email.insert({ after: email_bis });
+
+    $A($('id_connu').children).slice(1, -1).sort(function() { return Math.random()-.5; }).forEach(function(e) { e.parentNode.insertBefore(e, e.parentNode.down().next()); });
 
     disable_form_if_needed();
 
