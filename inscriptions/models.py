@@ -281,7 +281,7 @@ def lookup_ville(nom, cp, pays):
     nom = re.sub('[- ,/]+', ' ', nom)
     try:
         return Ville.objects.get(nom=nom)
-    except Ville.DoesNotExist, e:
+    except Ville.DoesNotExist as e:
         pass
 
     try:
@@ -308,7 +308,7 @@ def lookup_ville(nom, cp, pays):
         data['latLng']['lng'] = str(data['latLng']['lng'])
         try:
             return Ville.objects.get(lat=data['latLng']['lat'], lng=data['latLng']['lng'])
-        except Ville.DoesNotExist, e:
+        except Ville.DoesNotExist as e:
             pass
         obj = Ville(
             lat      = data['latLng']['lat'],
@@ -319,7 +319,7 @@ def lookup_ville(nom, cp, pays):
         )
         obj.save()
         return obj
-    except e:
+    except Exception as e:
         traceback.print_exc(e)
         return None
 
@@ -403,22 +403,22 @@ class Equipe(models.Model):
                 self.numero = self.getNumero()
                 try:
                     self.send_mail('changement_numero')
-                except e:
+                except Exception as e:
                     traceback.print_exc(e)
                 try:
                     self.send_mail('changement_numero_admin')
-                except e:
+                except Exception as e:
                     traceback.print_exc(e)
 
             paiement = Equipe.objects.get(id=self.id).paiement
             if paiement != self.paiement:
                 try:
                     self.send_mail('paiement')
-                except e:
+                except Exception as e:
                     traceback.print_exc(e)
                 try:
                     self.send_mail('paiement_admin')
-                except e:
+                except Exception as e:
                     traceback.print_exc(e)
         else:
             if not self.numero:

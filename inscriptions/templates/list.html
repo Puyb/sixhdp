@@ -4,6 +4,7 @@
 {% block content %}
     <style>
         .container_16 .grid_11 { width: 940px; }
+        tr:nth-child(odd) { background: #F2E5FF; }
     </style>
     <script>
         var nbcomplet = 0;
@@ -25,7 +26,7 @@
             {% endif %}
         </tr>
         {% for equipe in equipes %}
-        <tr>
+        <tr class="{% cycle 'odd' 'even' %}">
             <td>{{ equipe.numero }}</td>
             <td>{{ equipe.nom }}</td>
             <td>{{ equipe.club }}</td>

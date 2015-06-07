@@ -94,16 +94,16 @@ def form(request, course_uid, numero=None, code=None):
                 if not instance:
                     try:
                         course.send_mail('inscription', [ new_instance ])
-                    except Exception, e:
+                    except Exception as e:
                         traceback.print_exc(e)
                     try:
                         course.send_mail('inscription_admin', [ new_instance ])
-                    except Exception, e:
+                    except Exception as e:
                         traceback.print_exc(e)
                 return redirect('inscriptions.done', course_uid=course.uid, numero=new_instance.numero)
-        except NoPlaceLeftException, e:
+        except NoPlaceLeftException as e:
             message = _(u"Désolé, il n'y a plus de place dans cette catégorie")
-        except Exception, e:
+        except Exception as e:
             raise e
     else:
         equipe_form = EquipeForm(instance=instance)
@@ -171,7 +171,7 @@ def ipn(request, course_uid):
         equipe.paiement_info = 'Paypal %s %s' % (datetime.now(), data['txn_id'])
         equipe.save()
 
-    except Exception, e:
+    except Exception as e:
         print >>sys.stderr, e
 
     return HttpResponse()
