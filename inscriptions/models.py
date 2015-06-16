@@ -233,7 +233,7 @@ class Course(models.Model):
                 'count': ville.count,
             } for ville in Ville.objects.filter(equipier__equipe__course=self).annotate(count=Count('equipier'))
             if ville.count > 0 ]
-        result['villes'].sort(lambda a, b: cmp(b['count'], a['count']))
+        result['villes'].sort(lambda a, b: cmp(b['count'], a['count']) or cmp(a['nom'], b['nom']))
 
         result['course']['documents'] = 0
         result['course']['documents_electroniques'] = 0
@@ -283,6 +283,8 @@ def lookup_ville(nom, cp, pays):
         return Ville.objects.get(nom=nom)
     except Ville.DoesNotExist as e:
         pass
+    except Ville.MultipleObjectsReturned as e:
+        pass
 
     try:
         f = urllib.urlopen(iriToUri('http://open.mapquestapi.com/geocoding/v1/address?key=%s&location=%s' % (MAPQUEST_API_KEY, nom + ' ' + cp + ', ' + str(pays))))
@@ -292,7 +294,9 @@ def lookup_ville(nom, cp, pays):
         if('results' not in data or
            not len(data['results']) or
            'locations' not in data['results'][0] or
-           not len(data['results'][0]['locations'])):
+           not len(data['results'][0]['locations']) or
+           data['results'][0]['locations'][0].get('adminArea5', '') == ''
+           ):
             f = urllib.urlopen(iriToUri('http://open.mapquestapi.com/geocoding/v1/address?key=%s&location=%s' % (MAPQUEST_API_KEY, nom + ', ' + str(pays))))
             data = simplejson.load(f)
             f.close()
@@ -300,7 +304,9 @@ def lookup_ville(nom, cp, pays):
             if('results' not in data or
                not len(data['results']) or
                'locations' not in data['results'][0] or
-               not len(data['results'][0]['locations'])):
+               not len(data['results'][0]['locations']) or
+               data['results'][0]['locations'][0].get('adminArea5', '') == ''
+               ):
                 return None
 
         data = data['results'][0]['locations'][0]
@@ -319,6 +325,9 @@ def lookup_ville(nom, cp, pays):
         )
         obj.save()
         return obj
+    except simplejson.JSONDecodeError as e:
+        print(f)
+        traceback.print_exc(e)
     except Exception as e:
         traceback.print_exc(e)
         return None
@@ -572,12 +581,3 @@ class TemplateMail(models.Model):
             message = Template(self.message).render(context)
 
             bcc = []
-            if self.bcc:
-                bcc = re.split('[,; ]+', self.bcc)
-            for dest in dests:
-                if settings.DEBUG:
-                    dest = 'puyb@puyb.net'
-                message = EmailMessage(subject, message, self.course.email_contact, [ dest ], bcc)
-                message.content_subtype = "html"
-                messages.append(message)
-        MailThread(messages).start()

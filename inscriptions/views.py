@@ -249,28 +249,32 @@ def stats(request, course_uid):
     }))
 
 def stats_compare(request, course_uid, course_uid2):
+    uids = [ course_uid ]
+    uids.extend(course_uid2.split(','))
+
     course1 = get_object_or_404(Course, uid=course_uid)
-    stats1 = course1.stats()
-    course2 = get_object_or_404(Course, uid=course_uid2)
-    stats2 = course2.stats()
+    date1 = course1.date
+    #deltas = request.GET['delta'] 
 
-    duree1 = course1.date - course1.date_ouverture
-    duree2 = course2.date - course2.date_ouverture
-    delta = duree1.days - duree2.days
-    if 'delta' in request.GET:
-        delta = request.GET['delta'] or 0
+    res = []
+    i = 0;
+    for uid in uids:
+        course = get_object_or_404(Course, uid=uid)
+        stats = course.stats()
+        delta = (date1 - date).days
+        #if 'delta' in request.GET:
+        #    delta = request.GET['delta'] or 0
+        res.append({
+            'index': i,
+            'stats': stats,
+            'course': course,
+            'json': json.dumps(stats),
+            'delta': delta,
+            'augment': (course.date_augmentation - course.date_ouverture).days,
+        });
+        i += 1;
 
-    return render_to_response('stats_compare.html', RequestContext(request, {
-        'stats1': stats1,
-        'course1': course1,
-        'json1': json.dumps(stats1),
-        'stats2': stats2,
-        'course2': course2,
-        'json2': json.dumps(stats2),
-        'delta': delta,
-        'augment1': (course1.date_augmentation - course1.date_ouverture).days,
-        'augment2': (course2.date_augmentation - course2.date_ouverture).days,
-    }))
+    return render_to_response('stats_compare.html', RequestContext(request, { 'data': res }));
 
 def index(request):
     return render_to_response('index.html', RequestContext(request, {

@@ -28,7 +28,7 @@ class CourseAdminSite(admin.sites.AdminSite):
             return True
         if request.user.is_superuser:
             return True
-        if request.COOKIES.has_key('course_uid'):
+        if not request.COOKIES.has_key('course_uid'):
             return False
         course_uid = request.COOKIES['course_uid']
         return request.user.profile.course.filter(uid=course_uid)

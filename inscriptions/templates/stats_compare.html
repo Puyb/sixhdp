@@ -28,37 +28,35 @@
         g2.marker_font_size = 12;
         g2.y_axis_increment = 10;
 
-        var stats1 = {{ json1|safe }};
-        var stats2 = {{ json2|safe }};
+        var stats = [{% for d in data %}{{ d.json|safe }}{% if not forloop.last %},{% endif %}{% endfor %}];
 
-        var min = Math.min(0, {{ delta }});
-        var max = Math.max({{ stats1.jours.keys|get_max }}, {{ stats2.jours.keys|get_max }} + {{ delta }});
+
+        var min = Math.min({% for d in data %}{{ d.delta }}{% if not forloop.last %},{% endif %}{% endfor %});
+        var max = Math.max({% for d in data %}{{ d.stats.jours.keys|get_max }} + {{ d.delta }}{% if not forloop.last %},{% endif %}{% endfor %});
         var cumul1 = cumul2 = 0;
         console.log(min, max);
-        var d1 = [], d2 = [];
+        {% for d in data %}
+        var dataPlot = [];
         for(var i = min; i < max; i++) {
-            var a = b = 0;
-            if(i in stats1.jours)
-                a = stats1.jours[i].equipes;
-            if(i - {{ delta }} in stats2.jours)
-                b = stats2.jours[i - {{ delta }}].equipes;
-            d1.push(a);
-            d2.push(b);
+            var a = 0;
+            if(i - {{ d.delta }} in stats[{{ d.index }}].jours)
+                a = stats[{{ d.index }}].jours[i - {{ d.delta }}].equipes;
+            if(i <= {{ d.stats.jours.keys|get_max }} + {{ d.delta }}) 
+                dataPlot.push(a);
         }
         
         var cumul = 0;
-        g.data("{{ course1.uid }}", d1.map(function(value) { return cumul += value; }));
-        var cumul = 0;
-        g.data("{{ course2.uid }}", d2.map(function(value) { return cumul += value; }));
-        g2.data("{{ course1.uid }}", d1);
-        g2.data("{{ course2.uid }}", d2);
+        g.data("{{ d.course.uid }}", dataPlot.map(function(value) { return cumul += value; }));
+        g2.data("{{ d.course.uid }}", dataPlot);
+        {% endfor %}
 
         g.labels = {};
         for(var i = min; i < max; i += 7) {
-            g.labels[i] = i;
-            var d1 = new Date({{ course1.date_ouverture.year }}, {{ course1.date_ouverture.month }} - 1, {{ course1.date_ouverture.day }} + i + {{ delta }});
-            var d2 = new Date({{ course2.date_ouverture.year }}, {{ course2.date_ouverture.month }} - 1, {{ course2.date_ouverture.day }} + i);
-            g.labels[i] = d1.getDate() + '/' + (d1.getMonth() + 1) + '<br />' + d2.getDate() + '/' + (d2.getMonth() + 1);
+            g.labels[i - min] = max - i;
+            {% for d in data %}
+            var d1 = new Date({{ d.course.date_ouverture.year }}, {{ d.course.date_ouverture.month }} - 1, {{ d.course.date_ouverture.day }} + i - {{ d.delta }});
+            g.labels[i - min] += '<br /><span style="color: ' + g.colors[{{ d.index }}] + '">' + d1.getDate() + '/' + (d1.getMonth() + 1) + '</span>';
+            {% endfor %}
         }
         g2.labels = g.labels;
         g.draw();
@@ -68,12 +66,15 @@
             var x = g._graph_left + (g.x_increment * index);
             g._d.line(x, g._graph_bottom, x, g._graph_top);
         }
-        g._d.stroke = g._data[0][2];
-        var x = g._graph_left + (g.x_increment * ({{ augment1 }} - {{ delta }}));
+        {% for d in data %}
+        g._d.stroke = g._data[{{ d.index }}][2];
+        var x = g._graph_left + (g.x_increment * ({{ d.augment }} + {{ d.delta }} - min));
         g._d.line(x, g._graph_bottom, x, g._graph_top);
-        g._d.stroke = g._data[1][2];
-        var x = g._graph_left + (g.x_increment * {{ augment2 }});
-        g._d.line(x, g._graph_bottom, x, g._graph_top);
+
+        g2._d.stroke = g2._data[{{ d.index }}][2];
+        var x = g2._graph_left + (g2.x_increment * ({{ d.augment }} + {{ d.delta }} - min));
+        g2._d.line(x, g2._graph_bottom, x, g2._graph_top);
+        {% endfor %}
 
         g2.draw();
         g2._d.stroke = '#ccc';
@@ -82,12 +83,6 @@
             var x = g2._graph_left + (g2.x_increment * index);
             g2._d.line(x, g2._graph_bottom, x, g2._graph_top);
         }
-        g2._d.stroke = g2._data[0][2];
-        var x = g2._graph_left + (g2.x_increment * ({{ augment1 }} - {{ delta }}));
-        g2._d.line(x, g2._graph_bottom, x, g2._graph_top);
-        g2._d.stroke = g2._data[1][2];
-        var x = g2._graph_left + (g2.x_increment * {{ augment2 }});
-        g2._d.line(x, g2._graph_bottom, x, g2._graph_top);
 
 
         var e = document.getElementById('canvas_time').parentNode;

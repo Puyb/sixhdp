@@ -66,7 +66,7 @@
     </div>
     <div class="clearfix grid_4">
         <table>
-            <tr><th>Villes</th><th>#</th><th>%</th></tr>
+            <tr><th>Villes des participants</th><th>#</th><th>%</th></tr>
             {% for ville in stats.villes|slice:":20" %}
             <tr><td>{{ ville.nom }}</td><td>{{ ville.count }}</td><td>{% widthratio villes.count stats.course.equipiers 100 %}%</td></tr>
             {% endfor %}
@@ -74,7 +74,7 @@
     </div>
     <div class="grid_4">
         <table>
-            <tr><th>Origine</th><th>#</th><th>%</th></tr>
+            <tr><th>Origine des &eacute;quipes</th><th>#</th><th>%</th></tr>
             {% with stats.pays|pertinent_values:"equipes" as pays %}
             {% for key in pays %}
             <tr><td><img src="/static/flags/{{ stats.pays|get:key|get:"pays"|lower }}.png" alt="{{ stats.pays|get:key|get:"pays"|lower }}" /> {{ key }}</td><td>{{ stats.pays|get:key|get:"equipes" }}</td><td>{% widthratio stats.pays|get:key|get:"equipes" stats.course.equipes 100 %}%</td></tr>
