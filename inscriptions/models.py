@@ -581,3 +581,12 @@ class TemplateMail(models.Model):
             message = Template(self.message).render(context)
 
             bcc = []
+            if self.bcc:
+                bcc = re.split('[,; ]+', self.bcc)
+            for dest in dests:
+                if settings.DEBUG:
+                    dest = 'puyb@puyb.net'
+                message = EmailMessage(subject, message, self.course.email_contact, [ dest ], bcc)
+                message.content_subtype = "html"
+                messages.append(message)
+        MailThread(messages).start()
