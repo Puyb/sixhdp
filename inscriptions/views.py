@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys, urllib2, random, traceback
+import sys, urllib2, random, traceback, json
 from models import Equipe, Equipier, Categorie, Ville, Course, SEXE_CHOICES, JUSTIFICATIF_CHOICES, NoPlaceLeftException
 from decorators import open_closed
 from django.shortcuts import render_to_response, get_object_or_404, redirect
@@ -15,11 +15,13 @@ from django.utils.translation import ugettext as _
 from django.utils.http import urlencode
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Count, Sum, F
+from django.conf import settings
 from settings import *
 from datetime import datetime, date
 from django.utils import timezone
 from easy_pdf.views import PDFTemplateView
-import json
+from django.core.mail import EmailMessage
+from utils import MailThread
 
 class EquipeForm(ModelForm):
     class Meta:
@@ -101,6 +103,17 @@ def form(request, course_uid, numero=None, code=None):
                     except Exception as e:
                         traceback.print_exc(e)
                 return redirect('inscriptions.done', course_uid=course.uid, numero=new_instance.numero)
+            else:
+                text = 'Error in form submit\n'
+                text += request.META['REMOTE_ADDR'] + '\n'
+                text += request.path + '\n'
+                text += json.dumps(equipe_form.errors) + '\n'
+                for f in equipier_formset:
+                    text += json.dumps(f.errors) + '\n'
+                text += json.dumps(request.POST)
+                mail = EmailMessage('Error in form submit', text, course.email_contact, [ settings.SERVER_EMAIL ])
+                mail.content_subtype = "text"
+                MailThread([ mail ]).start()
         except NoPlaceLeftException as e:
             message = _(u"Désolé, il n'y a plus de place dans cette catégorie")
         except Exception as e:

@@ -89,7 +89,7 @@ function check_step(data) {
             gerant_nom:         /^.+$/i,
             gerant_prenom:      /^.+$/i,
             gerant_ville:       /^.+$/i,
-            gerant_code_postal: /^[0-9]{4,6}$/i,
+            gerant_code_postal: function(k) { return this.gerant_pays === 'FR' ? /^[0-9]{4,6}$/i.test(this.gerant_code_postal) : this.gerant_code_postal.length > 0; },
             gerant_email:       /^[a-z0-9+\-\._]+@([a-z0-9\-_]+\.)+[a-z]{2,5}$/i,
             gerant_email2:      function(k) { return this.gerant_email === this.gerant_email2; },
             nombre:             function(k) {
@@ -111,7 +111,7 @@ function check_step(data) {
             prenom:             /^.+$/i,
             sexe:               /^[HF]$/,
             ville:              /^.+$/i,
-            code_postal:        /^[0-9]{4,6}$/i,
+            code_postal:        function(k) { return this.pays === 'FR' ? /^[0-9]{4,6}$/i.test(this.code_postal) : this.code_postal.length > 0; },
             email:              /^[a-z0-9+\-\._]+@([a-z0-9\-_]+\.)+[a-z]{2,5}$/i,
             date_de_naissance:  function(k) { return check_date(this, k) && age(COURSE.MIN_AGE)(this); },
             num_licence:        function(k) { return this.justificatif !== 'licence' || /^[0-9]{3,9}$/i.test(this[k]); }
