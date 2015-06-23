@@ -63,8 +63,9 @@ def form(request, course_uid, numero=None, code=None, imaginr=False):
         #    }))
         if instance.password != code:
             raise Http404()
+        imaginr = "Imagin'r" in instance.commentaires
     if request.method == 'POST':
-        if request.POST.get('imaginr', False):
+        if 'imaginr' in request.POST:
             imaginr = True
         try:
             equipe_form = EquipeForm(request.POST, request.FILES, instance=instance)
@@ -86,7 +87,7 @@ def form(request, course_uid, numero=None, code=None, imaginr=False):
                 if not instance:
                     new_instance.password = '%06x' % random.randrange(0x100000, 0xffffff)
                     if imaginr:
-                        new_instance.commentaire = "Imagin'r"
+                        new_instance.commentaires = "Imagin'r"
                 #if instance and instance.categorie == new_instance.categorie and instance.prix:
                 #    new_instance.prix = instance.prix
                 #else:

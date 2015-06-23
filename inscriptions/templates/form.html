@@ -64,6 +64,7 @@
     CATEGORIES.some(function(c) {
         if(c.code === 'EFX') {
             c.prix -= 15;
+            c.label += " (promo Imagin'R)";
             return true;
         }
     });
