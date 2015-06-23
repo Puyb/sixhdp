@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 from django.db.models import Min, Max, Count, Avg, Sum
 from utils import iriToUri, MailThread
 import traceback
+import pytz
 
 class NoPlaceLeftException(Exception):
     pass
@@ -163,11 +164,12 @@ class Course(models.Model):
             ).select_related('categorie', 'gerant_ville2')
             .prefetch_related('equipier_set')
         )
+        tz = pytz.timezone('Europe/Paris')
         for equipe in equipes:
             stats = model_stats.copy()
             keys = {
                 "categories": equipe.categorie_id and equipe.categorie.code or '',
-                "jours": (equipe.date.date() - self.date_ouverture).days,
+                "jours": (equipe.date.astimezone(tz).date() - self.date_ouverture).days,
                 "pays":    '',
             }
             if equipe.gerant_ville2:

@@ -5,7 +5,36 @@
 
 {% block main %}
     <div class="clearfix grid_16">
+        Point de comparaison :
+        <form id="formAlign">
+            <ul>
+                <li>
+                    <input type="radio" name="align" id="align1" value="" {% if align == "" %}checked {% endif %}/>
+                    <label for="align1">Date de la course</label>
+                </li>
+                <li>
+                    <input type="radio" name="align" id="align2" value="augment" {% if align == "augment" %}checked {% endif %}/>
+                    <label for="align2">Date d'augmentation</label>
+                </li>
+                <li>
+                    <input type="radio" name="align" id="align3" value="start" {% if align == "start" %}checked {% endif %}/>
+                    <label for="align3">Date d'ouverture</label>
+                </li>
+            </ul>
+        </form>
+        <script>
+            [].forEach.call(document.getElementsByTagName('input'), function(e) {
+                e.addEventListener('click', function() {
+                    document.getElementById('formAlign').submit();
+                });
+            });
+        </script>
+    </div>
+
+    <div class="clearfix grid_16" style="margin-bottom: 50px">
         <canvas id="canvas_time"></canvas>
+    </div>
+    <div class="clearfix grid_16">
         <canvas id="canvas_time2"></canvas>
     </div>
 
@@ -70,10 +99,6 @@
         g._d.stroke = g._data[{{ d.index }}][2];
         var x = g._graph_left + (g.x_increment * ({{ d.augment }} + {{ d.delta }} - min));
         g._d.line(x, g._graph_bottom, x, g._graph_top);
-
-        g2._d.stroke = g2._data[{{ d.index }}][2];
-        var x = g2._graph_left + (g2.x_increment * ({{ d.augment }} + {{ d.delta }} - min));
-        g2._d.line(x, g2._graph_bottom, x, g2._graph_top);
         {% endfor %}
 
         g2.draw();
@@ -85,10 +110,10 @@
         }
 
 
-        var e = document.getElementById('canvas_time').parentNode;
-        var e2 = document.getElementById('canvas_time2').parentNode;
-        e2.style.display = 'none';
-        e.addEventListener('click', function() { e.style.display = 'none', e2.style.display = 'block'; });
-        e2.addEventListener('click', function() { e2.style.display = 'none', e.style.display = 'block'; });
+        // var e = document.getElementById('canvas_time').parentNode;
+        // var e2 = document.getElementById('canvas_time2').parentNode;
+        // e2.style.display = 'none';
+        // e.addEventListener('click', function() { e.style.display = 'none', e2.style.display = 'block'; });
+        // e2.addEventListener('click', function() { e2.style.display = 'none', e.style.display = 'block'; });
     </script>
 {% endblock %}

@@ -265,18 +265,25 @@ def stats_compare(request, course_uid, course_uid2):
     uids = [ course_uid ]
     uids.extend(course_uid2.split(','))
 
+    align = request.GET.get('align', '')
     course1 = get_object_or_404(Course, uid=course_uid)
-    date1 = course1.date
-    #deltas = request.GET['delta'] 
+    duree1 = (course1.date - course1.date_ouverture).days
+    if align == "augment":
+        duree1 = (course1.date_augmentation - course1.date_ouverture).days
 
     res = []
     i = 0;
     for uid in uids:
         course = get_object_or_404(Course, uid=uid)
         stats = course.stats()
-        delta = (date1 - date).days
-        #if 'delta' in request.GET:
-        #    delta = request.GET['delta'] or 0
+        
+        duree = (course.date - course.date_ouverture).days
+        if align == "augment":
+            duree = (course.date_augmentation - course.date_ouverture).days
+
+        delta = duree1 - duree
+        if align == 'start':
+            delta = 0
         res.append({
             'index': i,
             'stats': stats,
@@ -287,7 +294,10 @@ def stats_compare(request, course_uid, course_uid2):
         });
         i += 1;
 
-    return render_to_response('stats_compare.html', RequestContext(request, { 'data': res }));
+    return render_to_response('stats_compare.html', RequestContext(request, {
+        'data': res,
+        'align': request.GET.get('align', '')
+    }));
 
 def index(request):
     return render_to_response('index.html', RequestContext(request, {
