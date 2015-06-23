@@ -47,7 +47,7 @@ EquipierFormset = formset_factory(EquipierForm, formset=BaseModelFormSet, extra=
 EquipierFormset.model = Equipier
 
 @open_closed
-def form(request, course_uid, numero=None, code=None):
+def form(request, course_uid, numero=None, code=None, imaginr=False):
     course = get_object_or_404(Course, uid=course_uid)
     instance = None
     old_password = None
@@ -64,6 +64,8 @@ def form(request, course_uid, numero=None, code=None):
         if instance.password != code:
             raise Http404()
     if request.method == 'POST':
+        if request.POST.get('imaginr', False):
+            imaginr = True
         try:
             equipe_form = EquipeForm(request.POST, request.FILES, instance=instance)
             if instance:
@@ -83,6 +85,8 @@ def form(request, course_uid, numero=None, code=None):
                 new_instance.password = old_password
                 if not instance:
                     new_instance.password = '%06x' % random.randrange(0x100000, 0xffffff)
+                    if imaginr:
+                        new_instance.commentaire = "Imagin'r"
                 #if instance and instance.categorie == new_instance.categorie and instance.prix:
                 #    new_instance.prix = instance.prix
                 #else:
@@ -142,6 +146,7 @@ def form(request, course_uid, numero=None, code=None):
         "equipiers_count": equipiers_count,
         "course": course,
         "message": message,
+        "imaginr": imaginr,
     }))
 
 @open_closed

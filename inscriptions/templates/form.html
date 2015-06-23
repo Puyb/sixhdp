@@ -60,9 +60,18 @@
     {% endif %}
     var I18N = {};
     {% if message %} alert("{{ message }}"); location.reload(true); {% endif %}
+    {% if imaginr %}
+    CATEGORIES.some(function(c) {
+        if(c.code === 'EFX') {
+            c.prix -= 15;
+            return true;
+        }
+    });
+    {% endif %}
 </script>
 <script src="{{ STATIC_URL }}form.js"></script>
 <form method="post" enctype="multipart/form-data" onsubmit="$('button_submit').disabled = true; $('button_submit').style.display=='none'">
+    {% if imaginr %}<input type="hidden" name="imaginr" value=1" />{% endif %}
     <div id="errors">
         {% if equipe_form.errors %}
         <h3>{% trans 'Informations générales' %}</h3>
