@@ -154,7 +154,7 @@ function setup_categories(data) {
 
     // generate html
     $('catwrapper').innerHTML = actual_categories.map(function(c) {
-        return '<input type="radio" value="#{id}" name="categorie" id="id_categorie_id-#{id}"><label for="id_categorie-#{id}">#{label} - #{prix} €</label><br />'.interpolate(c);
+        return '<input type="radio" value="#{id}" name="categorie" id="id_categorie-#{id}"><label for="id_categorie-#{id}">#{label} - #{prix} €</label><br />'.interpolate(c);
     }).join('');
 
     disable_form_if_needed();
