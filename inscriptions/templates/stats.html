@@ -175,7 +175,24 @@
         L.marker(point).addTo(map).bindPopup("{{ ville.nom|escapejs }} : {{ ville.count }}");
         {% endif %}{% endfor %}
         {% endlocalize %}
-        map.fitBounds(points);
+        var bounds = [[points[0][0], points[0][1]], [points[0][0], points[0][1]]];
+        points.forEach(function(point) {
+            if(point[0] < bounds[0][0])
+                bounds[0][0] = point[0];
+            if(point[1] < bounds[0][1])
+                bounds[0][1] = point[1];
+            if(point[0] > bounds[1][0])
+                bounds[1][0] = point[0];
+            if(point[1] > bounds[1][1])
+                bounds[1][1] = point[1];
+        });
+        var marginX = Math.abs(.1 * (bounds[0][0] - bounds[1][0]));
+        var marginY = Math.abs(.1 * (bounds[0][1] - bounds[1][1]));
+        bounds[0][0] -= marginX;
+        bounds[1][0] += marginX;
+        bounds[0][1] -= marginY;
+        bounds[1][1] += marginY;
+        map.fitBounds(bounds);
     </script>
     <script>
         var colors = {};
