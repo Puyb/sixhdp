@@ -140,6 +140,7 @@ def form(request, course_uid, numero=None, code=None, imaginr=False):
     return render_to_response("form.html", RequestContext(request, {
         "equipe_form": equipe_form,
         "equipier_formset": equipier_formset,
+        "errors": equipe_form.errors or reduce(lambda a,b: a or b, [e.errors for e in equipier_formset]),
         "instance": instance,
         "create": not instance,
         "update": not not instance,
