@@ -75,6 +75,16 @@ DESTINATAIRE_CHOICES = (
 #class Chalenge(model.Model):
 #    nom = models.CharField(_('Nom'), max=200)
 
+def normalize_club(club):
+    club = club.upper().strip()
+    table = {
+        u'': u'Aucun',
+        u'-': u'Aucun',
+        u'INDÉPENDANT': u'Aucun',
+        u'INDéPENDANT': u'Aucun',
+    }
+    return table.get(club, club)
+
 class Course(models.Model):
     nom                 = models.CharField(_(u'Nom'), max_length=200)
     uid                 = models.CharField(_(u'uid'), max_length=200)
@@ -149,6 +159,7 @@ class Course(models.Model):
             "pays": {},
             "course": model_stats.copy(),
             "connu": {},
+            "clubs": {},
         }
 
         equipes = (Equipe.objects.filter(course=self)
@@ -171,6 +182,7 @@ class Course(models.Model):
                 "categories": equipe.categorie_id and equipe.categorie.code or '',
                 "jours": (equipe.date.astimezone(tz).date() - self.date_ouverture).days,
                 "pays":    '',
+                "clubs": normalize_club(equipe.club),
             }
             if equipe.gerant_ville2:
                 keys['pays'] = equipe.gerant_ville2.pays
