@@ -357,7 +357,7 @@ class CategorieAdmin(admin.ModelAdmin):
         course_uid = request.COOKIES['course_uid']
         qs = qs.filter(course__uid=course_uid)
         return qs
-    list_display = ('code', 'nom', 'min_equipiers', 'max_equipiers', 'min_age', 'sexe', )
+    list_display = ('code', 'nom', 'min_equipiers', 'max_equipiers', 'min_age', 'sexe', 'numero_debut', 'numero_fin', )
 site.register(Categorie, CategorieAdmin)
 
 
