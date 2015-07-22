@@ -34,8 +34,8 @@ MIXITE_CHOICES = (
 )
 
 JUSTIFICATIF_CHOICES = (
-    ('licence',    _(u'Licence FFRS 2014')),
-    ('certificat', _(u'Certificat médical établi après le 3/08/2013')),
+    ('licence',    _(u'Licence FFRS')),
+    ('certificat', _(u'Certificat médical')),
 )
 
 ROLE_CHOICES = (
@@ -95,8 +95,7 @@ class Course(models.Model):
     date_augmentation   = models.DateField(_(u"Date d'augmentation dss tarifs"))
     date_fermeture      = models.DateField(_(u"Date de fermeture des inscriptions"))
     limite_participants = models.DecimalField(_(u"Limite du nombre de participants"), max_digits=6, decimal_places=0)
-    limite_solo         = models.DecimalField(_(u"Limite du nombre de solo"), max_digits=6, decimal_places=0)
-    paypal              = models.EmailField(_(u'Adresse paypal'))
+    paypal              = models.EmailField(_(u'Adresse paypal'), blank=True)
     frais_paypal_inclus = models.BooleanField(_(u'Frais paypal inclus'))
     ordre               = models.CharField(_(u'Ordre des chèques'), max_length=200)
     adresse             = models.TextField(_(u'Adresse'), blank=True)
