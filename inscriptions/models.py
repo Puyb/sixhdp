@@ -140,6 +140,7 @@ class Course(models.Model):
             "nbcertifenattente": 0,
             "documents": 0,
             "documents_electroniques": 0,
+            "documents_attendus": 0,
             "p": 0,
             "pc": 0,
             "pi": 0,
@@ -251,16 +252,22 @@ class Course(models.Model):
 
         result['course']['documents'] = 0
         result['course']['documents_electroniques'] = 0
+        result['course']['documents_attendus'] = 0
         result['course']['licencies'] = 0
         for equipier in Equipier.objects.filter(equipe__course=self):
             if equipier.piece_jointe_valide:
                 result['course']['documents'] += 1
                 if equipier.piece_jointe:
                     result['course']['documents_electroniques'] += 1
-            if equipier.age() >= 18 and equipier.piece_jointe2_valide:
-                result['course']['documents'] += 1
-                if equipier.piece_jointe2:
-                    result['course']['documents_electroniques'] += 1
+            else:
+                result['course']['documents_attendus'] += 1
+            if equipier.age() < 18:
+                if equipier.piece_jointe2_valide:
+                    result['course']['documents'] += 1
+                    if equipier.piece_jointe2:
+                        result['course']['documents_electroniques'] += 1
+                else:
+                    result['course']['documents_attendus'] += 1
             if equipier.justificatif == 'licence':
                 result['course']['licencies'] +=1
 

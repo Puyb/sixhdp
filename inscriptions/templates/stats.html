@@ -426,8 +426,9 @@
         g.tooltips = true;
         g.sort = false;
         g.zero_degree = -90;
-        g.data("Paypal (" +       Math.round({{ stats.course.paiement_paypal }} / {{ stats.course.p }} * 100) + "%)", {{ stats.course.paiement_paypal }});
-        g.data("Autre (" + (100 - Math.round({{ stats.course.paiement_paypal }} / {{ stats.course.p }} * 100)) + "%)", {{ stats.course.p }} - {{ stats.course.paiement_paypal }});
+        g.data("Paypal (" + Math.round( {{ stats.course.paiement_paypal }} / {{ stats.course.equipes }} * 100) + "%)", {{ stats.course.paiement_paypal }});
+        g.data("Autre ("  + Math.round(({{ stats.course.p }} - {{ stats.course.paiement_paypal }}) / {{ stats.course.equipes }} * 100) + "%)", {{ stats.course.p }} - {{ stats.course.paiement_paypal }});
+        g.data("Impaye (" + Math.round(({{ stats.course.equipes }} - {{ stats.course.p }}) / {{ stats.course.equipes }} * 100) + "%)", {{ stats.course.equipes }} - {{ stats.course.p }});
         g.draw();
     </script>
     <script>
@@ -439,8 +440,9 @@
         g.tooltips = true;
         g.sort = false;
         g.zero_degree = -90;
-        g.data("Electronique ("  + Math.round({{ stats.course.documents_electroniques }} / {{ stats.course.documents }} * 100) + "%)", {{ stats.course.documents_electroniques }});
-        g.data("Papier (" + (100 - Math.round({{ stats.course.documents_electroniques }} / {{ stats.course.documents }} * 100)) + "%)", {{ stats.course.documents }} - {{ stats.course.documents_electroniques }});
+        g.data("Electronique (" + Math.round({{ stats.course.documents_electroniques }}                                  / ({{ stats.course.documents }} + {{ stats.course.documents_attendus }}) * 100) + "%)", {{ stats.course.documents_electroniques }});
+        g.data("Papier ("       + Math.round(({{ stats.course.documents }} - {{ stats.course.documents_electroniques }}) / ({{ stats.course.documents }} + {{ stats.course.documents_attendus }}) * 100) + "%)", {{ stats.course.documents }} - {{ stats.course.documents_electroniques }});
+        g.data("Attendu ("      + Math.round({{ stats.course.documents_attendus }}                                       / ({{ stats.course.documents }} + {{ stats.course.documents_attendus }}) * 100) + "%)", {{ stats.course.documents_attendus }});
         g.draw();
     </script>
     <script>
