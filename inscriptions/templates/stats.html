@@ -68,8 +68,24 @@
         <table>
             <tr><th>Villes des participants</th><th>#</th><th>%</th></tr>
             {% for ville in stats.villes|slice:":20" %}
-            <tr><td>{{ ville.nom }}</td><td>{{ ville.count }}</td><td>{% widthratio villes.count stats.course.equipiers 100 %}%</td></tr>
+            <tr><td>{{ ville.nom }}</td><td>{{ ville.count }}</td><td>{% widthratio ville.count stats.course.equipiers 100 %}%</td></tr>
             {% endfor %}
+            {% with stats.villes|slice:"20:" as villes %}
+            <tr>
+                <td><a onclick="var table = this.parentNode.parentNode.parentNode; for(var i=0; i<table.rows.length; i++) table.rows[i].style.display=''; this.parentNode.parentNode.style.display='none';">{{ villes|length }} autres villes</a></td>
+                <td><script>
+                    var num = 0{% for ville in villes %} + {{ ville.count }}{% endfor %};
+                    document.write(num);
+                </script></td>
+                <td><script>
+                    document.write(Math.round(num / {{ stats.course.equipiers }} * 100));
+                </script>%</td>
+            </tr>
+            <tr></tr>
+            {% for ville in villes %}
+            <tr style="display:none"><td>{{ ville.nom }}</td><td>{{ ville.count }}</td><td>{% widthratio villes.count stats.course.equipiers 100 %}%</td></tr>
+            {% endfor %}
+            {% endwith %}
         </table>
     </div>
     <div class="grid_4">
@@ -80,6 +96,22 @@
             <tr><td><img src="/static/flags/{{ stats.pays|get:key|get:"pays"|lower }}.png" alt="{{ stats.pays|get:key|get:"pays"|lower }}" /> {{ key }}</td><td>{{ stats.pays|get:key|get:"equipes" }}</td><td>{% widthratio stats.pays|get:key|get:"equipes" stats.course.equipes 100 %}%</td></tr>
             {% endfor %}
             {% endwith %}
+            {% with stats.pays|other_values:"equipes" as pays %}
+            <tr>
+                <td><a onclick="var table = this.parentNode.parentNode.parentNode; for(var i=0; i<table.rows.length; i++) table.rows[i].style.display=''; this.parentNode.parentNode.style.display='none';">{{ pays|length }} autres pays / regions</a></td>
+                <td><script>
+                    var num = 0{% for key in pays %} + {{ stats.pays|get:key|get:"equipes" }}{% endfor %};
+                    document.write(num);
+                </script></td>
+                <td><script>
+                    document.write(Math.round(num / {{ stats.course.equipes }} * 100));
+                </script>%</td>
+            </tr>
+            <tr></tr>
+            {% for key in pays %}
+            <tr style="display:none"><td><img src="/static/flags/{{ stats.pays|get:key|get:"pays"|lower }}.png" alt="{{ stats.pays|get:key|get:"pays"|lower }}" /> {{ key }}</td><td>{{ stats.pays|get:key|get:"equipes" }}</td><td>{% widthratio stats.pays|get:key|get:"equipes" stats.course.equipes 100 %}%</td></tr>
+            {% endfor %}
+            {% endwith %}
         </table>
     </div>
     <div class="grid_8">
@@ -87,6 +119,43 @@
     </div>
     <div class="clearfix grid_16">
         <div id="map"></div>
+    </div>
+    <div class="clearfix grid_16">
+        <canvas id="canvas_distance"></canvas>
+    </div>
+
+    <div class="clearfix grid_16">
+        <hr />
+        <h1>Clubs</h1>
+    </div>
+    <div class="clearfix grid_6">
+        <table>
+            <tr><th>Clubs</th><th>#</th><th>%</th></tr>
+            {% with stats.clubs|pertinent_values:"equipes,2%" as clubs %}
+            {% for club in clubs %}
+            <tr><td>{{ club }}</td><td>{{ stats.clubs|get:club|get:"equipes" }}</td><td>{% widthratio stats.clubs|get:club|get:"equipes" stats.course.equipes 100 %}%</td></tr>
+            {% endfor %}
+            {% endwith %}
+            {% with stats.clubs|other_values:"equipes,2%" as clubs %}
+            <tr>
+                <td><a onclick="var table = this.parentNode.parentNode.parentNode; for(var i=0; i<table.rows.length; i++) table.rows[i].style.display=''; this.parentNode.parentNode.style.display='none';">{{ clubs|length }} autres clubs</a></td>
+                <td><script>
+                    var num = 0{% for club in clubs %} + {{ stats.clubs|get:club|get:"equipes" }}{% endfor %};
+                    document.write(num);
+                </script></td>
+                <td><script>
+                    document.write(Math.round(num / {{ stats.course.equipes }} * 100));
+                </script>%</td>
+            </tr>
+            <tr></tr>
+            {% for club in clubs %}
+            <tr style="display:none"><td>{{ club }}</td><td>{{ stats.clubs|get:club|get:"equipes" }}</td><td>{% widthratio stats.clubs|get:club|get:"equipes" stats.course.equipes 100 %}%</td></tr>
+            {% endfor %}
+            {% endwith %}
+        </table>
+    </div>
+    <div class="grid_10">
+        <canvas id="canvas_clubs"></canvas>
     </div>
 
     <div class="clearfix grid_16">
@@ -109,25 +178,6 @@
         <canvas id="canvas_time2"></canvas>
     </div>
 
-    {% if stats.clubs %}
-    <div class="clearfix grid_16">
-        <hr />
-        <h1>Clubs</h1>
-    </div>
-    <div class="clearfix grid_6">
-        <table>
-            <tr><th>Clubs</th><th>#</th><th>%</th></tr>
-            {% with stats.clubs|pertinent_values:"equipes" as clubs %}
-            {% for club, value in stats.clubs.items %}
-            <tr><td>{{ club }}</td><td>{{ value.equipes }}</td><td>{% widthratio value.equipes stats.course.equipes 100 %} %</td></tr>
-            {% endfor %}
-            {% endwith %}
-        </table>
-    </div>
-    <div class="grid_10">
-        <canvas id="canvas_clubs"></canvas>
-    </div>
-    {% endif %}
     <div class="clearfix grid_16">
         <hr />
         <h1>Autre</h1>
@@ -161,6 +211,21 @@
     <script src="{{ STATIC_URL }}/bluff-src.js"></script>
 
     <script>
+        var args = {};
+        var queryStringRegex = /([^&=]+)=?([^&]*)/g;
+        function decode(s) {
+            return decodeURIComponent(s.replace("+", " "));
+        }
+        var qs = location.href.split('?').slice(1).join('?')
+        if (qs) {
+            var parts;
+            while (parts = queryStringRegex.exec(qs)) {
+                var key = decode(parts[1]);
+                args[key] = decode(parts[2]);
+            }
+        }
+
+        
         // map
         var map = L.map('map').setView([51.505, -0.09], 13);
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -168,11 +233,17 @@
         }).addTo(map);
 
         var points = [], point;
+        var distances = {};
+        var tranche = parseFloat(args.tranche) || 10;
+        var origine = new L.LatLng(48.852775, 2.247415);
         {% localize off %}
         {% for ville in stats.villes %}
         {% if ville.lat and ville.lng %}
         points.push(point=[{{ ville.lat }}, {{ ville.lng }}]);
+        point = new L.LatLng(point[0], point[1]);
         L.marker(point).addTo(map).bindPopup("{{ ville.nom|escapejs }} : {{ ville.count }}");
+        var distance = Math.ceil(origine.distanceTo(point) / 1000 / tranche);
+        distances[distance] = (distances[distance] || 0) + {{ ville.count }};
         {% endif %}{% endfor %}
         {% endlocalize %}
         var bounds = [[points[0][0], points[0][1]], [points[0][0], points[0][1]]];
@@ -275,6 +346,22 @@
         e2.addEventListener('click', function() { e2.style.display = 'none', e.style.display = 'block'; });
 
         // pies
+        var g = new Bluff.Pie('canvas_clubs', 400);
+        g.theme_pastel();
+        g.title = '';
+        g.tooltips = true;
+        g.sort = false;
+        g.zero_degree = -90;
+        {% with stats.clubs|pertinent_values:"equipes,2%" as clubs %}
+        {% for key in clubs %}
+        g.data("{{ key }}", {{ stats.clubs|get:key|get:"equipes" }}, colors.clubs && colors.clubs["{{ key }}"]);
+        {% endfor %}
+        {% endwith %}
+        {% with stats.clubs|other_values:"equipes,2%" as clubs %}
+        g.data("{{ clubs|length }} autres clubs", 0{% for club in clubs %} + {{ stats.clubs|get:club|get:"equipes" }}{% endfor %});
+        {% endwith %}
+        g.draw();
+        // pies
         var g = new Bluff.Pie('canvas_categories', 400);
         g.theme_pastel();
         g.title = '';
@@ -286,6 +373,33 @@
         g.data("{{ key }}", {{ stats.categories|get:key|get:"equipes" }}, colors.categories && colors.categories["{{ key }}"]);
         {% endfor %}
         {% endwith %}
+        g.draw();
+
+
+        var g = new Bluff.StackedBar('canvas_distance', 900);
+        g.theme_pastel();
+        g.title = '';
+        g.tooltips = true;
+        g.marker_font_size = 12;
+        g.y_axis_increment = 10;
+        var max = Math.max.apply(Math, Object.keys(distances).map(parseFloat));
+        var data = [];
+        g.labels = {};
+        var distanceMax = parseFloat(args.distanceMax) || 500;
+        for(var i = 1; i <= max; i++) {
+            var d = i;
+            if (d * tranche > distanceMax) {
+                d = distanceMax / tranche;
+                data[d - 1] += distances[i] || 0;
+            } else {
+                data.push(distances[i] || 0);
+            }
+            if (d % 5 === 0)
+                g.labels[d - 1] = d * tranche;
+        }
+        //g.labels[d - 2] = (d - 1) * tranche;
+        g.labels[d - 1] = i * tranche;
+        g.data('% / km', data.map(function(i) { return i / {{ stats.course.equipiers }} * 100; }));
         g.draw();
     </script>
     <script>
@@ -312,8 +426,9 @@
         g.tooltips = true;
         g.sort = false;
         g.zero_degree = -90;
-        g.data("Paypal (" +       Math.round({{ stats.course.paiement_paypal }} / {{ stats.course.p }} * 100) + "%)", {{ stats.course.paiement_paypal }});
-        g.data("Autre (" + (100 - Math.round({{ stats.course.paiement_paypal }} / {{ stats.course.p }} * 100)) + "%)", {{ stats.course.p }} - {{ stats.course.paiement_paypal }});
+        g.data("Paypal (" + Math.round( {{ stats.course.paiement_paypal }} / {{ stats.course.equipes }} * 100) + "%)", {{ stats.course.paiement_paypal }});
+        g.data("Autre ("  + Math.round(({{ stats.course.p }} - {{ stats.course.paiement_paypal }}) / {{ stats.course.equipes }} * 100) + "%)", {{ stats.course.p }} - {{ stats.course.paiement_paypal }});
+        g.data("Impaye (" + Math.round(({{ stats.course.equipes }} - {{ stats.course.p }}) / {{ stats.course.equipes }} * 100) + "%)", {{ stats.course.equipes }} - {{ stats.course.p }});
         g.draw();
     </script>
     <script>
@@ -325,8 +440,9 @@
         g.tooltips = true;
         g.sort = false;
         g.zero_degree = -90;
-        g.data("Electronique ("  + Math.round({{ stats.course.documents_electroniques }} / {{ stats.course.documents }} * 100) + "%)", {{ stats.course.documents_electroniques }});
-        g.data("Papier (" + (100 - Math.round({{ stats.course.documents_electroniques }} / {{ stats.course.documents }} * 100)) + "%)", {{ stats.course.documents }} - {{ stats.course.documents_electroniques }});
+        g.data("Electronique (" + Math.round({{ stats.course.documents_electroniques }}                                  / ({{ stats.course.documents }} + {{ stats.course.documents_attendus }}) * 100) + "%)", {{ stats.course.documents_electroniques }});
+        g.data("Papier ("       + Math.round(({{ stats.course.documents }} - {{ stats.course.documents_electroniques }}) / ({{ stats.course.documents }} + {{ stats.course.documents_attendus }}) * 100) + "%)", {{ stats.course.documents }} - {{ stats.course.documents_electroniques }});
+        g.data("Attendu ("      + Math.round({{ stats.course.documents_attendus }}                                       / ({{ stats.course.documents }} + {{ stats.course.documents_attendus }}) * 100) + "%)", {{ stats.course.documents_attendus }});
         g.draw();
     </script>
     <script>

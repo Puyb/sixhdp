@@ -5,6 +5,13 @@
 {% get_available_languages as LANGUAGES %}
 {% if create %}<h1>{% trans 'Inscription' %} - {{ TITLE }}</h1>{% endif %}
 {% if update %}<h1>{% trans 'Modification de votre inscription' %} - {{ TITLE }}</h1>{% endif %}
+<style>
+    #errors {
+        border: 1px solid red;
+        background: #ffaaaa;
+        padding: 10px;
+    }
+</style>
 <script type="text/javascript" src="{% url "django.views.i18n.javascript_catalog" %}"></script>
 <script src="{{ STATIC_URL }}prototype.js"></script>
 <script>
@@ -71,13 +78,18 @@
     {% endif %}
 </script>
 <script src="{{ STATIC_URL }}form.js"></script>
-<form method="post" enctype="multipart/form-data" onsubmit="$('button_submit').disabled = true; $('button_submit').style.display=='none'">
+<form method="post" enctype="multipart/form-data" onsubmit="$('button_submit').disabled = true; $('button_submit').style.display='none'; return actual_part > parseInt($F('id_nombre')); ">
     {% if imaginr %}<input type="hidden" name="imaginr" value=1" />{% endif %}
+    {% if errors %}
     <div id="errors">
         {% if equipe_form.errors %}
+        <h2>{% blocktrans %}Votre inscription comporte des erreurs :{% endblocktrans %}</h2>
+        {% blocktrans %}Veuillez les corriger et valider à nouveau votre inscription.{% endblocktrans %}
         <h3>{% trans 'Informations générales' %}</h3>
             {% for k,v in equipe_form.errors.items %}
+                {% if k != "prix" %}
                 {{ k }} : {{ v }}
+                {% endif %}
             {% endfor %}
         {% endif %}
         {% for equipier_form in equipier_formset %}
@@ -89,6 +101,7 @@
             {% endif %}
         {% endfor %}
     </div>
+    {% endif %}
     <div id="part0" class="parts">
         {% blocktrans %}Inscrivez votre équipe, votre duo ou votre solo en quelques étapes. Laissez vous guider.{% endblocktrans%}<br />
         <br />

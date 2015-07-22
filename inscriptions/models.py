@@ -75,6 +75,16 @@ DESTINATAIRE_CHOICES = (
 #class Chalenge(model.Model):
 #    nom = models.CharField(_('Nom'), max=200)
 
+def normalize_club(club):
+    club = club.upper().strip()
+    table = {
+        u'': u'Aucun',
+        u'-': u'Aucun',
+        u'INDÉPENDANT': u'Aucun',
+        u'INDéPENDANT': u'Aucun',
+    }
+    return table.get(club, club)
+
 class Course(models.Model):
     nom                 = models.CharField(_(u'Nom'), max_length=200)
     uid                 = models.CharField(_(u'uid'), max_length=200)
@@ -85,7 +95,6 @@ class Course(models.Model):
     date_augmentation   = models.DateField(_(u"Date d'augmentation dss tarifs"))
     date_fermeture      = models.DateField(_(u"Date de fermeture des inscriptions"))
     limite_participants = models.DecimalField(_(u"Limite du nombre de participants"), max_digits=6, decimal_places=0)
-    limite_solo         = models.DecimalField(_(u"Limite du nombre de solo"), max_digits=6, decimal_places=0)
     paypal              = models.EmailField(_(u'Adresse paypal'), blank=True)
     frais_paypal_inclus = models.BooleanField(_(u'Frais paypal inclus'))
     ordre               = models.CharField(_(u'Ordre des chèques'), max_length=200)
@@ -130,6 +139,7 @@ class Course(models.Model):
             "nbcertifenattente": 0,
             "documents": 0,
             "documents_electroniques": 0,
+            "documents_attendus": 0,
             "p": 0,
             "pc": 0,
             "pi": 0,
@@ -149,6 +159,7 @@ class Course(models.Model):
             "pays": {},
             "course": model_stats.copy(),
             "connu": {},
+            "clubs": {},
         }
 
         equipes = (Equipe.objects.filter(course=self)
@@ -171,6 +182,7 @@ class Course(models.Model):
                 "categories": equipe.categorie_id and equipe.categorie.code or '',
                 "jours": (equipe.date.astimezone(tz).date() - self.date_ouverture).days,
                 "pays":    '',
+                "clubs": normalize_club(equipe.club),
             }
             if equipe.gerant_ville2:
                 keys['pays'] = equipe.gerant_ville2.pays
@@ -239,16 +251,22 @@ class Course(models.Model):
 
         result['course']['documents'] = 0
         result['course']['documents_electroniques'] = 0
+        result['course']['documents_attendus'] = 0
         result['course']['licencies'] = 0
         for equipier in Equipier.objects.filter(equipe__course=self):
             if equipier.piece_jointe_valide:
                 result['course']['documents'] += 1
                 if equipier.piece_jointe:
                     result['course']['documents_electroniques'] += 1
-            if equipier.age() >= 18 and equipier.piece_jointe2_valide:
-                result['course']['documents'] += 1
-                if equipier.piece_jointe2:
-                    result['course']['documents_electroniques'] += 1
+            else:
+                result['course']['documents_attendus'] += 1
+            if equipier.age() < 18:
+                if equipier.piece_jointe2_valide:
+                    result['course']['documents'] += 1
+                    if equipier.piece_jointe2:
+                        result['course']['documents_electroniques'] += 1
+                else:
+                    result['course']['documents_attendus'] += 1
             if equipier.justificatif == 'licence':
                 result['course']['licencies'] +=1
 

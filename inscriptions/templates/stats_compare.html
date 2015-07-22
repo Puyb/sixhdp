@@ -4,9 +4,9 @@
 {% load stats %}
 
 {% block main %}
-    <div class="clearfix grid_16">
-        Point de comparaison :
-        <form id="formAlign">
+    <form id="formAlign">
+        <div class="clearfix grid_4">
+            Point de comparaison :
             <ul>
                 <li>
                     <input type="radio" name="align" id="align1" value="" {% if align == "" %}checked {% endif %}/>
@@ -21,15 +21,28 @@
                     <label for="align3">Date d'ouverture</label>
                 </li>
             </ul>
-        </form>
-        <script>
-            [].forEach.call(document.getElementsByTagName('input'), function(e) {
-                e.addEventListener('click', function() {
-                    document.getElementById('formAlign').submit();
-                });
+        </div>
+        <div class="clearfix grid_4">
+            Donnée :
+            <ul>
+                <li>
+                    <input type="radio" name="equipiers" id="equipiers1" value="" {% if request.GET.equipiers != "1" %}checked {% endif %}/>
+                    <label for="align1">Equipes</label>
+                </li>
+                <li>
+                    <input type="radio" name="equipiers" id="equipiers2" value="1" {% if request.GET.equipiers == "1" %}checked {% endif %}/>
+                    <label for="align2">Participants</label>
+                </li>
+            </ul>
+        </div>
+    </form>
+    <script>
+        [].forEach.call(document.getElementsByTagName('input'), function(e) {
+            e.addEventListener('click', function() {
+                document.getElementById('formAlign').submit();
             });
-        </script>
-    </div>
+        });
+    </script>
 
     <div class="clearfix grid_16" style="margin-bottom: 50px">
         <canvas id="canvas_time"></canvas>
@@ -42,12 +55,13 @@
     <script src="{{ STATIC_URL }}/bluff-src.js"></script>
 
     <script>
+        var equipiers = /[?&]equipiers=1/.test(location.href);
         var g = new Bluff.Line('canvas_time', 900);
         g.theme_pastel();
         g.title = '';
         g.tooltips = true;
         g.marker_font_size = 12;
-        g.y_axis_increment = 10;
+        g.y_axis_increment = equipiers ? 25 : 10;
         g.hide_dots = true;
         g.line_width = 2;
         var g2 = new Bluff.Bar('canvas_time2', 900);
@@ -55,7 +69,7 @@
         g2.title = '';
         g2.tooltips = true;
         g2.marker_font_size = 12;
-        g2.y_axis_increment = 10;
+        g2.y_axis_increment = equipiers ? 10 : 2;
 
         var stats = [{% for d in data %}{{ d.json|safe }}{% if not forloop.last %},{% endif %}{% endfor %}];
 
@@ -69,7 +83,7 @@
         for(var i = min; i < max; i++) {
             var a = 0;
             if(i - {{ d.delta }} in stats[{{ d.index }}].jours)
-                a = stats[{{ d.index }}].jours[i - {{ d.delta }}].equipes;
+                a = stats[{{ d.index }}].jours[i - {{ d.delta }}][equipiers ? 'equipiers' : 'equipes'];
             if(i <= {{ d.stats.jours.keys|get_max }} + {{ d.delta }}) 
                 dataPlot.push(a);
         }
