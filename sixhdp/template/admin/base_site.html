@@ -1,7 +1,7 @@
 {% extends "admin/base.html" %}
 {% load i18n %}
  
-{% block title %}{{ title }} | {% trans '6h de Paris' %}{% endblock %}
+{% block title %}{{ title }} | {% if COURSE %}{{ COURSE.nom }}{% else %}{% trans 'Administration des courses de roller' %}{% endif %}{% endblock %}
  
 {% block branding %}
 <style type="text/css">
@@ -10,7 +10,7 @@
     /* your style here */
   }
 </style>
-<h1 id="site-name">{% trans '6h de Paris' %}</h1>
+<h1 id="site-name">{% if COURSE %}{{ COURSE.nom }}{% else %}{% trans 'Administration des courses de roller' %}{% endif %}</h1>
 {% endblock %}
  
 {% block nav-global %}{% endblock %}
