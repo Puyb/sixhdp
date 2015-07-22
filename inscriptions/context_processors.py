@@ -6,7 +6,9 @@ def course(request):
     uid = request.path.split('/')[1]
     if uid in ('course', 'admin'):
         if 'course_uid' not in request.COOKIES:
-            return {}
+            return {
+                'COURSES': request.user.is_superuser and Course.objects.all() or [],
+            }
         uid = request.COOKIES['course_uid']
     course = (Course.objects
         .filter(uid=uid)
@@ -26,6 +28,7 @@ def course(request):
         'CLOSE_MONTH':     course[0].date_fermeture.month,
         'CLOSE_DAY':       course[0].date_fermeture.day,
         'PAYPAL_BUSINESS': course[0].paypal,
+        'COURSES':         request.user.is_superuser and Course.objects.all() or [],
     }
 
 def settings(request):

@@ -1,0 +1,23 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{% blocktrans with nom=COURSE.nom %}Administration {{ nom }}{% endblocktrans %}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">{% blocktrans with nom=COURSE.nom %}Administration {{ nom }}{% endblocktrans %}</h1>
+{% endblock %}
+
+{% block userlinks %}
+{% trans "Course : " %}<select id="course_chooser">{% if request.user.is_superuser %}
+        <option value="">Administration</option>
+    {% for course in COURSES %}
+        <option value="{{ course.uid }}" {% if course == COURSE %}selected {% endif %}>{{ course.nom }}</option>
+        {% endfor %}{% else %}{% for course in request.user.profile.course.all %}
+        <option value="{{ course.uid }}" {% if course == COURSE %}selected {% endif %}>{{ course.nom }}</option>
+        {% endfor %}{% endif %}</select>
+    <script src="{{ STATIC_URL }}/admin/js/jquery.js"></script>
+    <script src="{{ STATIC_URL }}/admin.js"></script>
+    {{ block.super }}
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
