@@ -34,8 +34,8 @@ MIXITE_CHOICES = (
 )
 
 JUSTIFICATIF_CHOICES = (
-    ('licence',    _(u'Licence FFRS 2014')),
-    ('certificat', _(u'Certificat médical établi après le 3/08/2013')),
+    ('licence',    _(u'Licence FFRS')),
+    ('certificat', _(u'Certificat médical')),
 )
 
 ROLE_CHOICES = (
