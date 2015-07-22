@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerEr
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.utils.http import urlencode
-from django.db.models import Count
+from django.db.models import Count, Max
 import urllib2
 import random
 from settings import *
@@ -17,7 +17,7 @@ import csv, cStringIO
 @login_required
 def dossards(request, course_uid):
     return render_to_response('dossards.html', RequestContext(request, {
-        'equipiers': Equipier.objects.filter(course__uid=course_uid).order_by(*request.GET.get('order','equipe__numero,numero').split(','))
+        'equipiers': Equipier.objects.filter(equipe__course__uid=course_uid).order_by(*request.GET.get('order','equipe__numero,numero').split(','))
     }))
 
 @login_required
@@ -30,8 +30,11 @@ def listing(request, course_uid, template='listing.html'):
 @login_required
 def listing_dossards(request, course_uid, template='listing_dossards.html'):
     equipes = Equipe.objects.filter(course__uid=course_uid).order_by(*request.GET.get('order','numero').split(','))
-    splits = ('1,' + request.GET.get('split', '1000')).split(',')
+    numero_max = equipes.aggregate(Max('numero'))['numero__max'] + 1
+    splits = ('1,' + request.GET.get('split', numero_max)).split(',')
     splits = map(int, splits)
+    if splits[-1] < numero_max:
+        splits.append(numero_max)
     datas = {}
     keys = []
     for i in range(len(splits) - 1):
@@ -50,7 +53,7 @@ def equipiers(request, course_uid):
 def dossardsCSV(request, course_uid):
     code = request.GET.get('code', 'utf-8')
     out = cStringIO.StringIO()
-    o=csv.writer(out)
+    o=csv.writer(out, dialect='excel')
     o.writerow([
         'equipe',
         'nom',
@@ -94,7 +97,7 @@ def dossardsCSV(request, course_uid):
 def dossardsEquipesCSV(request, course_uid):
     code = request.GET.get('code', 'utf-8')
     out = cStringIO.StringIO()
-    o=csv.writer(out)
+    o=csv.writer(out, dialect='excel')
     o.writerow([
         'equipe',
         'nom',
@@ -126,7 +129,7 @@ def dossardsEquipesCSV(request, course_uid):
 def dossardsEquipiersCSV(request, course_uid):
     code = request.GET.get('code', 'utf-8')
     out = cStringIO.StringIO()
-    o=csv.writer(out)
+    o=csv.writer(out, dialect='excel')
     o.writerow([
         'equipe',
         'dossard',

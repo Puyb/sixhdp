@@ -13,6 +13,7 @@
 {% if not COURSE %}<script>
 location.href = "choose/";
 </script>{% endif %}
+<script src="{% static "admin/js/jquery.js" %}"></script>
 <div id="content-main">
 
     {% with COURSE.stats as stats %}
@@ -155,6 +156,49 @@ location.href = "choose/";
 {% else %}
     <p>{% trans "You don't have permission to edit anything." %}</p>
 {% endif %}
+    <div class="module">
+        <table>
+            <caption>
+                {% blocktrans %}Exports{% endblocktrans %}
+            </caption>
+            <tr>
+                <th>Listing (HTML)</th>
+                <td>
+                    <a target="_blank" href="/{{ COURSE.uid }}/listing/">Par numéro</a><br />
+                    <a target="_blank" href="/{{ COURSE.uid }}/listing/?order=nom">Par nom</a><br />
+                    <a target="_blank" href="/{{ COURSE.uid }}/listing/?order=gerant_nom">Par nom du gérant</a>
+                </td>
+            </tr>
+            <tr>
+                <th colspan="2">
+                    Listing retrait dossards
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <label> Découpage :</label>
+                    <input id="listing_dossards_split" /><br />
+                    (numéro de dossards, séparés par des virgules, ex : "50,100,200")
+                </td>
+                <td>
+                    <a id="listing_dossards_link" target="_blank" href="/{{ COURSE.uid }}/listing_dossards/">HTML</a>
+                    <script>$('#listing_dossards_split').on('keyup', function() {
+                        var href = $('#listing_dossards_link').attr('href').split('?');
+                        href[1] = 'split=' + this.value;
+                        $('#listing_dossards_link').attr('href', href.join('?'));
+                    });</script>
+                </td>
+            </tr>
+            <tr>
+                <th>Chronomètrage (CSV)</th>
+                <td>
+                    <a target="_blank" href="/{{ COURSE.uid }}/dossards.csv">Equipes et équipiers</a><br />
+                    <a target="_blank" href="/{{ COURSE.uid }}/dossards_equipes.csv">Equipes</a><br />
+                    <a target="_blank" href="/{{ COURSE.uid }}/dossards_equipiers.csv">Equipiers</a>
+                </td>
+            </tr>
+        </table>
+    </div>
 </div>
 {% endblock %}
 
