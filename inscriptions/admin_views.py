@@ -12,6 +12,7 @@ from settings import *
 from threading import Thread
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
+from easy_pdf.views import PDFTemplateView
 import csv, cStringIO
 
 @login_required
@@ -155,5 +156,14 @@ def dossardsEquipiersCSV(request, course_uid):
     r = HttpResponse(out.getvalue(), mimetype='text/csv')
     out.close()
     return r
+
+class DossardsView(PDFTemplateView):
+    template_name = 'dossards.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(DossardsView, self).get_context_data(*args, **kwargs)
+        equipiers = Equipier.objects.filter(equipe__course__uid=self.kwargs['course_uid']).order_by('equipe__numero', 'numero')
+        context['equipiers'] = equipiers
+        return context
 
 
