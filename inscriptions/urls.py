@@ -3,7 +3,7 @@ from django.views.generic import TemplateView
 from django.views.generic import ListView
 from models import Equipe
 from views import FactureView
-from admin_views import DossardsView
+#from admin_views import DossardsView
 
 import admin
 
@@ -30,7 +30,7 @@ urlpatterns = patterns('',
     (r'^(?P<course_uid>[^/]+)/stats/$', 'stats', {}, 'inscriptions.stats'),
     (r'^(?P<course_uid>[^/]+)/stats/(?P<course_uid2>[^/]+)$', 'stats_compare', {}, 'inscriptions.stats_compare'),
 ) + patterns('inscriptions.admin_views',
-    (r'^(?P<course_uid>[^/]+)/dossards/$', DossardsView.as_view(), {}, 'inscriptions.dossards'),
+    #(r'^(?P<course_uid>[^/]+)/dossards/$', DossardsView.as_view(), {}, 'inscriptions.dossards'),
     (r'^(?P<course_uid>[^/]+)/equipiers/$', 'equipiers', {}, 'inscriptions.equipiers'),
     (r'^(?P<course_uid>[^/]+)/dossards.csv$', 'dossardsCSV', {}, 'inscriptions.dossardsCSV'),
     (r'^(?P<course_uid>[^/]+)/dossards_equipes.csv$', 'dossardsEquipesCSV', {}, 'inscriptions.dossardsEquipesCSV'),

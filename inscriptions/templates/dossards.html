@@ -8,34 +8,46 @@
             margin-right: .5cm;
             margin-top: .5cm;
             margin-bottom: .5cm;
-            -pdf-frame-border: none;
-            @frame center {
-                left: 0.5cm; right: 0.5cm;
-                top: 3cm;
-                height: 10cm;
-            }
             @frame bottom {
                 left: 0.5cm;
                 right: 0.5cm;
                 top: 13cm;
-                height: 2cm;
+                height: 3cm;
             }
+            @frame center {
+                left: 0.5cm; right: 0.5cm;
+                top: 3cm;
+                height: 12.5cm;
+            }
+            @frame center2 {
+                left: 0cm;
+                top: 0;
+                width: 21cm;
+                height: 10cm;
+            }
+            background-image: url("/static/dossard_fond.png");
+        }
+        @font-face {
+            font-family: Impact;
+            src: url("/static/fonts/impact.ttf");
         }
         .dossard {
             font-family: Helvetica;
             color: black;
+            white-space: normal;
         }
         .numero {
+            font-family: Impact;
             margin-top: 3cm;
             text-align: center;
             font-size: 7cm;
-            line-height: 5cm;
+            line-height: 3cm;
         }
         .prenom {
-            margin-top: -1cm;
+            margin-top: -2cm;
             text-align: center;
             font-size: 3cm;
-            line-height: 3cm;
+            line-height: 2.2m;
         }
         .info {
             position: absolute;
@@ -56,16 +68,16 @@
 {% endblock %}
 
 {% block content %}
-<div class="dossard {{ equipier.equipe.categorie.code }}">
 {% for equipier in equipiers %}
-    <div class="numero">{{ equipier.equipe.numero }}{{ equipier.numero }}</div>
-    <div class="prenom">{{ equipier.prenom }}</div>
-    <pdf:nextframe>
+<div class="dossard {{ equipier.equipe.categorie.code }}">
     <div class="info">
         {{ equipier.equipe.numero }} - {{ equipier.equipe.nom}} - {{ equipier.equipe.categorie.code }} {{ equipier.equipe.categorie.nom }}<br />
         {{ equipier.numero }} - {{ equipier.prenom}} {{ equipier.nom }} - Puce #{{ equipier.transpondeur }}
     </div>
+    <pdf:nextframe>
+    <div class="numero">{{ equipier.equipe.numero }}{{ equipier.numero }}</div>
+    <div class="prenom">{{ equipier.prenom }}</div>
+</div>
 <pdf:nextpage>
 {% endfor %}
-</div>
 {% endblock %}

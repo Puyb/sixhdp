@@ -12,7 +12,7 @@ from settings import *
 from threading import Thread
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
-from easy_pdf.views import PDFTemplateView
+#from easy_pdf.views import PDFTemplateView
 import csv, cStringIO
 
 @login_required
@@ -60,6 +60,7 @@ def dossardsCSV(request, course_uid):
         'nom',
         'categorie',
         'dossard',
+        'transpondeur',
         'nom',
         'prenom',
         'sexe',
@@ -77,6 +78,7 @@ def dossardsCSV(request, course_uid):
             e.equipe.nom,
             e.equipe.categorie,
             e.dossard(),
+            e.transpondeur,
             e.nom,
             e.prenom,
             e.sexe,
@@ -157,13 +159,13 @@ def dossardsEquipiersCSV(request, course_uid):
     out.close()
     return r
 
-class DossardsView(PDFTemplateView):
-    template_name = 'dossards.html'
-
-    def get_context_data(self, *args, **kwargs):
-        context = super(DossardsView, self).get_context_data(*args, **kwargs)
-        equipiers = Equipier.objects.filter(equipe__course__uid=self.kwargs['course_uid']).order_by('equipe__numero', 'numero')
-        context['equipiers'] = equipiers
-        return context
+#class DossardsView(PDFTemplateView):
+#    template_name = 'dossards.html'
+#
+#    def get_context_data(self, *args, **kwargs):
+#        context = super(DossardsView, self).get_context_data(*args, **kwargs)
+#        equipiers = Equipier.objects.filter(equipe__course__uid=self.kwargs['course_uid']).order_by('equipe__numero', 'numero')
+#        context['equipiers'] = equipiers
+#        return context
 
 
