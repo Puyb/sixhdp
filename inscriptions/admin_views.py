@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
-from models import Equipe, Equipier, TemplateMail
-from django.shortcuts import render_to_response
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, Http404
-from django.template import RequestContext
-from django.utils.translation import ugettext as _
-from django.utils.http import urlencode
-from django.db.models import Count, Max
-import urllib2
 import random
-from settings import *
-from threading import Thread
-from django.utils.translation import ugettext as _
+import csv, io
+from .models import Equipe, Equipier, TemplateMail
+from .settings import *
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Max
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, Http404
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.utils.http import urlencode
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _
+from threading import Thread
 #from easy_pdf.views import PDFTemplateView
-import csv, cStringIO
 
 @login_required
 def dossards(request, course_uid):
@@ -53,7 +52,7 @@ def equipiers(request, course_uid):
 #@login_required
 def dossardsCSV(request, course_uid):
     code = request.GET.get('code', 'utf-8')
-    out = cStringIO.StringIO()
+    out = io.StringIO()
     o=csv.writer(out, dialect='excel')
     o.writerow([
         'equipe',
@@ -99,7 +98,7 @@ def dossardsCSV(request, course_uid):
 
 def dossardsEquipesCSV(request, course_uid):
     code = request.GET.get('code', 'utf-8')
-    out = cStringIO.StringIO()
+    out = io.StringIO()
     o=csv.writer(out, dialect='excel')
     o.writerow([
         'equipe',
@@ -131,7 +130,7 @@ def dossardsEquipesCSV(request, course_uid):
 
 def dossardsEquipiersCSV(request, course_uid):
     code = request.GET.get('code', 'utf-8')
-    out = cStringIO.StringIO()
+    out = io.StringIO()
     o=csv.writer(out, dialect='excel')
     o.writerow([
         'equipe',

@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.db.models import Sum, F, Q
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin import SimpleListFilter
-import simplejson
+import json
 
 
 class CourseAdminSite(admin.sites.AdminSite):
@@ -55,7 +55,7 @@ class CourseAdminSite(admin.sites.AdminSite):
             if 'skip' in request.POST and request.POST['skip'] != '':
                 skip = request.POST['skip'].split(',')
             equipier = Equipier.objects.get(id=request.POST['id'])
-            print 'value:', request.POST['value']
+            print('value:', request.POST['value'])
             if request.POST['value'] == 'yes' or request.POST['value'] == 'no':
                 equipier.piece_jointe_valide = request.POST['value'] == 'yes'
                 equipier.save()
@@ -64,9 +64,9 @@ class CourseAdminSite(admin.sites.AdminSite):
             else:
                 skip.append(str(equipier.id))
         equipier = Equipier.objects.filter(equipe__course=course).exclude(id__in=skip).filter(verifier=True)
-        print equipier.query
+        print(equipier.query)
 
-        print equipier.count()
+        print(equipier.count())
         if equipier.count() == 0:
             return redirect('/course/')
 
@@ -279,7 +279,7 @@ class EquipeAdmin(admin.ModelAdmin):
         try:
             sujet = Template(mail.sujet).render(Context({ "course": instance.course, "instance": instance, }))
             message = Template(mail.message).render(Context({ "course": instance.course, "instance": instance, }))
-        except Exception, e:
+        except Exception as e:
             message = '<p style="color: red">Error in template: %s</p>' % str(e)
 
         return render_to_response('admin/equipe/send_mail.html', RequestContext(request, {
@@ -298,10 +298,10 @@ class EquipeAdmin(admin.ModelAdmin):
         try:
             sujet = Template(mail.sujet).render(Context({ "course": instance.course, "instance": instance, }))
             message = Template(mail.message).render(Context({ "course": instance.course, "instance": instance, }))
-        except Exception, e:
+        except Exception as e:
             message = '<p style="color: red">Error in template: %s</p>' % str(e)
 
-        return HttpResponse(simplejson.dumps({
+        return HttpResponse(json.dumps({
             'mail': instance.gerant_email,
             'subject': sujet,
             'message': message,
@@ -309,7 +309,7 @@ class EquipeAdmin(admin.ModelAdmin):
 
     def version(self, request):
         import django
-        return HttpResponse(django.__file__ + ' ' + simplejson.dumps(list(django.VERSION)))
+        return HttpResponse(django.__file__ + ' ' + json.dumps(list(django.VERSION)))
 
     def send_mails(self, request, queryset=None):
         course = get_object_or_404(Course, uid=request.COOKIES['course_uid'])

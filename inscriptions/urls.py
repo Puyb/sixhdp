@@ -1,11 +1,11 @@
 from django.conf.urls import patterns, include, url
 from django.views.generic import TemplateView
 from django.views.generic import ListView
-from models import Equipe
-from views import FactureView
+from .models import Equipe
+from .views import FactureView
 #from admin_views import DossardsView
 
-import admin
+from inscriptions import admin
 
 urlpatterns = patterns('',
     (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', { 'packages': ('inscriptions',), 'domain': 'djangojs' }),

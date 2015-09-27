@@ -1,27 +1,27 @@
 # -*- coding: utf-8 -*-
-import sys, urllib2, random, traceback, json
-from models import Equipe, Equipier, Categorie, Ville, Course, SEXE_CHOICES, JUSTIFICATIF_CHOICES, NoPlaceLeftException
-from decorators import open_closed
-from django.shortcuts import render_to_response, get_object_or_404, redirect
-from django.template.loader import render_to_string
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, Http404
-from django.template import RequestContext
+import sys, requests, random, traceback, json
+from .decorators import open_closed
+from .models import Equipe, Equipier, Categorie, Ville, Course, SEXE_CHOICES, JUSTIFICATIF_CHOICES, NoPlaceLeftException
+from .settings import *
+from .utils import MailThread
+from datetime import datetime, date
+from django.conf import settings
+from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
+from django.db.models import Count, Sum, F
 from django.forms import ModelForm, Form, CharField, PasswordInput, HiddenInput, Select, RadioSelect
 from django.forms.extras.widgets import SelectDateWidget
 from django.forms.formsets import formset_factory
 from django.forms.models import BaseModelFormSet
-from django.utils.translation import ugettext as _
-from django.utils.http import urlencode
-from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Count, Sum, F
-from django.conf import settings
-from settings import *
-from datetime import datetime, date
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, Http404
+from django.shortcuts import render_to_response, get_object_or_404, redirect
+from django.template import RequestContext
+from django.template.loader import render_to_string
 from django.utils import timezone
+from django.utils.http import urlencode
+from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import csrf_exempt
 from easy_pdf.views import PDFTemplateView
-from django.core.mail import EmailMessage
-from utils import MailThread
 
 class EquipeForm(ModelForm):
     class Meta:
@@ -192,7 +192,7 @@ def ipn(request, course_uid):
         equipe.save()
 
     except Exception as e:
-        print >>sys.stderr, e
+        print(e, file=sys.stderr)
 
     return HttpResponse()
 
@@ -202,15 +202,12 @@ def confirm_ipn_data(data, PP_URL):
 
     params = data + '&' + urlencode({ 'cmd': "_notify-validate" })
 
-    req = urllib2.Request(PP_URL)
-    req.add_header("Content-type", "application/x-www-form-urlencoded")
-    fo = urllib2.urlopen(req, params)
+    response = requests.post(PP_URL, params, headers={ "Content-type": "application/x-www-form-urlencoded" })
 
-    ret = fo.read()
-    if ret == "VERIFIED":
-        print >>sys.stderr, "PayPal IPN data verification was successful."
+    if response.text == "VERIFIED":
+        print("PayPal IPN data verification was successful.", file=sys.stderr)
     else:
-        print >>sys.stderr, "PayPal IPN data verification failed."
+        print("PayPal IPN data verification failed.", file=sys.stderr)
         return False
 
     return True

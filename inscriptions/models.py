@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 from django.utils.translation import ugettext_lazy as _
-from django_countries import CountryField
+from django_countries.fields import CountryField
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.template import Template, Context
 from django.core.mail import EmailMessage
-import os, re, urllib, simplejson, sys
+import os, re, requests, json, sys
 from django.db import models
-from settings import *
+from .settings import *
 from datetime import date, timedelta
 from decimal import Decimal
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
 from django.db.models import Min, Max, Count, Avg, Sum
-from utils import iriToUri, MailThread
+from .utils import iriToUri, MailThread
 import traceback
 import pytz
 
@@ -307,9 +307,8 @@ def lookup_ville(nom, cp, pays):
         pass
 
     try:
-        f = urllib.urlopen(iriToUri('http://open.mapquestapi.com/geocoding/v1/address?key=%s&location=%s' % (MAPQUEST_API_KEY, nom + ' ' + cp + ', ' + str(pays))))
-        data = simplejson.load(f)
-        f.close()
+        response = requests.get(iriToUri('http://open.mapquestapi.com/geocoding/v1/address?key=%s&location=%s' % (MAPQUEST_API_KEY, nom + ' ' + cp + ', ' + str(pays))))
+        data = response.json()
 
         if('results' not in data or
            not len(data['results']) or
@@ -317,9 +316,8 @@ def lookup_ville(nom, cp, pays):
            not len(data['results'][0]['locations']) or
            data['results'][0]['locations'][0].get('adminArea5', '') == ''
            ):
-            f = urllib.urlopen(iriToUri('http://open.mapquestapi.com/geocoding/v1/address?key=%s&location=%s' % (MAPQUEST_API_KEY, nom + ', ' + str(pays))))
-            data = simplejson.load(f)
-            f.close()
+            response = requests.get(iriToUri('http://open.mapquestapi.com/geocoding/v1/address?key=%s&location=%s' % (MAPQUEST_API_KEY, nom + ', ' + str(pays))))
+            data = response.json()
 
             if('results' not in data or
                not len(data['results']) or
@@ -345,8 +343,8 @@ def lookup_ville(nom, cp, pays):
         )
         obj.save()
         return obj
-    except simplejson.JSONDecodeError as e:
-        print(f)
+    except json.JSONDecodeError as e:
+        print(response.text)
         traceback.print_exc(e)
     except Exception as e:
         traceback.print_exc(e)
@@ -533,12 +531,10 @@ class Equipier(models.Model):
             if (original.nom != self.nom or 
                 original.prenom != self.prenom or
                 original.piece_jointe != self.piece_jointe):
-                print 'toto'
                 self.piece_jointe_valide = None
             if (original.nom != self.nom or 
                 original.prenom != self.prenom or
                 original.autorisation != self.autorisation):
-                print 'coucou'
                 self.autorisation_valide = None
         self.verifier = ((self.piece_jointe and self.piece_jointe_valide == None) or
                          (self.autorisation and self.autorisation_valide == None))

@@ -1,5 +1,5 @@
-from settings import *
-from models import Course
+from .settings import *
+from .models import Course
 from django.db.models import Min, Max
 
 def course(request):

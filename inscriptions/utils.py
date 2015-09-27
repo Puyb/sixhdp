@@ -1,4 +1,5 @@
-import urlparse, re
+import re
+from urllib.parse import urlparse, urlunparse
 from threading import Thread
 #from django.template.loader import render_to_string
 #from django.core.mail import EmailMessage
@@ -7,8 +8,8 @@ def urlEncodeNonAscii(b):
     return re.sub('[\x80-\xFF]', lambda c: '%%%02x' % ord(c.group(0)), b)
 
 def iriToUri(iri):
-    parts = urlparse.urlparse(iri)
-    return urlparse.urlunparse(
+    parts = urlparse(iri)
+    return urlunparse(
         part.encode('idna') if parti==1 else urlEncodeNonAscii(part.encode('utf-8'))
         for parti, part in enumerate(parts)
     )
