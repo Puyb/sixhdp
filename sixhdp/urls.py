@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = patterns('',
+    url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^', include('inscriptions.urls')),
 )
 urlpatterns += staticfiles_urlpatterns()
