@@ -21,7 +21,7 @@ from django.utils import timezone
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
-from easy_pdf.views import PDFTemplateView
+from functools import reduce
 
 class EquipeForm(ModelForm):
     class Meta:
@@ -30,7 +30,7 @@ class EquipeForm(ModelForm):
         widgets = {
             'categorie': HiddenInput(),
             'prix': HiddenInput(),
-            'nombre': Select(choices=tuple([(i, i) for i in range(1, 6)])),
+            'nombre': Select(choices=tuple([(i, i) for i in range(1, MAX_EQUIPIERS + 1)])),
         }
 
 class EquipierForm(ModelForm):
@@ -43,11 +43,11 @@ class EquipierForm(ModelForm):
             'justificatif':      RadioSelect(choices=JUSTIFICATIF_CHOICES),
         }
 
-EquipierFormset = formset_factory(EquipierForm, formset=BaseModelFormSet, extra=5)
+EquipierFormset = formset_factory(EquipierForm, formset=BaseModelFormSet, extra=MAX_EQUIPIERS)
 EquipierFormset.model = Equipier
 
 @open_closed
-def form(request, course_uid, numero=None, code=None, imaginr=False):
+def form(request, course_uid, numero=None, code=None):
     course = get_object_or_404(Course, uid=course_uid)
     instance = None
     old_password = None
@@ -63,10 +63,7 @@ def form(request, course_uid, numero=None, code=None, imaginr=False):
         #    }))
         if instance.password != code:
             raise Http404()
-        imaginr = "Imagin'r" in instance.commentaires
     if request.method == 'POST':
-        if 'imaginr' in request.POST:
-            imaginr = True
         try:
             equipe_form = EquipeForm(request.POST, request.FILES, instance=instance)
             if instance:
@@ -86,8 +83,6 @@ def form(request, course_uid, numero=None, code=None, imaginr=False):
                 new_instance.password = old_password
                 if not instance:
                     new_instance.password = '%06x' % random.randrange(0x100000, 0xffffff)
-                    if imaginr:
-                        new_instance.commentaires = "Imagin'r"
                 #if instance and instance.categorie == new_instance.categorie and instance.prix:
                 #    new_instance.prix = instance.prix
                 #else:
@@ -102,11 +97,11 @@ def form(request, course_uid, numero=None, code=None, imaginr=False):
                     try:
                         course.send_mail('inscription', [ new_instance ])
                     except Exception as e:
-                        traceback.print_exc(e)
+                        traceback.print_exc()
                     try:
                         course.send_mail('inscription_admin', [ new_instance ])
                     except Exception as e:
-                        traceback.print_exc(e)
+                        traceback.print_exc()
                 return redirect('inscriptions.done', course_uid=course.uid, numero=new_instance.numero)
             else:
                 text = 'Error in form submit\n'
@@ -134,7 +129,7 @@ def form(request, course_uid, numero=None, code=None, imaginr=False):
     nombres_par_tranche = {}
     for categorie in Categorie.objects.filter(course=course):
         key = '%d-%d' % (categorie.numero_debut, categorie.numero_fin)
-        if not nombres_par_tranche.has_key(key):
+        if key not in nombres_par_tranche:
             nombres_par_tranche[key] = Equipe.objects.filter(course=course, numero__gte=categorie.numero_debut, numero__lte=categorie.numero_fin).count()
     
     return render_to_response("form.html", RequestContext(request, {
@@ -148,7 +143,6 @@ def form(request, course_uid, numero=None, code=None, imaginr=False):
         "equipiers_count": equipiers_count,
         "course": course,
         "message": message,
-        "imaginr": imaginr,
     }))
 
 @open_closed
@@ -308,17 +302,4 @@ def index(request):
         'prochaines_courses': Course.objects.filter(date__gt=date.today()).order_by('date'),
         'anciennes_courses': Course.objects.filter(date__lte=date.today()).order_by('date'),
     }))
-
-class FactureView(PDFTemplateView):
-    template_name = 'facture.html'
-
-    def get_context_data(self, *args, **kwargs):
-        context = super(FactureView, self).get_context_data(*args, **kwargs)
-        equipe = get_object_or_404(Equipe, course__uid=self.kwargs['course_uid'], numero=self.kwargs['numero'], paiement__gte=F('prix'))
-        if not equipe.date_facture:
-            equipe.date_facture = date.today();
-            equipe.save()
-        context['equipe'] = equipe
-        return context
-
 

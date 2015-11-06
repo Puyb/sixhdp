@@ -1,155 +1,79 @@
 {% load i18n %}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="fr-FR">
-<head profile="http://gmpg.org/xfn/11">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>{% block title %}{{ TITLE }}{% endblock %}</title>
-    <script type="text/javascript">
-    WebFontConfig = {
-        google: { families: ['Pontano+Sans::latin,latin-ext'] }
-    };
-    (function() {
-        var wf = document.createElement('script');
-        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-        wf.type = 'text/javascript';
-        wf.async = 'true';
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(wf, s);
-    })(); 
-    </script>
-    <link rel='stylesheet' id='admin-bar-css'  href='http://www.6hdeparis.fr/wp-includes/css/admin-bar.min.css?ver=3.5.1' type='text/css' media='all' />
-    <link rel='stylesheet' id='contact-form-7-css'  href='http://www.6hdeparis.fr/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=3.3.3' type='text/css' media='all' />
-    <link rel='stylesheet' id='graphene-stylesheet-css'  href='http://www.6hdeparis.fr/wp-content/themes/graphene/style.css?ver=3.5.1' type='text/css' media='screen' />
-    <style type="text/css">
-        #content, .menu-bottom-shadow, #sidebar_bottom{background-color: #ffffff}.post-title, .post-title a, .post-title a:visited, .entry-footer{border-color: #ffffff}.post{border-top-color: #ffffff}.post{border-bottom-color: #ffffff}.sidebar h3{border-color: #5f138f}.sidebar h3{ background: #8f1378; background: -moz-linear-gradient(#eb6ce1, #8f1378); background: -webkit-linear-gradient(#eb6ce1, #8f1378); background: -o-linear-gradient(#eb6ce1, #8f1378); -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#eb6ce1', EndColorStr='#8f1378')"; background: linear-gradient(#eb6ce1, #8f1378); }.block-button, .block-button:visited, .Button, .button, #commentform #submit, .wpsc_buy_button{ background: #75005E; background: -moz-linear-gradient(#8f1378,#75005E); background: -webkit-linear-gradient(#8f1378,#75005E); background: -o-linear-gradient(#8f1378, #75005E); -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#8f1378', EndColorStr='#75005E')"; background: linear-gradient(#8f1378,#75005E); border-color: #75005E; text-shadow: 0 -1px 1px #5f138f; color: #fff; -moz-box-shadow: 0 0 5px #555555; -webkit-box-shadow: 0 0 5px #555555; box-shadow: 0 0 5px #555555} .block-button:hover, .button:hover, #commentform #submit:hover,.wpsc_buy_button:hover{ background: #75005E; background: -moz-linear-gradient(#8f1378,#5B0044); background: -webkit-linear-gradient(#8f1378,#5B0044); background: -o-linear-gradient(#8f1378, #5B0044); -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#8f1378', EndColorStr='#5B0044')"; background: linear-gradient(#8f1378,#5B0044); color: #fff; }.page-title{ -pie-background: linear-gradient(left top,#5f138f,#8f1378); background: #8f1378; background: -moz-linear-gradient(left top,#5f138f, #8f1378); background: -webkit-linear-gradient(left top,#5f138f, #8f1378); background: -o-linear-gradient(left top,#5f138f, #8f1378); -ms-filter: "progid:DXImageTransform.Microsoft.gradient(gradientType=1,startColorStr='#5f138f', EndColorStr='#8f1378')"; background: linear-gradient(left top,#5f138f, #8f1378); }.header_title, .header_title a, .header_title a:visited, .header_title a:hover, .header_desc {color:#blank}a,.post-title,.post-title a,#comments > h4.current a{color: #8f1378}a:visited,.post-title a:visited{color: #8f1378}a:hover,.post-title a:hover{color: #5f138f}.post-title, .post-title a, .post-title a:hover, .post-title a:visited{ color: #8f1378 }html{ background: #aaa; } body{ background: white url("http://www.6hdeparis.fr/wp-content/uploads/2012/06/bg.png") no-repeat right bottom; } H1.page-title.archive-title{ font-size: 0; color: transparent; background: transparent; margin-top: -26px} H1.page-title.archive-title span{ font: 24px "Pontano Sans", sans-serif; color: #8F1378; display: block; } #nav LI.lang-item{ float: right; } #graphene-dynamic-widget-graphene_header .sidebar-wrap{ position: static; }
-    </style>
-    <!--[if lte IE 7]>
-      <style type="text/css" media="screen">
-        #footer, div.sidebar-wrap, .block-button, .featured_slider, #slider_root, #nav li ul, .pie{behavior: url(http://www.6hdeparis.fr/wp-content/themes/graphene/js/PIE.php);}
-        .featured_slider{margin-top:0 !important;}
-        #header-menu-wrap {z-index:5}
-      </style>
+
+    <!-- Bootstrap -->
+    <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <style>
-        th { font-weight: normal; text-align: left; vertical-align: top; }
-        #nom_erreur { color: red; }
-        .entry-content h1 {
-            color: #8F1378;
-            border-color: #FFFFFF;
-            font: 24px "Pontano Sans",sans-serif;
-            margin-top: -3px;
-        }
-        table th, table td, table tr {
-            border: none transparent;
-            background: transparent;
-        }
-        #buttons { text-align: right; }
-        #buttons input { margin: 10px 30px; }
+        #autorisation-warning { display: none; }
     </style>
-</head>
-    <body class="page page-template-default logged-in admin-bar no-customize-support one_column">
+  </head>
+  <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">{% block navbar-brand %}{{ TITLE }}{% endblock %}</a>
+        </div>
+        <!--
+        <div id="navbar" class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right">
+            <div class="form-group">
+              <input type="text" placeholder="Email" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" placeholder="Password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success">Sign in</button>
+          </form>
+        </div>
+        -->
+      </div>
+    </nav>
 
-        <div class="bg-gradient">
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1>{% trans "Courses d'endurance de roller" %}</h1>
+        <p>This is a template for a simple marketing or informational website. It includes a large callout called a jumbotron and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+        <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+      </div>
+    </div>
 
+    <div class="container">
+      <!-- Example row of columns -->
+      {% block main %}
+          {% block content %}{% endblock %}
+          {% block sidebar %}{% endblock %}
+      {% endblock %}
 
-            <div id="container" class="container_16">
+      <hr>
 
+      <footer>
+        <p>&copy; Company 2014</p>
+      </footer>
+    </div> <!-- /container -->
 
-                <div id="header">
-                    <div class="graphene-dynamic-widget" id="graphene-dynamic-widget-graphene_header">
-                        <div id="text-4" class="sidebar-wrap clearfix widget_text">
-                             <div class="textwidget"><img src="http://www.6hdeparis.fr/wp-content/uploads/2014/12/bandeau_{{ LANGUAGE_CODE }}.png" alt="" class="header-img"></div>
-                        </div>
-                    </div>
-                </div>
-                <div id="nav">
-                    <div id="header-menu-wrap" class="clearfix">
-                        <ul id="header-menu" class="menu clearfix">
-                            <li id="menu-item-238" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/"><strong>{% trans "Accueil" %}</strong></a></li>
-                            {% if COURSE %}
-                            <li id="menu-item-238" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/{{ COURSE.uid }}/list/"><strong>{% trans "Liste des inscrits" %}</strong></a></li>
-                            <li id="menu-item-238" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/{{ COURSE.uid }}/stats/"><strong>{% trans "Statistiques" %}</strong></a></li>
-                            <li id="menu-item-238" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/{{ COURSE.uid }}/change/"><strong>{% trans "Modifier une inscription" %}</strong></a></li>
-                            {% endif %}
-                            <li class='no-translation lang-item lang-item-9 lang-item-en menu-item'><a hreflang='en' href="javascript:set_lang('en')"><img src="http://www.6hdeparis.fr/wp-content/plugins/polylang/flags/en_US.png" title="English" alt="English" /></a></li>
-                            <li class='lang-item lang-item-8 lang-item-fr current-lang menu-item'><a hreflang='fr' href="javascript:set_lang('fr')"><img src="http://www.6hdeparis.fr/wp-content/plugins/polylang/flags/fr_FR.png" title="Français" alt="Français" /></a></li>
-                        </ul>            
-                        <script> function set_lang(l) {
-                            var i = document.getElementById('id_language');
-                            i.value = l;
-                            i.parentNode.submit();
-                        } </script>
-                        <form action="/i18n/setlang/" method="post">{% csrf_token %}
-                            <input id="id_language" name="language" type="hidden" value="" />
-                        </form>
-                        <div class="clear"></div>
-                    </div>
-                </div>
-    
-            
-                <div class="menu-bottom-shadow">&nbsp;</div>
-
-
-        
-
-                
-                <div id="content" class="clearfix hfeed">
-                    {% block main %}
-                    <div id="content-main" class="clearfix grid_11">
-                        <div class="entry clearfix">                
-                            <div class="entry-content clearfix">
-                                {% block content %}{% endblock %}
-                            </div>
-                            <div class="entry-footer clearfix"></div>
-                        </div>
-                    </div><!-- #content-main -->
-                    <div id="sidebar" class="sidebar grid_5">
-                        {% block sidebar %}{% endblock %}
-                    </div>
-                    {% endblock %}
-                </div><!-- #content -->
-
-
-
-                <div id="footer" class="clearfix">
-                    <div id="copyright">
-                        <h3>Copyright</h3>
-                        <p> &copy; 2013 6h de Paris.</p> 
-                    </div>
-
-                    <div class="footer-menu-wrap">
-                        <ul id="footer-menu" class="clearfix">
-                            <li class="menu-item return-top"><a href="#">Retour en Haut</a></li>
-                        </ul>
-                    </div>
-                    
-                    <div id="developer" class="grid_7">
-                        <p> Inscription roller par <a href="http://puyb.net/">Puyb</a></p>
-                    </div>
-                </div><!-- #footer -->
-
-
-            </div><!-- #container -->
-
-        </div><!-- .bg-gradient -->
-
-    <!--[if IE 8]>
-    <script type="text/javascript">
-        (function( $) {
-            var imgs, i, w;
-            var imgs = document.getElementsByTagName( 'img' );
-            maxwidth = 0.98 * $( '.entry-content' ).width();
-            for( i = 0; i < imgs.length; i++ ) {
-                w = imgs[i].getAttribute( 'width' );
-                if ( w > maxwidth ) {
-                    imgs[i].removeAttribute( 'width' );
-                    imgs[i].removeAttribute( 'height' );
-                }
-            }
-        })(jQuery);
-    </script>
-    <![endif]-->
-
-    </body>
+    <script src="{{ STATIC_URL }}jquery-2.1.4.min.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
+    {% block scripts %}{% endblock %}
+  </body>
 </html>

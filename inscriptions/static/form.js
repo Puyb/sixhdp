@@ -10,6 +10,15 @@ if(![].map)
         return r;
     };
 
+$.fn.serializeObject = function() {
+    var o = {};
+    var a = this.serializeArray();
+    a.forEach(function(i) {
+        o[i.name] = i.value;
+    });
+    return o;
+};
+
 var actual_part = 0;
 
 function age(a) {
@@ -30,18 +39,10 @@ function check_date(data, k) {
 }
 
 function serialize() {
-    $$('input, select').each(function(e) {
-        e.disabled = false;
-    });
-    var data = Form.serialize(document.body, true);
-    if(!STAFF) {
-        if(new Date() >= COURSE.CLOSE_DATE || COURSE.EQUIPIERS_COUNT >= COURSE.MAX_EQUIPIERS) {
-            $$('input, select').each(function(e) {
-                if(e.type !== 'file' && e.type !== 'button' && e.type !== 'submit' && e.type !== 'radio' && !/num_licence$/.test(e.name))
-                    e.disabled = true;
-            });
-        }
-    }
+    $('input, select').attr('disabled', false);
+    var data = $('form').serializeObject();
+    disable_form_if_needed();
+
     data.equipiers = [{}, {}, {}, {}, {}];
     data.nombre = parseFloat(data.nombre);
     for(var k in data)
@@ -53,24 +54,26 @@ function serialize() {
 }
 
 function disable_form_if_needed() {
-    if(new Date() >= COURSE.CLOSE_DATE || COURSE.EQUIPIERS_COUNT >= COURSE.MAX_EQUIPIERS && !STAFF) {
-        $$('input, select').each(function(e) {
-            if(e.type !== 'file' && e.type !== 'button' && e.type !== 'submit' && e.type !== 'radio' && !/num_licence$/.test(e.name))
-                e.disabled = true;
+    if(STAFF) return;
+    if(new Date() >= COURSE.CLOSE_DATE || COURSE.EQUIPIERS_COUNT >= COURSE.MAX_EQUIPIERS) {
+        $('input, select').each(function() {
+            if(this.type !== 'file' && this.type !== 'button' && this.type !== 'submit' && this.type !== 'radio' && !/num_licence$/.test(this.name))
+                this.disabled = true;
         });
     }
 }
 
 function check_nom(wait) {
-    if($F('id_nom'))
-        new Ajax.Request(CHECK_URL, {
-            parameters: { nom: $F('id_nom'), id: INSTANCE.ID || '0' },
-            asynchronous: !wait,
-            onSuccess: function(r) {
-                if(r.responseText !== '0')
-                    $('nom_erreur').update(gettext("Ce nom d'équipe est déjà utilisé !"));
+    var v = $('#id_nom').val();
+    if (v)
+        new $.ajax(CHECK_URL, {
+            data: { nom: v, id: INSTANCE.ID || '0' },
+            async: !wait,
+            success: function(r, text) {
+                if(text !== '0')
+                    $('#nom_erreur').html(gettext("Ce nom d'équipe est déjà utilisé !"));
                 else
-                    $('nom_erreur').update("");
+                    $('#nom_erreur').html("");
 
             }
         });
@@ -79,13 +82,13 @@ function check_nom(wait) {
 function check_step(data) {
     // check values
     var ok = true;
-    var prefix = 'id_';
+    var prefix = '#id_';
     var test_data = data;
     var tests;
     var message = '';
     if(!actual_part) {
         tests = {
-            nom:                function(k) { check_nom(true); return /^.+$/i.test(this.nom) && $('nom_erreur').innerHTML === ''; },
+            nom:                function(k) { check_nom(true); return /^.+$/i.test(this.nom) && $('#nom_erreur').html() === ''; },
             gerant_nom:         /^.+$/i,
             gerant_prenom:      /^.+$/i,
             gerant_ville:       /^.+$/i,
@@ -97,7 +100,7 @@ function check_step(data) {
                 if(CATEGORIES.filter(function(categorie) {
                     return categorie.min_equipiers <= nombre && nombre <= categorie.max_equipiers;
                 }).length === 0) {
-                    message += gettext("Désolé, il n'y a plus de place dans ces catégories. Changez le nombre de participants.") + '\n';
+                    message += gettext("Désolé, il n'y a plus de place dans cette catégorie. Changez le nombre de participants.") + '\n';
                     return false;
                 }
                 return true;
@@ -117,15 +120,15 @@ function check_step(data) {
             justificatif:       /^(licence|certificat)$/,
             num_licence:        function(k) { return this.justificatif !== 'licence' || /^[0-9]{3,9}$/i.test(this[k]); }
         };
-        prefix = 'id_form-' + (actual_part - 1) + '-';
+        prefix = '#id_form-' + (actual_part - 1) + '-';
         test_data = data.equipiers[actual_part - 1];
     }
     for(var k in tests) {
         if(tests[k].test ? tests[k].test(test_data[k]) : tests[k].call(test_data, k)) {
-            $(prefix + k).setStyle({ background: 'white' });
+            $(prefix + k).parents('.form-group').removeClass('has-error');
         } else {
             ok = false;
-            $(prefix + k).setStyle({ background: '#ff6666' });
+            $(prefix + k).parents('.form-group').addClass('has-error');
         }
     }
     if(!ok) {
@@ -148,180 +151,180 @@ function setup_categories(data) {
     });
     
     if(actual_categories.length === 0) {
-        $('button_prev').click();
+        $('#button_prev')[0].click();
         alert(gettext("Votre équipe n'est éligible dans aucune des catégories proposées pour cette compétition. Veuillez vous référer au réglement de la course disponible sur le site pour voir les critères de chaque catégorie."));
         return false;
     }
 
     // generate html
-    $('catwrapper').innerHTML = actual_categories.map(function(c) {
-        return '<input type="radio" value="#{id}" name="categorie" id="id_categorie-#{id}"><label for="id_categorie-#{id}">#{label} - #{prix} €</label><br />'.interpolate(c);
-    }).join('');
+    $('#catwrapper').html(actual_categories.map(function(c) {
+        var s = '<input type="radio" value="#{id}" name="categorie" id="id_categorie-#{id}"><label for="id_categorie-#{id}">#{label} - #{prix} €</label><br />';
+        for(var k in c)
+            s = s.replace(new RegExp('#\\{' + k + '\\}', 'g'), c[k]);
+        return s
+    }).join(''));
 
     disable_form_if_needed();
 
     // install handlers
-    $$('input[name=categorie]').invoke('observe', 'change', function(event) {
-        var categorie = $$('input[name=categorie]').filter(function(e) { return e.checked; })[0].value;
-        var d = CATEGORIES.filter(function(c) { return c.code === categorie; })[0];
-        $('id_prix').value = d.prix;
-        $$('.justif_supp').invoke('hide');
-        if(d.show)
-            $('justif_' + d.code).show();
+    $('input[name=categorie]').on('change', function(event) {
+        $('input[name=categorie]').each(function() {
+            if (!this.checked) return;
+            var categorie = this.value;
+            var d = CATEGORIES.filter(function(c) { return c.code === categorie; })[0];
+            $('#id_prix').val(d.prix);
+        });
     });
 
     // select the categorie
     if(UPDATE) {
-        if(!$('id_categorie-' + INSTANCE.CATEGORIE))
+        if(!$('#id_categorie-' + INSTANCE.CATEGORIE).length)
             alert(gettext("Vos modifications impliquent un changement de catégorie. Veuillez sélectionner la nouvelle catégorie."));
         else
-            $('id_categorie-' + INSTANCE.CATEGORIE).checked = true;
+            $('#id_categorie-' + INSTANCE.CATEGORIE).attr('checked', true);
     } else {
-        $$('input[name=categorie]')[0].checked = true;
-        $('id_prix').value = actual_categories[0].prix;
+        $('input[name=categorie]')[0].checked = true;
+        $('#id_prix').val(actual_categories[0].prix);
     }
 
     return true;
 }
 
-function setup_extra_justif() {
-    for(var i = 1; i < actual_part; i++) {
-        var n = $F('id_form-' + (i - 1) + '-prenom') + ' ' + $F('id_form-' + (i - 1) + '-nom');
-        $$('#justif_FMX', '#justif_EPX').each(function(e) {
-            var tr = e.down('tr', i - 1);
-            tr.show();
-            tr.down().update(n);
-        });
+function naissanceOnChange(n) {
+    var data = serialize();
+    var e = $('#id_form-' + n + '-autorisation').parents('.form-group')
+    if(age(18)(data.equipiers[n])) {
+        e.hide();
+    } else {
+        e.show();
     }
-}
 
-Event.observe(window, 'load', function() {
-    $('id_categorie').remove();
-    for(var i = 0; i < 5; i++) {
-        $('id_form-' + i + '-date_de_naissance_day').up().id = 'id_form-' + i + '-date_de_naissance';
+};
+$(function() {
+    $('#id_categorie').remove();
+
+    var TOTAL_FORMS = parseFloat($('id_form-TOTAL_FORM').val())
+    for(var i = 0; i < TOTAL_FORMS; i++) {
+        $('#id_form-' + i + '-date_de_naissance_day').parent()[0].id = 'id_form-' + i + '-date_de_naissance';
     }
     //$('id_password').up().insert('<br /><input type="password" id="id_password2" />');
-
-    $$('select[name*=naissance]').invoke('observe', 'change', function(event) {
-        var data = serialize();
-        var n = event.element().name.split('-')[1];
-        if(age(18)(data.equipiers[n])) {
-            $('id_form-' + n + '-autorisation').up('tr').hide();
-            if($('tr-autorisation-warning'))
-                $('tr-autorisation-warning').remove();
-        } else {
-            var e = $('id_form-' + n + '-autorisation').up('tr').show();
-            if(!$('tr-autorisation-warning'))
-                e.insert({
-                    after: new Element('tr', { id: 'tr-autorisation-warning' })
-                            .insert(new Element('td', { colspan: 2 })
-                            .update(gettext("Si vous le pouvez, scannez l'autorisation et ajoutez la en pièce jointe (formats PDF ou JPEG).") + "<br />" + gettext("Vous pourrez aussi la télécharger plus tard, ou l'envoyer par courrier (<a href=\"http://www.6hdeparis.fr/wp-content/uploads/2013/03/autorisation_parentale.pdf\" target=\"_blank\">modèle</a>).")))
-                });
-        }
-    
+    var maxEquipier = 0;
+    CATEGORIES.forEach(function(c) {
+        if (c.max_equipiers > maxEquipier)
+            maxEquipier = c.max_equipiers;
     });
-    $$('input[name*=licence]').each(function(e) {
-        var tr = e.up('tr');
-        var id = e.id.split('-').slice(0, 2).join('-');
-        tr.hide()
+    $('#id_nombre>option').filter(function() {
+        return parseFloat(this.value) > maxEquipier;
+    }).remove();
+            
+
+    $('select[name*=naissance]').on('change', function() {
+        var n = this.name.split('-')[1];
+        naissanceOnChange(n);
+    });
+
+    var equipier_year_max = COURSE.YEAR - COURSE.MIN_AGE;
+    $('select[name*=naissance_year]>option').each(function() {
+        if (parseFloat(this.value) > equipier_year_max)
+            this.remove();
+    });
+
+    $('[data-id]').each(function() {
+        var $this = $(this);
+        $('#' + $this.attr('data-id')).parents('.col-md-9').append($this);
+    });
+
+    $('input[name*=licence]').each(function() {
+        var $this = $(this);
+        var $formGroup = $this.parents('.form-group');
+        var id = this.id.split('-').slice(0, 2).join('-');
+        $formGroup.hide()
             .next().hide();
         var handler = function() {
-            if($(id + '-justificatif_1').checked) {
-                tr.show()
-                    .next().show().down('label').update(gettext('Licence') + ':');
-                tr.next(1).show();
+            if($('#' + id + '-justificatif_1')[0].checked) {
+                $formGroup.show()
+                    .next().show().find('label').html(gettext('Licence') + ':');
             }
-            if($(id + '-justificatif_2').checked) {
-                tr.hide()
-                    .next().show().down('label').update(gettext('Certificat médical') + ':');
-                tr.next(1).show();
+            if($('#' + id + '-justificatif_2')[0].checked) {
+                $formGroup.hide()
+                    .next().show().find('label').html(gettext('Certificat médical') + ':');
             }
         };
-        $(id + '-justificatif_0').up('li').remove();
-        $(id + '-justificatif_1').observe(Prototype.Browser.IE ? 'click' : 'change', handler);
-        $(id + '-justificatif_2').observe(Prototype.Browser.IE ? 'click' : 'change', handler);
-        $(id + '-justificatif_1').up('tr').next(1).insert({after: e.up('table').down('tr:last') });
+        var ie = /msie/i.test(navigator.userAgent);
+        $('#' + id + '-justificatif_0').parents('.radio').remove();
+        $('#' + id + '-justificatif_1').on(ie ? 'click' : 'change', handler);
+        $('#' + id + '-justificatif_2').on(ie ? 'click' : 'change', handler);
         handler();
     });
-    $$('input[name*=parent]').each(function(e) {
-        var tr = e.up('tr').hide();
-        $('justif_FMX').down('table').insert(tr);
-    });
-    $$('input[name*=jointe2]').each(function(e) {
-        var tr = e.up('tr').hide();
-        $('justif_EPX').down('table').insert(tr);
-    });
 
-    var tr_email = $('id_gerant_email').up('tr');
-    var email_bis = tr_email.clone(true);
-    email_bis.down('input').id = "id_gerant_email2";
-    email_bis.down('input').setAttribute('name', "gerant_email2");
-    email_bis.down('label').setAttribute('for', "id_gerant_email2");
-    email_bis.down('label').innerHTML = gettext("E-mail (confirmation) :");
-    tr_email.insert({ after: email_bis });
+    var email = $('#id_gerant_email').parents('.form-group');
+    var email_bis = email.clone(true);
+    email_bis.find('input:first').attr("id", "id_gerant_email2");
+    email_bis.find('input:first').attr('name', "gerant_email2");
+    email_bis.find('label:first').attr('for', "id_gerant_email2");
+    email_bis.find('label:first').html(gettext("E-mail (confirmation) :"));
+    email.after(email_bis);
 
-    $A($('id_connu').children).slice(1, -1).sort(function() { return Math.random()-.5; }).forEach(function(e) { e.parentNode.insertBefore(e, e.parentNode.down().next()); });
+    $('#id_connu>*').slice(1, -1).sort(function() { return Math.random()-.5; }).detach().appendTo($('#id_connu'));
 
     disable_form_if_needed();
 
     var nom_timeout;
-    $('id_nom')
-        .insert({ after: new Element('div', { id: 'nom_erreur' }) })
-        .observe('keydown', function(event) {
-            if(nom_timeout) clearTimeout(nom_timeout);
+    $('#id_nom')
+        .after($('<div id="nom_erreur">'))
+        .on('keydown', function(event) {
+            clearTimeout(nom_timeout);
             nom_timeout = setTimeout(check_nom, 500);
         });
 
 
 
-    $('part0').down('input').focus();
+    $('#part0 input')[0].focus();
 
-    $('button_prev').observe('click', function(event) {
-        $$('.parts').invoke('hide');
+    $('#button_prev').on('click', function(event) {
+        $('.parts').hide();
         actual_part--;
-        $('part' + actual_part).show();
-        $('part' + actual_part).down('input').focus();
-        $('button_next').show();
-        $('button_submit').hide();
-        if(!actual_part) event.element().hide();
+        $('#part' + actual_part).show();
+        $('#part' + actual_part + ' input')[0].focus();
+        $('#button_next').show();
+        $('#button_submit').hide();
+        if(!actual_part) $(this).hide();
     });
 
 
-    $('button_next').observe('click', function(event) {
+    $('#button_next').on('click', function(event) {
         var data = serialize();
         if(!check_step(data)) {
             return;
         }
 
         // change page
-        $('button_prev').show();
-        $$('.parts').invoke('hide');
+        $('#button_prev').show();
+        $('.parts').hide();
         actual_part++;
-        if(actual_part > parseInt($F('id_nombre'))) {
+        if(actual_part > parseFloat($('#id_nombre').val())) {
             // last page
-            $('partlast').show();
+            $('#partlast').show();
             try {
-                $('partlast').down('input').focus();
+                $('#partlast input')[0].focus();
             } catch(e) {}
 
             if(setup_categories(data)) {
 
-                setup_extra_justif();
-
-                $('button_next').hide();
-                $('id_form-TOTAL_FORMS').value = actual_part - 1;
-                $('button_submit').show();
+                $('#button_next').hide();
+                $('#id_form-TOTAL_FORMS').val(actual_part - 1);
+                $('#button_submit').show();
             }
         } else {
-            $('part' + actual_part).show();
-            $('part' + actual_part).down('input').focus();
-            if(age(18)(data.equipiers[actual_part - 1]))
-                $('id_form-' + (actual_part - 1) + '-autorisation').up('tr').hide();
+            $('#part' + actual_part).show();
+            $('#part' + actual_part + ' input')[0].focus();
+            naissanceOnChange(actual_part - 1);
             if(actual_part === 1) {
-                $$('[name*=gerant_]').each(function(element) {
-                    var element2 = $('id_form-0-' + element.name.substr('gerant_'.length));
-                    if(element2 && !element2.getValue()) {
-                        element2.setValue(element.getValue());
+                // copy gerant info to the first equipier
+                $('[name*=gerant_]').each(function() {
+                    var element2 = $('#id_form-0-' + this.name.substr('gerant_'.length));
+                    if(!element2.val()) {
+                        element2.val($(this).val());
                     }
                 });
             }
@@ -330,20 +333,20 @@ Event.observe(window, 'load', function() {
 
 
 
-    $('button_submit').observe('mousedown', function(event) {
-        $R(actual_part, 5).each(function(i) { $('part' + i).remove(); });
-        var categorie = $$('input[name=categorie]').filter(function(e) { return e.checked; })[0].value;
-        $('id_prix').value = CATEGORIES.filter(function(c) { return c.id === categorie; })[0].prix;
+    $('#button_submit').on('mousedown', function(event) {
+        for(var i = actual_part; i <= TOTAL_FORMS; i++) $('#part' + i).remove();
+        var categorie = $('input[name=categorie]').filter(function() { return this.checked; })[0].value;
+        $('#id_prix').val(CATEGORIES.filter(function(c) { return c.id === categorie; })[0].prix);
         if(!categorie) {
-            event.stop();
+            event.stopPropagation();
             alert(gettext('Vous devez choisir une catégorie'));
         }
-        if(!$('id_conditions').checked) {
-            event.stop();
+        if(!$('#id_conditions')[0].checked) {
+            event.stopPropagation();
             alert(gettext('Vous devez accépter le règlement de la compétition'));
         }
-        $$('input, select').each(function(e) {
-            e.disabled = false;
+        $('input, select').each(function() {
+            this.disabled = false;
         });
     });
 });

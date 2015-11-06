@@ -1,0 +1,6 @@
+*.pyc
+*.bak
+*.orig
+__pycache__
+env
+*.db

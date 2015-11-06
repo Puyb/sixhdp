@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from operator import itemgetter
 from django.utils.translation import ugettext_lazy as _
 from django_countries.fields import CountryField
 from django.conf import settings
@@ -116,7 +117,7 @@ class Course(models.Model):
             self.uid = self.nom.lower().replace(' ', '_')
         super(Course, self).save(*args, **kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s (%s)' % (self.nom, self.date)
 
     def send_mail(self, nom, instances):
@@ -235,8 +236,8 @@ class Course(models.Model):
                 result['connu'][equipe.connu] = 0;
             result['connu'][equipe.connu] += 1;
 
-        result['connu'] = result['connu'].items()
-        result['connu'].sort(lambda a, b: cmp(b[1], a[1]))
+        result['connu'] = list(result['connu'].items())
+        sorted(result['connu'], key=itemgetter(1), reverse=True)
 
         result['villes'] = [
             {
@@ -247,7 +248,8 @@ class Course(models.Model):
                 'count': ville.count,
             } for ville in Ville.objects.filter(equipier__equipe__course=self).annotate(count=Count('equipier'))
             if ville.count > 0 ]
-        result['villes'].sort(lambda a, b: cmp(b['count'], a['count']) or cmp(a['nom'], b['nom']))
+        sorted(result['villes'], key=itemgetter('nom'))
+        sorted(result['villes'], key=itemgetter('count'), reverse=True)
 
         result['course']['documents'] = 0
         result['course']['documents_electroniques'] = 0
@@ -286,7 +288,7 @@ class Categorie(models.Model):
     numero_debut    = models.IntegerField(_(u'Numero de dossard (début)'), default=0)
     numero_fin      = models.IntegerField(_(u'Numero de dossard (fin)'), default=0)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.code
 
 class Ville(models.Model):
@@ -345,9 +347,9 @@ def lookup_ville(nom, cp, pays):
         return obj
     except json.JSONDecodeError as e:
         print(response.text)
-        traceback.print_exc(e)
+        traceback.print_exc()
     except Exception as e:
-        traceback.print_exc(e)
+        traceback.print_exc()
         return None
 
 class Equipe(models.Model):
@@ -380,7 +382,7 @@ class Equipe(models.Model):
     class Meta:
         unique_together = ( ('course', 'numero'), )
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s - %s - %s - %s' % (self.numero, self.course.uid, self.categorie, self.nom)
 
     def licence_manquantes(self):
@@ -398,7 +400,7 @@ class Equipe(models.Model):
         return len([equipier for equipier in self.equipier_set.all() if equipier.verifier]) > 0
 
     def paiement_complet(self):
-        return self.paiement >= self.prix
+        return (self.paiement or Decimal(0)) >= self.prix
     
     def dossier_complet_auto(self):
         if hasattr(self, 'erreur_count'):
@@ -431,22 +433,22 @@ class Equipe(models.Model):
                 try:
                     self.send_mail('changement_numero')
                 except Exception as e:
-                    traceback.print_exc(e)
+                    traceback.print_exc()
                 try:
                     self.send_mail('changement_numero_admin')
                 except Exception as e:
-                    traceback.print_exc(e)
+                    traceback.print_exc()
 
             paiement = Equipe.objects.get(id=self.id).paiement
             if paiement != self.paiement:
                 try:
                     self.send_mail('paiement')
                 except Exception as e:
-                    traceback.print_exc(e)
+                    traceback.print_exc()
                 try:
                     self.send_mail('paiement_admin')
                 except Exception as e:
-                    traceback.print_exc(e)
+                    traceback.print_exc()
         else:
             if not self.numero:
                 self.numero = self.getNumero()
@@ -499,13 +501,11 @@ class Equipier(models.Model):
     num_licence       = models.CharField(_(u'Numéro de licence'), max_length=15, blank=True)
     piece_jointe      = models.FileField(_(u'Certificat ou licence'), upload_to='certificats', blank=True)
     piece_jointe_valide  = models.NullBooleanField(_(u'Certificat ou licence valide'))
-    parent            = models.CharField(_(u'Lien de parenté'), max_length=200, blank=True)
-    piece_jointe2       = models.FileField(_(u'Justificatif entreprise / etudiant'), upload_to='certificats', blank=True)
-    piece_jointe2_valide  = models.NullBooleanField(_(u'Justificatif valide'))
     ville2            = models.ForeignKey(Ville, null=True)
-    code_eoskates     = models.CharField(_(u'Code EOSkates'), max_length=20, blank=True)
     transpondeur      = models.CharField(_(u'Transpondeur'), max_length=20, blank=True)
     taille_tshirt     = models.CharField(_(u'Taille T-shirt'), max_length=3, choices=TAILLES_CHOICES, blank=True)
+
+    # Pre-calculated fields
     verifier               = models.BooleanField(_(u'Verifier'), editable=False)
     licence_manquante      = models.BooleanField(_(u'Licence manquante'), editable=False)
     certificat_manquant    = models.BooleanField(_(u'Certificat manquant'), editable=False)
@@ -522,7 +522,7 @@ class Equipier(models.Model):
             birthday = self.date_de_naissance.replace(year=today.year, day=self.date_de_naissance.day-1)
         return today.year - self.date_de_naissance.year - (birthday > today)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%d' % self.numero
 
     def save(self, *args, **kwargs):
