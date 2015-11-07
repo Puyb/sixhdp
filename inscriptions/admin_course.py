@@ -8,7 +8,8 @@ from django.template import Template, Context
 from django.template import RequestContext
 from django.conf.urls import patterns
 from django.contrib import messages
-from django.db.models import Sum, F, Q
+from django.db.models import Sum, Value, F, Q
+from django.db.models.functions import Coalesce
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin import SimpleListFilter
 import json
@@ -19,7 +20,7 @@ class CourseAdminSite(admin.sites.AdminSite):
         user = request.user
         if user.is_authenticated() and user.is_active and not self.has_permission(request) and request.META['REQUEST_METHOD'] == 'GET':
             return self.display_login_form(request, _("You're not allowed to access this part of the site. Please contact your site adminstrator."))
-        return super(CourseAdminSite, self).login(request)
+        return super().login(request)
 
     def has_permission(self, request):
         if not request.user.is_authenticated():
@@ -37,7 +38,7 @@ class CourseAdminSite(admin.sites.AdminSite):
         urls = patterns('',
             (r'choose/', self.admin_view(self.course_choose), {}, '%sadmin_choose' % self.name),
             (r'document/review/', self.admin_view(self.document_review), {}, '%sadmin_documenr_review' % self.name)
-        ) + super(CourseAdminSite, self).get_urls()
+        ) + super().get_urls()
         return urls
 
     def course_choose(self, request):
@@ -83,6 +84,14 @@ class CourseAdminSite(admin.sites.AdminSite):
 
 site = CourseAdminSite(name='course')
 
+class CourseFilteredObjectAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        course_uid = request.COOKIES['course_uid']
+        qs = qs.filter(course__uid=course_uid)
+        return qs
+    pass
+
 HELP_TEXT = """
 <ul>
     <li>
@@ -116,18 +125,9 @@ HELP_TEXT = """
             <li>Modifiez la case 'Autorisation parentale' de 'Inconnu' à 'Oui' ou 'Non' selon le cas</li>
         </ol>
     </li>
-    <li>
-        Réception d'une attestation entreprise ou étudiant :
-        <ol>
-            <li>Identifier à quel équipier il se rapporte</li>
-            <li>Vérifiez qu'il est valide</li>
-            <li>Modifiez la case 'Justificatif' de 'Inconnu' à 'Oui' ou 'Non' selon le cas</li>
-        </ol>
-    </li>
 </ul>
 <p>Au besoin, vous pouvez saisir des informations complémentaires dans la case 'commentaires'.</p>
 <p>Une fois terminer, cliquer sur le bouton 'Enregistrer' en bas de page.</p>
-<p>En cas de difficultés, contacter Stéphane au 06 72 80 65 98 ou par <a href="mailto:stephane.puybareau@6hdeparis.fr">mail</a>.</p>
 """
 
 class EquipierInline(admin.StackedInline):
@@ -194,17 +194,16 @@ class CategorieFilter(SimpleListFilter):
             return queryset.filter(categorie__code=self.value())
         return queryset
 
-class EquipeAdmin(admin.ModelAdmin):
-    def queryset(self, request):
-        qs = super(EquipeAdmin, self).queryset(request)
-        course_uid = request.COOKIES['course_uid']
-        qs = qs.filter(course__uid=course_uid)
+class EquipeAdmin(CourseFilteredObjectAdmin):
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
         qs = qs.annotate(
-            verifier_count= Sum('equipier__verifier'),
-            valide_count  = Sum('equipier__valide'),
-            erreur_count  = Sum('equipier__erreur'),
+            verifier_count = Coalesce(Sum('equipier__verifier'), Value(0)),
+            valide_count   = Coalesce(Sum('equipier__valide'), Value(0)),
+            erreur_count   = Coalesce(Sum('equipier__erreur'), Value(0)),
         )
         return qs
+
     class Media:
         css = {"all": ("admin.css",)}
         js = ('custom_admin/equipe.js', )
@@ -252,7 +251,7 @@ class EquipeAdmin(admin.ModelAdmin):
     dossier_complet_auto2.short_description = mark_safe(u"""<img alt="None" src="/static/admin/img/icon-yes.gif">""")
 
     def get_urls(self):
-        urls = super(EquipeAdmin, self).get_urls()
+        urls = super().get_urls()
         my_urls = patterns('',
             (r'^version/$', self.version),
             (r'^send/$', self.send_mails),
@@ -340,35 +339,23 @@ class EquipeAdmin(admin.ModelAdmin):
 site.register(Equipe, EquipeAdmin)
 
 class CourseAdmin(admin.ModelAdmin):
-    def queryset(self, request):
-        qs = super(CourseAdmin, self).queryset(request)
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
         course_uid = request.COOKIES['course_uid']
         qs = qs.filter(uid=course_uid)
-        return qs
-    pass
 site.register(Course, CourseAdmin)
 
 
-class CategorieAdmin(admin.ModelAdmin):
+class CategorieAdmin(CourseFilteredObjectAdmin):
     class Media:
         js = ('custom_admin/categorie.js', )
-    def queryset(self, request):
-        qs = super(CategorieAdmin, self).queryset(request)
-        course_uid = request.COOKIES['course_uid']
-        qs = qs.filter(course__uid=course_uid)
-        return qs
     list_display = ('code', 'nom', 'min_equipiers', 'max_equipiers', 'min_age', 'sexe', 'numero_debut', 'numero_fin', )
 site.register(Categorie, CategorieAdmin)
 
 
-class TemplateMailAdmin(admin.ModelAdmin):
+class TemplateMailAdmin(CourseFilteredObjectAdmin):
     class Media:
         js  = ('http://tinymce.cachefly.net/4.0/tinymce.min.js', 'custom_admin/templatemail.js', )
-    def queryset(self, request):
-        qs = super(TemplateMailAdmin, self).queryset(request)
-        course_uid = request.COOKIES['course_uid']
-        qs = qs.filter(course__uid=course_uid)
-        return qs
     list_display = ('nom', 'sujet', )
 site.register(TemplateMail, TemplateMailAdmin)
 

@@ -13,7 +13,8 @@ from datetime import date, timedelta
 from decimal import Decimal
 from django.utils.safestring import mark_safe
 from django.contrib.auth.models import User
-from django.db.models import Min, Max, Count, Avg, Sum
+from django.db.models import Count, Sum, Value
+from django.db.models.functions import Coalesce
 from .utils import iriToUri, MailThread
 import traceback
 import pytz
@@ -166,13 +167,13 @@ class Course(models.Model):
         equipes = (Equipe.objects.filter(course=self)
             .annotate(
                 equipiers_count=Count('equipier'),
-                verifier_count=Sum('equipier__verifier'),
-                licence_manquantes_count=Sum('equipier__licence_manquante'),
-                certificat_manquants_count=Sum('equipier__certificat_manquant'),
-                autorisation_manquantes_count=Sum('equipier__autorisation_manquante'),
-                valide_count=Sum('equipier__valide'),
-                erreur_count=Sum('equipier__erreur'),
-                hommes_count=Sum('equipier__homme'),
+                verifier_count=Coalesce(Sum('equipier__verifier'), Value(0)),
+                licence_manquantes_count=Coalesce(Sum('equipier__licence_manquante'), Value(0)),
+                certificat_manquants_count=Coalesce(Sum('equipier__certificat_manquant'), Value(0)),
+                autorisation_manquantes_count=Coalesce(Sum('equipier__autorisation_manquante'), Value(0)),
+                valide_count=Coalesce(Sum('equipier__valide'), Value(0)),
+                erreur_count=Coalesce(Sum('equipier__erreur'), Value(0)),
+                hommes_count=Coalesce(Sum('equipier__homme'), Value(0)),
             ).select_related('categorie', 'gerant_ville2')
             .prefetch_related('equipier_set')
         )
